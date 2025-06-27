@@ -1,0 +1,17 @@
+{
+  "name": "pumproom-sdk",
+  "version": "0.1.0",
+  "main": "dist/pumproom-sdk.umd.js",
+  "module": "dist/pumproom-sdk.esm.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "devDependencies": {
+    "rollup": "^3.29.2",
+    "@rollup/plugin-terser": "^0.4.3",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "typescript": "^5.2.2"
+  },
+  "type": "module"
+}

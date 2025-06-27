@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>LMS Demo</title>
+  <script src="../dist/pumproom-sdk.umd.js"></script>
+</head>
+<body>
+  <h1>LMS Demo</h1>
+  <button id="open">Open PumpRoom</button>
+  <script>
+    PumpRoomSdk.init({
+      authUrl: 'https://example.com/auth',
+      apiKey: 'demo',
+      allowedOrigins: ['*']
+    });
+
+    PumpRoomSdk.authenticate();
+
+    PumpRoomSdk.onMessage(function(msg, ev) {
+      if (msg.type === 'getPumpRoomUser') {
+        PumpRoomSdk.sendUser(ev.source, ev.origin);
+      }
+    });
+
+    document.getElementById('open').addEventListener('click', function () {
+      window.open('pumpRoom.html');
+    });
+  </script>
+</body>
+</html>
