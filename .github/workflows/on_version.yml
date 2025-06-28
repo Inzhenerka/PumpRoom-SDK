@@ -1,4 +1,4 @@
-name: Publish to npm on tag
+name: Publish to npm on version
 
 on:
   push:
@@ -7,24 +7,24 @@ on:
 
 jobs:
   publish:
-    name: '\ud83d\ude80 Publish'
+    name: '🚀 Publish'
     runs-on: ubuntu-latest
     steps:
-      - name: '\ud83d\udc4b Checkout'
+      - name: '👋 Checkout'
         uses: actions/checkout@v4
 
-      - name: '\u2699\ufe0f Setup Bun'
+      - name: '⚙️ Setup Bun'
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.2.16
 
-      - name: '\ud83d\udcaa Install deps'
+      - name: '💪 Install deps'
         run: bun install
 
-      - name: '\ud83d\udd27 Build'
+      - name: '🔧 Build'
         run: bun run build
 
-      - name: '\ud83d\udce6 Publish package'
+      - name: '📦 Publish package'
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

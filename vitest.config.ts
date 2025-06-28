@@ -7,7 +7,7 @@ export default defineConfig({
             provider: 'istanbul',
             reporter: ['text', 'html', 'json-summary', 'json'],
             reportOnFailure: true,
-            exclude: ['example/**', 'vite.config.ts'],
+            exclude: ['example/**', 'vite.config.ts', 'dist'],
         },
     },
 });
