@@ -6,15 +6,19 @@
   "types": "dist/types/index.d.ts",
   "scripts": {
     "build": "rollup -c",
-    "dev": "ROLLUP_WATCH=true bun run build -- --watch"
+    "dev": "ROLLUP_WATCH=true bun run build -- --watch",
+    "test": "vitest run --coverage"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.3",
+    "@vitest/coverage-istanbul": "^3.2.4",
+    "jsdom": "^26.1.0",
     "rollup": "^3.29.2",
     "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-serve": "^3.0.0",
     "rollup-plugin-typescript2": "^0.34.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vitest": "^3.2.4"
   },
   "type": "module"
 }

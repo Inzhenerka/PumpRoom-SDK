@@ -1,0 +1,22 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import * as fullscreen from '../src/fullscreen';
+import { init, getConfig, setCurrentUser, getCurrentUser } from '../src/state';
+
+beforeEach(() => {
+  vi.restoreAllMocks();
+});
+
+describe('state', () => {
+  it('initializes config and handles fullscreen', () => {
+    const spy = vi.spyOn(fullscreen, 'handleFullscreenToggle').mockImplementation(() => {});
+    init({ apiKey: 'key', realm: 'test' });
+    expect(getConfig()).toEqual({ apiKey: 'key', realm: 'test', cacheUser: true });
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('sets and gets current user', () => {
+    const user = { uid: '1', token: 't', is_admin: false };
+    setCurrentUser(user);
+    expect(getCurrentUser()).toEqual(user);
+  });
+});

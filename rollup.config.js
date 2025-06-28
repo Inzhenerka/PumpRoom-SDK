@@ -25,7 +25,7 @@ export default [
             },
         ],
         plugins: [
-            typescript({tsconfig: "tsconfig.json", useTsconfigDeclarationDir: true}),
+            typescript({ tsconfig: "tsconfig.build.json", useTsconfigDeclarationDir: true }),
             terser(),
             isWatch && serve({
                 contentBase: [''], // папки, которые хотим отдавать
@@ -51,7 +51,7 @@ export default [
             },
         ],
         plugins: [
-            typescript({tsconfig: "tsconfig.json", useTsconfigDeclarationDir: true})
+            typescript({ tsconfig: "tsconfig.build.json", useTsconfigDeclarationDir: true })
         ]
     }
 ];
