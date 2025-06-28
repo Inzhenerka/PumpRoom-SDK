@@ -19,9 +19,9 @@ jobs:
         with:
           name: coverage
           path: coverage
-      - name: Publish Test Report
-        if: always()
-        uses: dorny/test-reporter@v1
+      - name: Test Report
+        uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}
         with:
           name: Vitest
           path: report.xml
