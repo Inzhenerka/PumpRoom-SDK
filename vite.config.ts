@@ -7,9 +7,9 @@ import pkg from './package.json';
 const version = pkg.version;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-function buildExample() {
+function buildSite() {
     return {
-        name: 'build-example',
+        name: 'build-site',
         async closeBundle() {
             await build({
                 root: resolve(__dirname, 'example'),
@@ -64,5 +64,5 @@ export default defineConfig({
         port: 8002,
         open: '/',
     },
-    plugins: [buildExample()],
+    plugins: [buildSite()],
 });

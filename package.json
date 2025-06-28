@@ -1,12 +1,20 @@
 {
   "name": "pumproom-sdk",
   "version": "0.1.2",
-  "main": "dist/bundles/pumproom-sdk-latest.umd.js",
-  "module": "dist/bundles/pumproom-sdk-latest.esm.js",
-  "types": "dist/types/index.d.ts",
+  "description": "Lightweight SDK for integrating Learning Management Systems with PumpRoom platform",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/bundles/pumproom-sdk-latest.esm.js",
+      "require": "./dist/bundles/pumproom-sdk-latest.umd.js"
+    }
+  },
   "files": [
     "dist/bundles",
-    "dist/types"
+    "dist/types",
+    "README.md",
+    "LICENSE"
+
   ],
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json --emitDeclarationOnly",
@@ -23,7 +31,28 @@
     "vitest": "^3.2.4"
   },
   "type": "module",
+  "sideEffects": true,
   "engines": {
-    "node": ">=20"
-  }
+    "node": ">=20",
+    "npm": ">=9"
+  },
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Inzhenerka.Tech",
+    "email": "info@inzhenerka.tech",
+    "url": "https://inzhenerka.tech"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Inzhenerka/PumpRoom-SDK.git"
+  },
+  "homepage": "https://sdk.pumproom.tech",
+  "keywords": [
+    "pumproom",
+    "lms",
+    "sdk",
+    "integration",
+    "education",
+    "ai"
+  ]
 }
