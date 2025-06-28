@@ -1,6 +1,6 @@
 {
   "name": "pumproom-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "dist/bundles/pumproom-sdk-latest.umd.js",
   "module": "dist/bundles/pumproom-sdk-latest.esm.js",
   "types": "dist/types/index.d.ts",
