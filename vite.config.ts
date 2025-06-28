@@ -1,17 +1,21 @@
 import { defineConfig } from 'vite';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import pkg from './package.json';
 
 const version = pkg.version;
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  root: 'example',
   build: {
     target: 'es2015',
     emptyOutDir: false,
     sourcemap: true,
+    lib: {
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: 'PumpRoomSdk',
+    },
     rollupOptions: {
-      input: resolve(__dirname, 'src/index.ts'),
       output: [
         {
           dir: 'dist',
@@ -40,6 +44,7 @@ export default defineConfig({
   },
   server: {
     port: 8002,
+    open: '/example/index.html',
   },
 });
 
