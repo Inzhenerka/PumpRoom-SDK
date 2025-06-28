@@ -1,8 +1,8 @@
 {
   "name": "pumproom-sdk",
   "version": "0.1.0",
-  "main": "dist/pumproom-sdk-latest.umd.js",
-  "module": "dist/pumproom-sdk-latest.esm.js",
+  "main": "dist/bundles/pumproom-sdk-latest.umd.js",
+  "module": "dist/bundles/pumproom-sdk-latest.esm.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json --emitDeclarationOnly",

@@ -5,7 +5,8 @@ export default defineConfig({
     environment: 'jsdom',
     coverage: {
       provider: 'istanbul',
-      reporter: ['text', 'html'],
+      reporter: ['text', 'html', 'json-summary'],
+      reportOnFailure: true,
       exclude: ['example/**'],
     },
   },

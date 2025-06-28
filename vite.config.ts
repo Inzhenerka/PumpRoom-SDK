@@ -7,7 +7,9 @@ const version = pkg.version;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  publicDir: 'landing',
   build: {
+    outDir: 'dist',
     target: 'es2015',
     emptyOutDir: false,
     sourcemap: true,
@@ -18,25 +20,21 @@ export default defineConfig({
     rollupOptions: {
       output: [
         {
-          dir: 'dist',
-          entryFileNames: `pumproom-sdk-v${version}.umd.js`,
+          entryFileNames: `bundles/pumproom-sdk-v${version}.umd.js`,
           format: 'umd',
           name: 'PumpRoomSdk',
         },
         {
-          dir: 'dist',
-          entryFileNames: 'pumproom-sdk-latest.umd.js',
+          entryFileNames: 'bundles/pumproom-sdk-latest.umd.js',
           format: 'umd',
           name: 'PumpRoomSdk',
         },
         {
-          dir: 'dist',
-          entryFileNames: `pumproom-sdk-v${version}.esm.js`,
+          entryFileNames: `bundles/pumproom-sdk-v${version}.esm.js`,
           format: 'es',
         },
         {
-          dir: 'dist',
-          entryFileNames: 'pumproom-sdk-latest.esm.js',
+          entryFileNames: 'bundles/pumproom-sdk-latest.esm.js',
           format: 'es',
         },
       ],
@@ -44,6 +42,6 @@ export default defineConfig({
   },
   server: {
     port: 8002,
-    open: '/example/',
+    open: '/',
   },
 });
