@@ -21,6 +21,9 @@ jobs:
       - name: '💪 Install deps'
         run: bun install
 
+      - name: 🧪 Test
+        run: bun run test
+
       - name: '🔧 Build'
         run: bun run build
 
@@ -39,6 +42,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: '📦 Publish package'
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        uses: JS-DevTools/npm-publish@v3
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
