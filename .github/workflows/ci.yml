@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test -- --coverage --reporter=junit --outputFile=report.xml
+      - uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: coverage
+      - name: Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Vitest
+          path: report.xml
+          reporter: jest-junit

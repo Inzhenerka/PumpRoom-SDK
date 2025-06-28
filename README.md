@@ -2,6 +2,8 @@
 
 Лёгкая библиотека для интеграции LMS с PumpRoom. Предоставляет методы для аутентификации через API и обмена сообщениями между окнами.
 
+После сборки в каталоге `dist` доступна небольшая страница `index.html`, которая кратко демонстрирует назначение SDK и примеры его использования.
+
 ## Установка
 
 ```
@@ -11,7 +13,7 @@ npm install pumproom-sdk
 Или подключите собранный UMD-бандл через тег `<script>`:
 
 ```html
-<script src="dist/pumproom-sdk-latest.umd.js"></script>
+<script src="dist/bundles/pumproom-sdk-latest.umd.js"></script>
 ```
 
 ## Инициализация
@@ -46,7 +48,7 @@ onMessage((msg, ev) => {
 ## Пример подключения через `<script>`
 
 ```html
-<script src="/path/to/pumproom-sdk-latest.umd.js"></script>
+<script src="/path/to/bundles/pumproom-sdk-latest.umd.js"></script>
 <script>
 PumpRoomSdk.init({ apiKey: 'KEY', realm: 'inzh', cacheUser: true });
 PumpRoomSdk.authenticate(profileObj);
@@ -56,7 +58,7 @@ PumpRoomSdk.authenticate(profileObj);
 ## Пример ES-модуля
 
 ```ts
-import { init, authenticate } from './dist/pumproom-sdk-latest.esm.js';
+import { init, authenticate } from './dist/bundles/pumproom-sdk-latest.esm.js';
 
 init({ apiKey: 'KEY', realm: 'inzh', cacheUser: true });
 authenticate(profileObj);

@@ -18,24 +18,24 @@ export default defineConfig({
     rollupOptions: {
       output: [
         {
-          dir: 'dist',
+          dir: 'dist/bundles',
           entryFileNames: `pumproom-sdk-v${version}.umd.js`,
           format: 'umd',
           name: 'PumpRoomSdk',
         },
         {
-          dir: 'dist',
+          dir: 'dist/bundles',
           entryFileNames: 'pumproom-sdk-latest.umd.js',
           format: 'umd',
           name: 'PumpRoomSdk',
         },
         {
-          dir: 'dist',
+          dir: 'dist/bundles',
           entryFileNames: `pumproom-sdk-v${version}.esm.js`,
           format: 'es',
         },
         {
-          dir: 'dist',
+          dir: 'dist/bundles',
           entryFileNames: 'pumproom-sdk-latest.esm.js',
           format: 'es',
         },
