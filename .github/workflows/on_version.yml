@@ -24,6 +24,20 @@ jobs:
       - name: '🔧 Build'
         run: bun run build
 
+      - name: '📁 Create dist archive'
+        run: |
+          cd dist
+          tar -czf ../dist-${{ github.ref_name }}.tar.gz .
+          cd ..
+
+      - name: '🏷️ Create GitHub Release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist-${{ github.ref_name }}.tar.gz
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: '📦 Publish package'
         run: npm publish --access public
         env:

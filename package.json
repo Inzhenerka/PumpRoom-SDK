@@ -11,7 +11,8 @@
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json --emitDeclarationOnly",
     "dev": "vite",
-    "test": "vitest run --coverage"
+    "test": "vitest run --coverage",
+    "postversion": "git push && git push --tags"
   },
   "devDependencies": {
     "@types/node": "^24.0.7",
