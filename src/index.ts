@@ -1,20 +1,13 @@
-/**
- * PumpRoom user information returned by authentication endpoint.
- */
-export interface PumpRoomUser {
-  id: number;
-  token: string;
-  email: string;
-}
-
-/**
- * PumpRoom postMessage structure.
- */
-export interface PumpRoomMessage {
-  service: 'pumproom';
-  type: string;
-  payload?: any;
-}
+import type {
+  PumpRoomUser,
+  PumpRoomMessage,
+  CourseInput,
+  TildaProfileInput,
+  RealmPayload,
+  AuthInput,
+  AuthResult,
+  IdentityProviderType
+} from './types';
 
 const AUTH_URL =
   'https://pumproom-api.inzhenerka-cloud.com/tracker/authenticate';
@@ -127,3 +120,5 @@ export function sendUser(target: Window, origin: string): void {
 export function getCurrentUser(): PumpRoomUser | null {
   return currentUser;
 }
+
+export * from './types';
