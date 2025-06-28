@@ -1,6 +1,6 @@
-import type { PumpRoomMessage } from './types';
-import { ALLOWED_ORIGINS } from './constants';
-import { getCurrentUser } from './state';
+import type { PumpRoomMessage } from './types.ts';
+import { ALLOWED_ORIGINS } from './constants.ts';
+import { getCurrentUser } from './state.ts';
 
 export function isAllowedOrigin(origin: string): boolean {
     return ALLOWED_ORIGINS.some((o) =>

@@ -6,8 +6,16 @@
     "declarationDir": "dist/types",
     "outDir": "dist",
     "strict": true,
-    "esModuleInterop": true,
     "skipLibCheck": true,
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
+    "types": [
+      "node",
+      "vite/client"
+    ],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
     "lib": [
       "dom",
       "es2015"

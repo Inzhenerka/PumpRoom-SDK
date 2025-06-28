@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { isAllowedOrigin, sendUser } from '../src/messaging';
-import { setCurrentUser } from '../src/state';
+import { isAllowedOrigin, sendUser } from '../src/messaging.js';
+import { setCurrentUser } from '../src/state.js';
 
 beforeEach(() => {
   setCurrentUser(null);

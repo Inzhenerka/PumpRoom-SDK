@@ -44,7 +44,6 @@ export default defineConfig({
   },
   server: {
     port: 8002,
-    open: '/example/index.html',
+    open: '/example/',
   },
 });
-

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { authenticate } from '../src/auth';
-import { init, getCurrentUser } from '../src/state';
-import { setCurrentUser } from '../src/state';
-import { AUTH_URL, VERIFY_URL } from '../src/constants';
+import { authenticate } from '../src/auth.js';
+import { init, getCurrentUser } from '../src/state.js';
+import { setCurrentUser } from '../src/state.js';
+import { AUTH_URL, VERIFY_URL } from '../src/constants.js';
 
 beforeEach(() => {
   init({ apiKey: 'key', realm: 'test' });

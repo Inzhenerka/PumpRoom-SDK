@@ -1,4 +1,4 @@
-export { init, getCurrentUser } from './state';
-export { authenticate } from './auth';
-export { handleFullscreenToggle, enforceIframeHeight } from './fullscreen';
-export * from './types';
+export { init, getCurrentUser } from './state.ts';
+export { authenticate } from './auth.ts';
+export { handleFullscreenToggle, enforceIframeHeight } from './fullscreen.ts';
+export * from './types.ts';

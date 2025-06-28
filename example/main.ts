@@ -1,7 +1,8 @@
-import * as PumpRoomSdk from '../src/index';
+import * as PumpRoomSdk from '../src/index.ts';
 
-const apiKey = 'fGETxzTIi94ZkBU7';
-const realm = 'inzh';
+const apiKey = import.meta.env.VITE_PUMPROOM_API_KEY;
+const realm  = import.meta.env.VITE_PUMPROOM_REALM;
+
 const user = {
   courses: [
     {

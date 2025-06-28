@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { readCachedUser, saveCachedUser } from '../src/storage';
+import { readCachedUser, saveCachedUser } from '../src/storage.js';
 
 beforeEach(() => {
   localStorage.clear();

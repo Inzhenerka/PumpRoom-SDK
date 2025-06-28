@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { authenticate } from '../src/auth';
-import { init } from '../src/state';
-import * as messaging from '../src/messaging';
+import { authenticate } from '../src/auth.js';
+import { init } from '../src/state.js';
+import * as messaging from '../src/messaging.js';
 
 beforeEach(() => {
   init({ apiKey: 'key', realm: 'test', cacheUser: false });
