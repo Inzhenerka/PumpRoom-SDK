@@ -9,65 +9,65 @@ export type IdentityProviderType = 'tilda' | 'telegram';
  * Information about a user returned by authentication endpoint.
  */
 export interface PumpRoomUser {
-  id: number;
-  token: string;
-  email: string;
+    id: number;
+    token: string;
+    email: string;
 }
 
 /**
  * Message format exchanged with PumpRoom via postMessage.
  */
 export interface PumpRoomMessage {
-  service: 'pumproom';
-  type: string;
-  payload?: any;
+    service: 'pumproom';
+    type: string;
+    payload?: any;
 }
 
 /**
  * Course information within Tilda profile.
  */
 export interface CourseInput {
-  alias: string;
-  name: string;
-  created: Date;
+    alias: string;
+    name: string;
+    created: Date;
 }
 
 /**
  * User profile representation expected by PumpRoom authentication API.
  */
 export interface TildaProfileInput {
-  login: string;
-  name: string;
-  istutor: boolean;
-  lang: string;
-  projectid: string;
-  courses?: CourseInput[] | null;
-  memberlogo?: string | null;
+    login: string;
+    name: string;
+    istutor: boolean;
+    lang: string;
+    projectid: string;
+    courses?: CourseInput[] | null;
+    memberlogo?: string | null;
 }
 
 /**
  * Payload containing realm identifier.
  */
 export interface RealmPayload {
-  realm: string;
+    realm: string;
 }
 
 /**
  * Input data for authentication call.
  */
 export interface AuthInput extends RealmPayload {
-  profile?: TildaProfileInput | null;
-  url?: string | null;
+    profile?: TildaProfileInput | null;
+    url?: string | null;
 }
 
 /**
  * Result returned by authentication endpoint.
  */
 export interface AuthResult {
-  uid: string;
-  token: string;
-  is_admin: boolean;
-  provider: IdentityProviderType;
-  available_providers: IdentityProviderType[];
+    uid: string;
+    token: string;
+    is_admin: boolean;
+    provider: IdentityProviderType;
+    available_providers: IdentityProviderType[];
 }
 
