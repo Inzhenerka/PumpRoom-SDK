@@ -4,6 +4,10 @@
   "main": "dist/bundles/pumproom-sdk-latest.umd.js",
   "module": "dist/bundles/pumproom-sdk-latest.esm.js",
   "types": "dist/types/index.d.ts",
+  "files": [
+    "dist/bundles",
+    "dist/types"
+  ],
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json --emitDeclarationOnly",
     "dev": "vite",
