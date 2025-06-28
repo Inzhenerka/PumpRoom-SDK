@@ -1,24 +1,20 @@
 {
   "name": "pumproom-sdk",
   "version": "0.1.0",
-  "main": "dist/pumproom-sdk.umd.js",
-  "module": "dist/pumproom-sdk.esm.js",
+  "main": "dist/pumproom-sdk-latest.umd.js",
+  "module": "dist/pumproom-sdk-latest.esm.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
-    "build": "rollup -c",
-    "dev": "ROLLUP_WATCH=true bun run build -- --watch",
+    "build": "vite build && tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "dev": "vite",
     "test": "vitest run --coverage"
   },
   "devDependencies": {
-    "@rollup/plugin-terser": "^0.4.3",
     "@vitest/coverage-istanbul": "^3.2.4",
     "jsdom": "^26.1.0",
-    "rollup": "^3.29.2",
-    "rollup-plugin-livereload": "^2.0.5",
-    "rollup-plugin-serve": "^3.0.0",
-    "rollup-plugin-typescript2": "^0.34.1",
     "typescript": "^5.2.2",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "vite": "^5.2.0"
   },
   "type": "module"
 }
