@@ -9,9 +9,9 @@ export type IdentityProviderType = 'tilda' | 'telegram';
  * Information about a user returned by authentication endpoint.
  */
 export interface PumpRoomUser {
-    id: number;
+    uid: string;
     token: string;
-    email: string;
+    is_admin: boolean;
 }
 
 /**
@@ -69,5 +69,21 @@ export interface AuthResult {
     is_admin: boolean;
     provider: IdentityProviderType;
     available_providers: IdentityProviderType[];
+}
+
+/**
+ * Input data for token verification call.
+ */
+export interface VerifyTokenInput extends RealmPayload {
+    token: string;
+    uid: string;
+}
+
+/**
+ * Result returned by token verification endpoint.
+ */
+export interface VerifyTokenResult {
+    is_valid: boolean;
+    is_admin: boolean;
 }
 

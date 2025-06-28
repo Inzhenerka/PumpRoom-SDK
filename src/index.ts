@@ -6,6 +6,8 @@ import type {
   RealmPayload,
   AuthInput,
   AuthResult,
+  VerifyTokenInput,
+  VerifyTokenResult,
   IdentityProviderType
 } from './types';
 
@@ -64,6 +66,13 @@ function saveCachedUser(user: PumpRoomUser): void {
 
 async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
   if (!config) return false;
+
+  const payload: VerifyTokenInput = {
+    realm: config.realm,
+    token: user.token,
+    uid: user.uid,
+  };
+
   try {
     const resp = await fetch(VERIFY_URL, {
       method: 'POST',
@@ -71,9 +80,15 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
         'Content-Type': 'application/json',
         'X-API-KEY': config.apiKey,
       },
-      body: JSON.stringify({ realm: config.realm, token: user.token }),
+      body: JSON.stringify(payload),
     });
-    return resp.ok;
+    if (!resp.ok) return false;
+    const result = (await resp.json()) as VerifyTokenResult;
+    if (result.is_valid) {
+      user.is_admin = result.is_admin;
+      saveCachedUser(user);
+    }
+    return result.is_valid;
   } catch (err) {
     console.error('Verification error', err);
     return false;
