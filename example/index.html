@@ -13,27 +13,28 @@
         allow="clipboard-write; fullscreen;"
 ></iframe>
 <script>
-    function getDemoTildaProfile() {
-        return {
-            courses: [{
-                alias: 'demo_user_course',
-                name: 'demo_user_course',
-                created: new Date(2024, 0, 1, 0, 0, 0)
-            }],
-            istutor: false,
-            lang: 'ru',
-            login: 'demo_user@inzhenerka.tech',
-            name: 'demo_user',
-            projectid: '000000'
-        };
+    const apiKey = '';
+    const realm = 'inzh';
+    const user = {
+        courses: [{
+            alias: 'demo_user_course',
+            name: 'demo_user_course',
+            created: new Date(2024, 0, 1, 0, 0, 0)
+        }],
+        istutor: false,
+        lang: 'ru',
+        login: 'demo_user@inzhenerka.tech',
+        name: 'demo_user',
+        projectid: '000000'
     }
 
     PumpRoomSdk.init({
-        apiKey: 'fGETxzTIi94ZkBU7',
-        realm: 'inzh'
+        apiKey: apiKey,
+        realm: realm,
+        cacheUser: true
     });
 
-    PumpRoomSdk.authenticate(getDemoTildaProfile());
+    PumpRoomSdk.authenticate(user);
 </script>
 </body>
 </html>

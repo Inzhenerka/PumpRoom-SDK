@@ -21,12 +21,17 @@ import { init, authenticate } from 'pumproom-sdk';
 
 init({
   apiKey: 'API_KEY',
-  realm: 'inzh'
+  realm: 'inzh',
+  cacheUser: true
 });
 
 const profile = getLmsProfile();
 authenticate(profile);
 ```
+
+Параметр `cacheUser` включает сохранение авторизованного пользователя в
+`localStorage`. При повторной загрузке страницы SDK проверит токен через
+эндпоинт `tracker/verify_token` и избежит лишнего запроса авторизации.
 
 ## Прослушка сообщений
 
@@ -43,7 +48,7 @@ onMessage((msg, ev) => {
 ```html
 <script src="/path/to/pumproom-sdk.umd.js"></script>
 <script>
-PumpRoomSdk.init({ apiKey: 'KEY', realm: 'inzh' });
+PumpRoomSdk.init({ apiKey: 'KEY', realm: 'inzh', cacheUser: true });
 PumpRoomSdk.authenticate(profileObj);
 </script>
 ```
@@ -53,7 +58,7 @@ PumpRoomSdk.authenticate(profileObj);
 ```ts
 import { init, authenticate } from './dist/pumproom-sdk.esm.js';
 
-init({ apiKey: 'KEY', realm: 'inzh' });
+init({ apiKey: 'KEY', realm: 'inzh', cacheUser: true });
 authenticate(profileObj);
 ```
 
