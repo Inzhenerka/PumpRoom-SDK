@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleFullscreenToggle, enforceIframeHeight } from '../src/fullscreen';
+import { handleFullscreenToggle, enforceIframeHeight } from '../src/index.js';
 
 beforeEach(() => {
   // reset listeners

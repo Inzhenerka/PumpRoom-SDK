@@ -8,6 +8,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
     "lib": ["dom", "es2015"]
   },
   "include": ["src/**/*"]

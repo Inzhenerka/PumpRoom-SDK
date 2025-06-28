@@ -11,7 +11,7 @@ npm install pumproom-sdk
 Или подключите собранный UMD-бандл через тег `<script>`:
 
 ```html
-<script src="dist/pumproom-sdk.umd.js"></script>
+<script src="dist/pumproom-sdk-latest.umd.js"></script>
 ```
 
 ## Инициализация
@@ -46,7 +46,7 @@ onMessage((msg, ev) => {
 ## Пример подключения через `<script>`
 
 ```html
-<script src="/path/to/pumproom-sdk.umd.js"></script>
+<script src="/path/to/pumproom-sdk-latest.umd.js"></script>
 <script>
 PumpRoomSdk.init({ apiKey: 'KEY', realm: 'inzh', cacheUser: true });
 PumpRoomSdk.authenticate(profileObj);
@@ -56,7 +56,7 @@ PumpRoomSdk.authenticate(profileObj);
 ## Пример ES-модуля
 
 ```ts
-import { init, authenticate } from './dist/pumproom-sdk.esm.js';
+import { init, authenticate } from './dist/pumproom-sdk-latest.esm.js';
 
 init({ apiKey: 'KEY', realm: 'inzh', cacheUser: true });
 authenticate(profileObj);
@@ -99,7 +99,9 @@ bun install
 bun run build
 ```
 
-Живая разработка
+Запуск сервера разработки
+
+Сервер запускает Vite с live reload для каталога `example`.
 
 ```bash
 bun dev

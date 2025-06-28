@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as fullscreen from '../src/fullscreen';
-import { init, getConfig, setCurrentUser, getCurrentUser } from '../src/state';
+import * as fullscreen from '../src/fullscreen.js';
+import { init, getConfig, setCurrentUser, getCurrentUser } from '../src/state.js';
 
 beforeEach(() => {
   vi.restoreAllMocks();

@@ -1,4 +1,4 @@
-import type { PumpRoomMessage } from './types';
+import type { PumpRoomMessage } from './types.ts';
 
 let savedScroll = 0;
 let fullscreenHandled = false;

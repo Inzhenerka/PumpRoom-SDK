@@ -1,15 +1,15 @@
-import type { TildaProfileInput, AuthInput, PumpRoomUser, VerifyTokenInput, VerifyTokenResult } from './types';
-import { AUTH_URL, VERIFY_URL } from './constants';
-import { readCachedUser, saveCachedUser } from './storage';
+import type { TildaProfileInput, AuthInput, PumpRoomUser, VerifyTokenInput, VerifyTokenResult } from './types.ts';
+import { AUTH_URL, VERIFY_URL } from './constants.ts';
+import { readCachedUser, saveCachedUser } from './storage.ts';
 import {
     getConfig,
     setCurrentUser,
     getCurrentUser,
     registerAutoListener,
     isAutoListenerRegistered,
-} from './state';
-import type { PumpRoomMessage } from './types';
-import { sendUser, isAllowedOrigin } from './messaging';
+} from './state.ts';
+import type { PumpRoomMessage } from './types.ts';
+import { sendUser, isAllowedOrigin } from './messaging.ts';
 
 async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
     const config = getConfig();

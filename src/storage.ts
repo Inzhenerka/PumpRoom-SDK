@@ -1,4 +1,4 @@
-import type { PumpRoomUser } from './types';
+import type { PumpRoomUser } from './types.ts';
 
 export function readCachedUser(): PumpRoomUser | null {
     if (typeof localStorage === 'undefined') return null;

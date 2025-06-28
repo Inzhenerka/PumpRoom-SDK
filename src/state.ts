@@ -1,5 +1,5 @@
-import type { PumpRoomUser } from './types';
-import { handleFullscreenToggle } from './fullscreen';
+import type { PumpRoomUser } from './types.ts';
+import { handleFullscreenToggle } from './fullscreen.ts';
 
 export interface PumpRoomConfig {
     apiKey: string;
