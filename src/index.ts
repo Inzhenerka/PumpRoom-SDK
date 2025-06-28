@@ -16,14 +16,26 @@ export interface PumpRoomMessage {
   payload?: any;
 }
 
+const AUTH_URL =
+  'https://pumproom-api.inzhenerka-cloud.com/tracker/authenticate';
+
+const ALLOWED_ORIGINS = [
+  '.inzhenerka-cloud.com',
+  '.inzhenerka.tech',
+  '.pumproom.tech',
+  'https://inzhenerka.tech',
+  'https://pumproom.tech',
+  'http://127.0.0.1:8002',
+];
+
 interface PumpRoomConfig {
-  authUrl: string;
   apiKey: string;
-  allowedOrigins: string[];
+  realm: string;
 }
 
 let config: PumpRoomConfig | null = null;
 let currentUser: PumpRoomUser | null = null;
+let autoListenerRegistered = false;
 
 /**
  * Initializes SDK configuration.
@@ -35,29 +47,29 @@ export function init(cfg: PumpRoomConfig): void {
 /**
  * Authenticates current LMS user via PumpRoom API.
  */
-export async function authenticate(): Promise<PumpRoomUser | null> {
+export async function authenticate(profile: unknown): Promise<PumpRoomUser | null> {
   if (!config) {
     throw new Error('SDK is not initialized');
   }
-  const profileGetter = (window.parent as any).tma__getProfileObjFromLS;
-  if (typeof profileGetter !== 'function') {
-    document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', { detail: null }));
-    return null;
-  }
   try {
-    const response = await fetch(config.authUrl, {
+    const response = await fetch(AUTH_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-API-KEY': config.apiKey
       },
       body: JSON.stringify({
-        profile: profileGetter(),
+        profile,
+        realm: config.realm,
         url: window.location.href
       })
     });
     if (response.ok) {
       currentUser = await response.json();
+      if (!autoListenerRegistered) {
+        window.addEventListener('message', defaultUserListener);
+        autoListenerRegistered = true;
+      }
     } else {
       console.error('Authentication failed', response.status);
     }
@@ -70,10 +82,18 @@ export async function authenticate(): Promise<PumpRoomUser | null> {
 }
 
 function isAllowedOrigin(origin: string): boolean {
-  if (!config) return false;
-  return config.allowedOrigins.some(o =>
+  return ALLOWED_ORIGINS.some((o) =>
     o.startsWith('http') ? origin === o : origin.endsWith(o)
   );
+}
+
+function defaultUserListener(ev: MessageEvent): void {
+  if (!currentUser) return;
+  if (!isAllowedOrigin(ev.origin)) return;
+  const data = ev.data as PumpRoomMessage;
+  if (data?.service === 'pumproom' && data.type === 'getPumpRoomUser') {
+    sendUser(ev.source as Window, ev.origin);
+  }
 }
 
 /**

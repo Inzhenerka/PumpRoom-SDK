@@ -17,23 +17,23 @@ npm install pumproom-sdk
 ## Инициализация
 
 ```ts
-import { init, authenticate, onMessage, sendUser } from 'pumproom-sdk';
+import { init, authenticate } from 'pumproom-sdk';
 
 init({
-  authUrl: 'https://pumproom-api.inzhenerka-cloud.com/tracker/authenticate',
   apiKey: 'API_KEY',
-  allowedOrigins: ['.inzhenerka-cloud.com']
+  realm: 'inzh'
 });
 
-authenticate();
+const profile = getLmsProfile();
+authenticate(profile);
 ```
 
 ## Прослушка сообщений
 
 ```ts
 onMessage((msg, ev) => {
-  if (msg.type === 'getPumpRoomUser') {
-    sendUser(ev.source as Window, ev.origin);
+  if (msg.type === 'customEvent') {
+    console.log(msg.payload);
   }
 });
 ```
@@ -43,8 +43,8 @@ onMessage((msg, ev) => {
 ```html
 <script src="/path/to/pumproom-sdk.umd.js"></script>
 <script>
-PumpRoomSdk.init({ authUrl: '/auth', apiKey: 'KEY', allowedOrigins: ['http://localhost'] });
-PumpRoomSdk.authenticate();
+PumpRoomSdk.init({ apiKey: 'KEY', realm: 'inzh' });
+PumpRoomSdk.authenticate(profileObj);
 </script>
 ```
 
@@ -53,13 +53,13 @@ PumpRoomSdk.authenticate();
 ```ts
 import { init, authenticate } from './dist/pumproom-sdk.esm.js';
 
-init({ authUrl: '/auth', apiKey: 'KEY', allowedOrigins: [] });
-authenticate();
+init({ apiKey: 'KEY', realm: 'inzh' });
+authenticate(profileObj);
 ```
 
 ## Пример демо-страницы
 
 В каталоге `example` расположена страница `lms.html`. Она инициализирует SDK,
-создаёт тестовый профиль и встраивает PumpRoom через iframe. После загрузки
-пользователь автоматически авторизуется, а PumpRoom может запрашивать данные
-через `postMessage`.
+использует демо-профиль и встраивает PumpRoom через iframe. После загрузки
+пользователь автоматически авторизуется, а SDK отвечает на запрос
+`getPumpRoomUser`.

@@ -28,21 +28,12 @@
       };
     }
 
-    window.tma__getProfileObjFromLS = getDemoTildaProfile;
-
     PumpRoomSdk.init({
-      authUrl: 'https://pumproom-api.inzhenerka-cloud.com/tracker/authenticate',
       apiKey: 'demo',
-      allowedOrigins: ['https://pumproom.inzhenerka-cloud.com']
+      realm: 'inzh'
     });
 
-    PumpRoomSdk.authenticate();
-
-    PumpRoomSdk.onMessage(function(msg, ev) {
-      if (msg.type === 'getPumpRoomUser') {
-        PumpRoomSdk.sendUser(ev.source, ev.origin);
-      }
-    });
+    PumpRoomSdk.authenticate(getDemoTildaProfile());
   </script>
 </body>
 </html>
