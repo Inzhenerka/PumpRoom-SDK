@@ -87,55 +87,54 @@ export async function authenticate(profile: unknown): Promise<PumpRoomUser | nul
   if (!config) {
     throw new Error('SDK is not initialized');
   }
+
+  let fromCache = false;
   if (config.cacheUser) {
     const cached = readCachedUser();
-    if (cached) {
-      if (await verifyCachedUser(cached)) {
-        currentUser = cached;
-        if (!autoListenerRegistered) {
-          window.addEventListener('message', defaultUserListener);
-          autoListenerRegistered = true;
+    if (cached && (await verifyCachedUser(cached))) {
+      currentUser = cached;
+      fromCache = true;
+    } else if (cached && typeof localStorage !== 'undefined') {
+      localStorage.removeItem('pumproomUser');
+    }
+  }
+
+  if (!fromCache) {
+    try {
+      const response = await fetch(AUTH_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': config.apiKey,
+        },
+        body: JSON.stringify({
+          profile,
+          realm: config.realm,
+          url: window.location.href,
+        }),
+      });
+      if (response.ok) {
+        currentUser = (await response.json()) as PumpRoomUser;
+        if (config.cacheUser) {
+          saveCachedUser(currentUser);
         }
-        document.dispatchEvent(
-          new CustomEvent('itAuthenticationCompleted', { detail: currentUser })
-        );
-        return currentUser;
+      } else {
+        console.error('Authentication failed', response.status);
       }
-      if (typeof localStorage !== 'undefined') {
-        localStorage.removeItem('pumproomUser');
-      }
+    } catch (err) {
+      console.error('Network error', err);
     }
   }
-  try {
-    const response = await fetch(AUTH_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': config.apiKey
-      },
-      body: JSON.stringify({
-        profile,
-        realm: config.realm,
-        url: window.location.href
-      })
-    });
-    if (response.ok) {
-      currentUser = await response.json();
-      if (config.cacheUser) {
-        saveCachedUser(currentUser as PumpRoomUser);
-      }
-      if (!autoListenerRegistered) {
-        window.addEventListener('message', defaultUserListener);
-        autoListenerRegistered = true;
-      }
-    } else {
-      console.error('Authentication failed', response.status);
-    }
-  } catch (err) {
-    console.error('Network error', err);
-  } finally {
-    document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', { detail: currentUser }));
+
+  if (currentUser && !autoListenerRegistered) {
+    window.addEventListener('message', defaultUserListener);
+    autoListenerRegistered = true;
   }
+
+  document.dispatchEvent(
+    new CustomEvent('itAuthenticationCompleted', { detail: currentUser })
+  );
+
   return currentUser;
 }
 

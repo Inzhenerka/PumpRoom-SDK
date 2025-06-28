@@ -29,6 +29,10 @@ const profile = getLmsProfile();
 authenticate(profile);
 ```
 
+Параметр `cacheUser` включает сохранение авторизованного пользователя в
+`localStorage`. При повторной загрузке страницы SDK проверит токен через
+эндпоинт `tracker/verify_token` и избежит лишнего запроса авторизации.
+
 ## Прослушка сообщений
 
 ```ts
