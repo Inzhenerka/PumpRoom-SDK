@@ -9,30 +9,31 @@ export default defineConfig({
   build: {
     target: 'es2015',
     emptyOutDir: false,
+    sourcemap: true,
     rollupOptions: {
       input: resolve(__dirname, 'src/index.ts'),
       output: [
         {
-          file: `dist/pumproom-sdk-v${version}.umd.js`,
+          dir: 'dist',
+          entryFileNames: `pumproom-sdk-v${version}.umd.js`,
           format: 'umd',
           name: 'PumpRoomSdk',
-          sourcemap: true,
         },
         {
-          file: 'dist/pumproom-sdk-latest.umd.js',
+          dir: 'dist',
+          entryFileNames: 'pumproom-sdk-latest.umd.js',
           format: 'umd',
           name: 'PumpRoomSdk',
-          sourcemap: true,
         },
         {
-          file: `dist/pumproom-sdk-v${version}.esm.js`,
+          dir: 'dist',
+          entryFileNames: `pumproom-sdk-v${version}.esm.js`,
           format: 'es',
-          sourcemap: true,
         },
         {
-          file: 'dist/pumproom-sdk-latest.esm.js',
+          dir: 'dist',
+          entryFileNames: 'pumproom-sdk-latest.esm.js',
           format: 'es',
-          sourcemap: true,
         },
       ],
     },
