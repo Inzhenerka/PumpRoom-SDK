@@ -7,33 +7,40 @@ on:
 
 jobs:
   publish:
-    name: '🚀 Publish'
+    name: 🚀 Publish
     runs-on: ubuntu-latest
     steps:
-      - name: '👋 Checkout'
+      - name: 👋 Checkout
         uses: actions/checkout@v4
 
-      - name: '⚙️ Setup Bun'
+      - name: ⚙️ Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.2.16
 
-      - name: '💪 Install deps'
+      - name: ⚙️ Install AWS CLI
+        uses: unfor19/install-aws-cli-action@v1
+        with:
+          version: 2
+          verbose: false
+          arch: amd64
+
+      - name: 💪 Install deps
         run: bun install
 
       - name: 🧪 Test
         run: bun run test
 
-      - name: '🔧 Build'
+      - name: 🔧 Build
         run: bun run build
 
-      - name: '📁 Create dist archive'
+      - name: 📁 Create dist archive
         run: |
           cd dist
           tar -czf ../dist-${{ github.ref_name }}.tar.gz .
           cd ..
 
-      - name: '🏷️ Create GitHub Release'
+      - name: 🏷️ Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: dist-${{ github.ref_name }}.tar.gz
@@ -41,7 +48,29 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: '📦 Publish package'
+      - name: 📦 Publish package
         uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.NPM_TOKEN }}
+
+      - name: 🔼 Upload site
+        run: |
+          AWS_ACCESS_KEY_ID=${{ secrets.ACCESS_KEY_ID }} \
+          AWS_SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }} \
+          aws s3 sync "dist/" "s3://pumproom-sdk-site/" \
+            --endpoint-url https://storage.yandexcloud.net
+        shell: bash
+
+      - name: 🔃 Purge CDN cache
+        uses: yc-actions/yc-cdn-cache@v2
+        with:
+          yc-sa-json-credentials: ${{ secrets.yc_sa_json_credentials }}
+          cdn-resource-id: asdre3dzed6dwkut637s
+
+      - name: 🏁 Create GitHub deployment
+        uses: chrnorm/deployment-action@v2
+        with:
+          token: '${{ github.token }}'
+          initial-status: success
+          environment-url: https://pumproom-sdk.inzhenerka-cloud.com
+          environment: prod
