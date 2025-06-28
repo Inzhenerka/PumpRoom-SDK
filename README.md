@@ -1,5 +1,7 @@
 # PumpRoom SDK
 
+[![npm version](https://badge.fury.io/js/pumproom-sdk.svg)](https://www.npmjs.com/package/pumproom-sdk)
+
 Лёгкая библиотека для интеграции LMS с PumpRoom. Предоставляет методы для аутентификации через API и обмена сообщениями между окнами.
 
 После сборки в каталоге `dist` доступна небольшая страница `index.html`, которая кратко демонстрирует назначение SDK и примеры его использования.
