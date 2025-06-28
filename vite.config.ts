@@ -1,10 +1,30 @@
-import {defineConfig} from 'vite';
-import {resolve, dirname} from 'path';
+import {defineConfig, build} from 'vite';
+import {resolve, dirname, join} from 'path';
+import {promises as fs} from 'fs';
 import {fileURLToPath} from 'url';
 import pkg from './package.json';
 
 const version = pkg.version;
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function buildExample() {
+    return {
+        name: 'build-example',
+        async closeBundle() {
+            await build({
+                root: resolve(__dirname, 'example'),
+                publicDir: false,
+                build: {
+                    emptyOutDir: false,
+                    outDir: resolve(__dirname, 'dist/example'),
+                },
+            });
+            const src = resolve(__dirname, 'index.html');
+            const dest = join(__dirname, 'dist/index.html');
+            await fs.copyFile(src, dest);
+        },
+    };
+}
 
 export default defineConfig({
     publicDir: 'public',
@@ -44,4 +64,5 @@ export default defineConfig({
         port: 8002,
         open: '/',
     },
+    plugins: [buildExample()],
 });

@@ -1,0 +1,30 @@
+name: Publish to npm on version
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    name: '🚀 Publish'
+    runs-on: ubuntu-latest
+    steps:
+      - name: '👋 Checkout'
+        uses: actions/checkout@v4
+
+      - name: '⚙️ Setup Bun'
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.2.16
+
+      - name: '💪 Install deps'
+        run: bun install
+
+      - name: '🔧 Build'
+        run: bun run build
+
+      - name: '📦 Publish package'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
