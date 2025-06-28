@@ -56,3 +56,10 @@ import { init, authenticate } from './dist/pumproom-sdk.esm.js';
 init({ authUrl: '/auth', apiKey: 'KEY', allowedOrigins: [] });
 authenticate();
 ```
+
+## Пример демо-страницы
+
+В каталоге `example` расположена страница `lms.html`. Она инициализирует SDK,
+создаёт тестовый профиль и встраивает PumpRoom через iframe. После загрузки
+пользователь автоматически авторизуется, а PumpRoom может запрашивать данные
+через `postMessage`.
