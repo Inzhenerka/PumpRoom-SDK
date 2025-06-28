@@ -7,19 +7,27 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: 📥 Checkout
+        uses: actions/checkout@v3
       - name: ⚙️ Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: 1.2.16
-      - run: bun install
-      - run: bun run build
-      - run: bun run test -- --reporter=junit --outputFile=report.xml
-      - uses: actions/upload-artifact@v4
+      - name: 📦 Install deps
+        run: bun install
+      - name: 🛠️ Build
+        run: bun run build
+      - name: 🧪 Test
+        run: bun run test -- --reporter=junit --outputFile=report.xml
+      - name: 📊 Report Coverage
+        if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+      - name: 📤 Upload Coverage
+        uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: coverage
-      - name: Test Report
+      - name: 📈 Test Report
         uses: dorny/test-reporter@v2
         if: ${{ !cancelled() }}
         with:
