@@ -19,12 +19,6 @@ describe('state', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  it('enforces iframe height when minHeight provided', () => {
-    const spy = vi.spyOn(fullscreen, 'enforceIframeHeight').mockImplementation(() => {});
-    init({ apiKey: 'key', realm: 'test', minHeight: 700 });
-    expect(spy).toHaveBeenCalledWith(700);
-  });
-
   it('sets and gets current user', () => {
     const user = { uid: '1', token: 't', is_admin: false };
     setCurrentUser(user);

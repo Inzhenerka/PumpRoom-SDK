@@ -1,10 +1,12 @@
 import {setConfig} from "./state.js"
-import {enforceIframeHeight, handleFullscreenToggle} from './fullscreen.ts';
+import {handleFullscreenToggle} from './fullscreen.ts';
+import {enforceIframeHeight} from './iframe.ts';
 import {PumpRoomConfig} from './types.ts';
 
 export {setConfig, getCurrentUser} from './state.ts';
 export {authenticate} from './auth.ts';
-export {handleFullscreenToggle, enforceIframeHeight} from './fullscreen.ts';
+export {handleFullscreenToggle} from './fullscreen.ts';
+export {enforceIframeHeight} from './iframe.ts';
 export * from './types.ts';
 
 export function init(cfg: PumpRoomConfig): void {
