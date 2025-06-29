@@ -13,7 +13,11 @@ describe('fullscreen helpers', () => {
     window.dispatchEvent(new Event('scroll'));
 
     const event = new MessageEvent('message', {
-      data: { service: 'pumproom', type: 'toggleFullscreen', state: false },
+      data: {
+        service: 'pumproom',
+        type: 'toggleFullscreen',
+        payload: { fullscreenState: false },
+      },
       origin: 'https://pumproom.tech',
     });
     window.dispatchEvent(event);

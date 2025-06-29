@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { sendUser } from '../src/messaging.js';
+import { sendUser, getPumpRoomEventMessage } from '../src/messaging.js';
 import { setCurrentUser } from '../src/state.js';
 
 beforeEach(() => {
@@ -17,5 +17,17 @@ describe('messaging', () => {
       { service: 'pumproom', type: 'setPumpRoomUser', payload: user },
       'https://pumproom.tech'
     );
+  });
+
+  it('parses only PumpRoom messages', () => {
+    const good = new MessageEvent('message', {
+      data: { service: 'pumproom', type: 'ping', payload: true },
+    });
+    const bad = new MessageEvent('message', {
+      data: { service: 'other', type: 'ping' },
+    });
+
+    expect(getPumpRoomEventMessage(good)).toEqual({ service: 'pumproom', type: 'ping', payload: true });
+    expect(getPumpRoomEventMessage(bad)).toBeNull();
   });
 });
