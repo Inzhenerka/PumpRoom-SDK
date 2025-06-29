@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { readCachedUser, saveCachedUser } from '../src/storage.js';
+import { retrieveData, storeData } from '../src/storage.js';
+import {userStorageKey} from "../src/constants.js";
 
 beforeEach(() => {
   localStorage.clear();
@@ -7,18 +8,18 @@ beforeEach(() => {
 
 describe('storage', () => {
   it('returns null when storage empty', () => {
-    expect(readCachedUser()).toBeNull();
+    expect(retrieveData(userStorageKey)).toBeNull();
   });
 
   it('saves and reads user', () => {
     const user = { uid: 'u', token: 't', is_admin: false };
-    saveCachedUser(user);
-    expect(readCachedUser()).toEqual(user);
+    storeData(userStorageKey, user);
+    expect(retrieveData(userStorageKey)).toEqual(user);
   });
 
   it('handles JSON parse error', () => {
     localStorage.setItem('pumproomUser', '{bad json');
-    expect(readCachedUser()).toBeNull();
+    expect(retrieveData(userStorageKey)).toBeNull();
   });
 
   it('ignores storage failures', () => {
@@ -30,7 +31,7 @@ describe('storage', () => {
       removeItem: orig.removeItem.bind(orig),
     } as any;
     const user = { uid: 'u', token: 't', is_admin: false };
-    expect(() => saveCachedUser(user)).not.toThrow();
+    expect(() => storeData(userStorageKey, user)).not.toThrow();
     global.localStorage = orig;
   });
 });

@@ -87,3 +87,18 @@ export interface VerifyTokenResult {
     is_admin: boolean;
 }
 
+
+export interface PumpRoomConfig {
+    apiKey: string;
+    realm: string;
+    cacheUser?: boolean;
+    minHeight?: number;
+}
+
+export interface InternalConfig {
+    apiKey: string;
+    realm: string;
+    cacheUser: boolean;
+    minHeight?: number;
+}
+

@@ -1,22 +1,12 @@
-import type { PumpRoomUser } from './types.ts';
-import { handleFullscreenToggle } from './fullscreen.ts';
-
-export interface PumpRoomConfig {
-    apiKey: string;
-    realm: string;
-    cacheUser?: boolean;
-}
-
-export type InternalConfig = Required<PumpRoomConfig>;
+import type {PumpRoomUser, PumpRoomConfig, InternalConfig} from './types.ts';
 
 let config: InternalConfig | null = null;
 let currentUser: PumpRoomUser | null = null;
 let autoListenerRegistered = false;
 
-export function init(cfg: PumpRoomConfig): void {
-    const { cacheUser = true, ...rest } = cfg;
-    config = { ...rest, cacheUser };
-    handleFullscreenToggle();
+export function setConfig(cfg: PumpRoomConfig): void {
+    const {cacheUser = true, ...rest} = cfg;
+    config = {...rest, cacheUser};
 }
 
 export function getConfig(): InternalConfig | null {

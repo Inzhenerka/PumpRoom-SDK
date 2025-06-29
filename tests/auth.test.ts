@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { authenticate } from '../src/auth.js';
-import { init, getCurrentUser } from '../src/state.js';
+import { setConfig, getCurrentUser } from '../src/state.js';
 import { setCurrentUser } from '../src/state.js';
 import { AUTH_URL, VERIFY_URL } from '../src/constants.js';
 
 beforeEach(() => {
-  init({ apiKey: 'key', realm: 'test' });
+  setConfig({ apiKey: 'key', realm: 'test' });
   localStorage.clear();
   vi.restoreAllMocks();
   setCurrentUser(null);
@@ -56,7 +56,7 @@ describe('authenticate', () => {
   });
 
   it('returns null on auth error', async () => {
-    init({ apiKey: 'key', realm: 'test', cacheUser: false });
+    setConfig({ apiKey: 'key', realm: 'test', cacheUser: false });
     global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 });
 
     const user = await authenticate({ login: 'l', name: 'n', istutor: false, lang: 'en', projectid: '1' });

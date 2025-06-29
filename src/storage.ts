@@ -1,20 +1,18 @@
-import type { PumpRoomUser } from './types.ts';
-
-export function readCachedUser(): PumpRoomUser | null {
+export function retrieveData(key: string): Record<any, any> | null {
     if (typeof localStorage === 'undefined') return null;
     try {
-        const raw = localStorage.getItem('pumproomUser');
-        return raw ? (JSON.parse(raw) as PumpRoomUser) : null;
+        const raw = localStorage.getItem(key);
+        return raw ? (JSON.parse(raw) as Record<any, any>) : null;
     } catch (err) {
         console.error('Cache read error', err);
         return null;
     }
 }
 
-export function saveCachedUser(user: PumpRoomUser): void {
+export function storeData(key: string, data: Record<any, any>): void {
     if (typeof localStorage === 'undefined') return;
     try {
-        localStorage.setItem('pumproomUser', JSON.stringify(user));
+        localStorage.setItem(key, JSON.stringify(data));
     } catch (err) {
         console.error('Cache save error', err);
     }

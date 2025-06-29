@@ -1,11 +1,10 @@
-import type { PumpRoomMessage } from './types.ts';
-import { ALLOWED_ORIGINS } from './constants.ts';
-import { getCurrentUser } from './state.ts';
+import type {PumpRoomMessage} from './types.ts';
+import {getCurrentUser} from './state.ts';
 
-export function isAllowedOrigin(origin: string): boolean {
-    return ALLOWED_ORIGINS.some((o) =>
-        o.startsWith('http') ? origin === o : origin.endsWith(o),
-    );
+export function getPumpRoomEventMessage(event: MessageEvent): PumpRoomMessage | null {
+    if (event.data?.service !== 'pumproom') return null;
+    if (!event.data?.type) return null;
+    return event.data;
 }
 
 export function sendUser(target: Window, origin: string): void {

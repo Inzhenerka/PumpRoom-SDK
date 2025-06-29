@@ -21,7 +21,7 @@ const user = {
 PumpRoomSdk.init({
   apiKey,
   realm,
-  cacheUser: true
+  cacheUser: true,
 });
 
 PumpRoomSdk.authenticate(user);

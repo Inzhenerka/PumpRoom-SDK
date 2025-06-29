@@ -1,6 +1,6 @@
 import type { TildaProfileInput, AuthInput, PumpRoomUser, VerifyTokenInput, VerifyTokenResult } from './types.ts';
-import { AUTH_URL, VERIFY_URL } from './constants.ts';
-import { readCachedUser, saveCachedUser } from './storage.ts';
+import { AUTH_URL, VERIFY_URL, userStorageKey } from './constants.ts';
+import { retrieveData, storeData } from './storage.ts';
 import {
     getConfig,
     setCurrentUser,
@@ -8,8 +8,7 @@ import {
     registerAutoListener,
     isAutoListenerRegistered,
 } from './state.ts';
-import type { PumpRoomMessage } from './types.ts';
-import { sendUser, isAllowedOrigin } from './messaging.ts';
+import { getPumpRoomEventMessage, sendUser } from './messaging.ts';
 
 async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
     const config = getConfig();
@@ -34,7 +33,7 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
         const result = (await resp.json()) as VerifyTokenResult;
         if (result.is_valid) {
             user.is_admin = result.is_admin;
-            saveCachedUser(user);
+            storeData(userStorageKey, user);
         }
         return result.is_valid;
     } catch (err) {
@@ -49,15 +48,15 @@ export async function authenticate(profile: TildaProfileInput): Promise<PumpRoom
         throw new Error('SDK is not initialized');
     }
 
-    let current = getCurrentUser();
+    let currentUser = getCurrentUser();
     let fromCache = false;
     if (config.cacheUser) {
-        const cached = readCachedUser();
-        if (cached && (await verifyCachedUser(cached))) {
-            current = cached;
+        const cachedUser = retrieveData(userStorageKey) as PumpRoomUser;
+        if (cachedUser && (await verifyCachedUser(cachedUser))) {
+            currentUser = cachedUser;
             fromCache = true;
-        } else if (cached && typeof localStorage !== 'undefined') {
-            localStorage.removeItem('pumproomUser');
+        } else if (cachedUser && typeof localStorage !== 'undefined') {
+            localStorage.removeItem(userStorageKey);
         }
     }
 
@@ -77,9 +76,9 @@ export async function authenticate(profile: TildaProfileInput): Promise<PumpRoom
                 body: JSON.stringify(body),
             });
             if (response.ok) {
-                current = (await response.json()) as PumpRoomUser;
+                currentUser = (await response.json()) as PumpRoomUser;
                 if (config.cacheUser) {
-                    saveCachedUser(current);
+                    storeData(userStorageKey, currentUser);
                 }
             } else {
                 console.error('Authentication failed', response.status);
@@ -89,24 +88,24 @@ export async function authenticate(profile: TildaProfileInput): Promise<PumpRoom
         }
     }
 
-    if (current && !isAutoListenerRegistered()) {
+    if (currentUser && !isAutoListenerRegistered()) {
         window.addEventListener('message', defaultUserListener);
         registerAutoListener();
     }
 
-    setCurrentUser(current || null);
+    setCurrentUser(currentUser || null);
 
-    document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', { detail: current }));
+    document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', { detail: currentUser }));
 
-    return current || null;
+    return currentUser || null;
 }
 
-function defaultUserListener(ev: MessageEvent): void {
+function defaultUserListener(event: MessageEvent): void {
+    const data = getPumpRoomEventMessage(event);
+    if (!data) return;
     const user = getCurrentUser();
     if (!user) return;
-    if (!isAllowedOrigin(ev.origin)) return;
-    const data = ev.data as PumpRoomMessage;
-    if (data?.service === 'pumproom' && data.type === 'getPumpRoomUser') {
-        sendUser(ev.source as Window, ev.origin);
+    if (data.type === 'getPumpRoomUser') {
+        sendUser(event.source as Window, event.origin);
     }
 }

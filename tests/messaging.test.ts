@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { isAllowedOrigin, sendUser } from '../src/messaging.js';
+import { sendUser } from '../src/messaging.js';
 import { setCurrentUser } from '../src/state.js';
 
 beforeEach(() => {
@@ -7,10 +7,6 @@ beforeEach(() => {
 });
 
 describe('messaging', () => {
-  it('validates origin', () => {
-    expect(isAllowedOrigin('https://pumproom.tech')).toBe(true);
-    expect(isAllowedOrigin('https://evil.com')).toBe(false);
-  });
 
   it('sends user to target window', () => {
     const target = { postMessage: vi.fn() } as unknown as Window;
