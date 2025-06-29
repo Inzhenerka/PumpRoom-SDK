@@ -9,7 +9,6 @@ export {setConfig, getCurrentUser} from './state.ts';
 export {authenticate} from './auth.ts';
 export {handleFullscreenToggle} from './fullscreen.ts';
 export {enforceIframeHeight} from './iframe.ts';
-export {listenEnvironment} from './environment.ts';
 export {getVersion} from './version.ts';
 export * from './types.ts';
 
