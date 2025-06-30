@@ -2,104 +2,17 @@
 
 [![npm version](https://badge.fury.io/js/pumproom-sdk.svg)](https://www.npmjs.com/package/pumproom-sdk)
 
-Лёгкая библиотека для интеграции LMS с PumpRoom. Предоставляет методы для аутентификации через API и обмена сообщениями между окнами.
+Лёгкая библиотека для интеграции LMS с PumpRoom. Предоставляет методы для аутентификации через API и обмена сообщениями.
 
-После сборки в каталоге `dist` доступна небольшая страница `index.html`, которая кратко демонстрирует назначение SDK и примеры его использования.
+# Документация
 
-## Установка
+[Инструкция по интеграции и использованию](https://pumproom-sdk.inzhenerka-cloud.com/)
 
-```
-npm install pumproom-sdk
-```
+# Разработка SDK
 
-Или подключите собранный UMD-бандл через тег `<script>`:
+## Установка зависимостей
 
-```html
-<script src="https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v1.0.0.umd.js"></script>
-```
-
-## Инициализация
-
-```ts
-import { init, authenticate } from 'pumproom-sdk';
-
-init({
-  apiKey: 'API_KEY',
-  realm: 'inzh',
-  cacheUser: true
-});
-
-const profile = getLmsProfile();
-authenticate(profile);
-```
-
-Параметр `cacheUser` включает сохранение авторизованного пользователя в
-`localStorage`. При повторной загрузке страницы SDK проверит токен через
-эндпоинт `tracker/verify_token` и избежит лишнего запроса авторизации.
-
-## Прослушка сообщений
-
-```ts
-onMessage((msg, ev) => {
-  if (msg.type === 'customEvent') {
-    console.log(msg.payload);
-  }
-});
-```
-
-## Пример подключения через `<script>`
-
-```html
-<script src="https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v1.0.0.umd.js"></script>
-<script>
-PumpRoomSdk.init({ apiKey: 'KEY', realm: 'inzh', cacheUser: true });
-PumpRoomSdk.authenticate(profileObj);
-</script>
-```
-
-## Пример ES-модуля
-
-```ts
-import { init, authenticate } from 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v1.0.0.esm.js';
-
-init({ apiKey: 'KEY', realm: 'inzh', cacheUser: true });
-authenticate(profileObj);
-```
-
-## Пример демо-страницы
-
-В каталоге `example` расположена страница `index.html`. Она инициализирует SDK,
-использует демо-профиль и встраивает PumpRoom через iframe. После загрузки
-пользователь автоматически авторизуется, а SDK отвечает на запрос
-`getPumpRoomUser`. При запуске сервера разработки основной лендинг доступен по
-адресу `/`, а демо по пути `/example/`. После сборки готовая версия примера
-располагается в каталоге `dist/example`.
-
-## Дополнительные функции
-
-### Восстановление прокрутки
-
-Метод `handleFullscreenToggle` вызывается автоматически при инициализации SDK. Он запоминает позицию прокрутки страницы и восстанавливает её после выхода из полноэкранного режима iframe.
-
-### Минимальная высота iframe
-
-```ts
-import { enforceIframeHeight } from 'pumproom-sdk';
-
-enforceIframeHeight(600); // значение по умолчанию
-```
-
-Функция увеличивает высоту всех iframe PumpRoom, если указано меньше минимальной.
-
-## Разработка
-
-Установка зависимостей
-
-```bash
-bun install
-```
-
-Сборка
+## Сборка
 
 ```bash
 bun run build
@@ -121,11 +34,13 @@ bun dev
 ```bash
 bun run test
 ```
+
 Отчёт в формате HTML появится в каталоге `coverage`.
 
 ### Публикация
 
-При создании в репозитории тега вида `vX.Y.Z` запускается workflow. Он собирает
-проект и публикует содержимое каталога `dist/bundle` с декларациями из
-`dist/types` в общедоступный npm. Для работы необходимо добавить токен доступа
-`NPM_TOKEN` в настройки secrets репозитория.
+Релиз новой версии:
+
+```bash
+npm version <patch|minor|major>
+```

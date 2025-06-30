@@ -47,7 +47,7 @@
     "type": "git",
     "url": "git+https://github.com/Inzhenerka/PumpRoom-SDK.git"
   },
-  "homepage": "https://sdk.pumproom.tech",
+  "homepage": "https://pumproom-sdk.inzhenerka-cloud.com/",
   "keywords": [
     "pumproom",
     "lms",

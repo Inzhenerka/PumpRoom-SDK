@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
     <title>PumpRoom SDK</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
@@ -52,17 +55,21 @@
             <div class="tab-pane fade show active" id="script" role="tabpanel" aria-labelledby="script-tab">
                 <p>Этот способ подойдет вам, если вы используете любую готовую LMS, которая позволяет вставлять на страницу HTML-код.</p>
                 <p>Добавьте HTML-код на страницу урока:</p>
-                <pre class="bg-light p-3 rounded"><code>&lt;script src="https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v__VERSION__.umd.js"&gt;&lt;/script&gt;
+                <pre class="bg-light p-3 rounded"><code>&lt;script src="https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-latest.umd.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
-  PumpRoomSdk.authenticate(profileObj).catch(err => console.error('Auth error:', err));
+  PumpRoomSdk.authenticate({
+        lms: { email: 'ПОЧТА_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+  }).catch(console.error);
 &lt;/script&gt;</code></pre>
                 <p>Альтернативный способ (более современный):</p>
                 <pre class="bg-light p-3 rounded"><code>&lt;script type="module">
-  import { init, authenticate } from 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v__VERSION__.esm.js';
+  import { init, authenticate } from 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-latest.esm.js';
 
   init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
-  authenticate(profileObj).catch(err => console.error('Auth error:', err));
+  authenticate({
+        lms: { email: 'ПОЧТА_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+  }).catch(console.error);
 &lt;/script></code></pre>
             </div>
             <div class="tab-pane fade" id="npm" role="tabpanel" aria-labelledby="npm-tab">
@@ -76,60 +83,15 @@
                 <pre class="bg-light p-3 rounded"><code>import { init, authenticate } from 'pumproom-sdk';
 
 init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
-authenticate(profileObj).catch(err => console.error('Auth error:', err));</code></pre>
+authenticate({
+    lms: { email: 'ПОЧТА_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+}).catch(console.error);</code></pre>
             </div>
         </div>
         <p class="my-4">
             После настройки SDK все задания PumpRoom, интегрированные на страницу урока через <code>iframe</code>,
             начнут работать автоматически.
         </p>
-    </section>
-
-    <section class="my-5">
-        <h2 class="h4 mb-3">Методы SDK</h2>
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Метод</th>
-                    <th>Аргументы</th>
-                    <th>Описание</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td><code>init(config)</code></td>
-                    <td><code>apiKey</code>, <code>realm</code>, <code>cacheUser?</code>, <code>minHeight?</code></td>
-                    <td>Инициализация SDK и установка конфигурации.</td>
-                </tr>
-                <tr>
-                    <td><code>authenticate(profile)</code></td>
-                    <td><code>profile</code> – объект пользователя</td>
-                    <td>Авторизация пользователя и кэширование токена.</td>
-                </tr>
-                <tr>
-                    <td><code>getCurrentUser()</code></td>
-                    <td>нет</td>
-                    <td>Возвращает текущего авторизованного пользователя.</td>
-                </tr>
-                <tr>
-                    <td><code>handleFullscreenToggle()</code></td>
-                    <td>нет</td>
-                    <td>Восстанавливает прокрутку после выхода из полноэкранного режима.</td>
-                </tr>
-                <tr>
-                    <td><code>enforceIframeHeight(minHeight)</code></td>
-                    <td><code>minHeight</code> – минимальная высота</td>
-                    <td>Устанавливает минимальную высоту iframe PumpRoom.</td>
-                </tr>
-                <tr>
-                    <td><code>getVersion()</code></td>
-                    <td>нет</td>
-                    <td>Возвращает текущую версию библиотеки.</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
     </section>
 
     <section class="my-5">
