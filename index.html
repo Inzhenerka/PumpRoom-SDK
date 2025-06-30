@@ -55,8 +55,67 @@ authenticate(profileObj);</code></pre>
     </section>
 
     <section class="my-5">
+      <h2 class="h4 mb-3">Методы SDK</h2>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Метод</th>
+              <th>Описание</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>init(config)</code></td>
+              <td>Инициализация SDK и установка конфигурации.</td>
+            </tr>
+            <tr>
+              <td><code>authenticate(profile)</code></td>
+              <td>Авторизация пользователя и кэширование токена.</td>
+            </tr>
+            <tr>
+              <td><code>getCurrentUser()</code></td>
+              <td>Возвращает текущего авторизованного пользователя.</td>
+            </tr>
+            <tr>
+              <td><code>handleFullscreenToggle()</code></td>
+              <td>Восстанавливает прокрутку после выхода из полноэкранного режима.</td>
+            </tr>
+            <tr>
+              <td><code>enforceIframeHeight(minHeight)</code></td>
+              <td>Устанавливает минимальную высоту iframe PumpRoom.</td>
+            </tr>
+            <tr>
+              <td><code>getVersion()</code></td>
+              <td>Возвращает текущую версию библиотеки.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="my-5">
       <h2 class="h4 mb-2">Примеры</h2>
-      <p>Демо и дополнительные материалы доступны в каталоге <code>example</code> репозитория.</p>
+      <div class="mb-4">
+        <h3 class="h6">ES-модуль</h3>
+        <pre><code>import { init, authenticate } from 'pumproom-sdk';
+
+init({ apiKey: 'KEY', realm: 'inzh' });
+authenticate(profileObj);</code></pre>
+      </div>
+      <div class="mb-4">
+        <h3 class="h6">UMD-бандл</h3>
+        <pre><code>&lt;script src="bundles/pumproom-sdk-latest.umd.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  PumpRoomSdk.init({ apiKey: 'KEY', realm: 'inzh' });
+&lt;/script&gt;</code></pre>
+      </div>
+      <div>
+        <h3 class="h6">Настройка высоты iframe</h3>
+        <pre><code>import { enforceIframeHeight } from 'pumproom-sdk';
+
+enforceIframeHeight(600);</code></pre>
+      </div>
+      <p class="mt-3">Полноценный пример размещён в каталоге <code>example</code> репозитория.</p>
     </section>
   </main>
 
