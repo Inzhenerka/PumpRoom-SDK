@@ -4,34 +4,44 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PumpRoom SDK</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
   <link rel="stylesheet" href="style.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 </head>
-<body>
-  <header>
-    <h1>PumpRoom SDK</h1>
-    <p>Лёгкая библиотека для интеграции LMS с PumpRoom.</p>
-  </header>
+<body class="bg-light">
+  <div class="container py-5">
+    <header class="text-center mb-5">
+      <img src="sdk-logo.png" alt="PumpRoom SDK" class="img-fluid" style="max-width: 180px;">
+      <h1 class="mt-3">PumpRoom SDK</h1>
+      <p class="lead">Простой способ подключить PumpRoom к LMS</p>
+    </header>
 
-  <section>
-    <h2>Установка</h2>
-    <pre><code>npm install pumproom-sdk</code></pre>
-    <p>Или подключите UMD-бандл:</p>
-    <pre><code>&lt;script src="bundles/pumproom-sdk-latest.umd.js"&gt;&lt;/script&gt;</code></pre>
-  </section>
+    <section class="mb-5">
+      <h2 class="h4">Установка</h2>
+      <p>Скачайте пакет из npm или подключите UMD-бандл:</p>
+      <pre><code>npm install pumproom-sdk</code></pre>
+      <pre><code>&lt;script src="bundles/pumproom-sdk-latest.umd.js"&gt;&lt;/script&gt;</code></pre>
+    </section>
 
-  <section>
-    <h2>Пример использования</h2>
-    <pre><code>import { init, authenticate } from 'pumproom-sdk';
+    <section class="mb-5">
+      <h2 class="h4">Использование ES-модуля</h2>
+      <pre><code>import { init, authenticate } from 'pumproom-sdk';
 
 init({ apiKey: 'API_KEY', realm: 'inzh', cacheUser: true });
+authenticate(profileObj);</code></pre>
+    </section>
 
-authenticate(getLmsProfile());</code></pre>
-  </section>
+    <section class="mb-5">
+      <h2 class="h4">Использование через &lt;script&gt;</h2>
+      <pre><code>&lt;script src="bundles/pumproom-sdk-latest.umd.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+PumpRoomSdk.init({ apiKey: 'API_KEY', realm: 'inzh', cacheUser: true });
+PumpRoomSdk.authenticate(profileObj);
+&lt;/script&gt;</code></pre>
+    </section>
 
-  <footer>
-    <p>Исходный код и примеры смотрите в репозитории.</p>
-  </footer>
+    <footer class="text-center text-muted">
+      <p>Подробные примеры находятся в каталоге <code>example</code>.</p>
+    </footer>
+  </div>
 </body>
 </html>
