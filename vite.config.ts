@@ -1,23 +1,10 @@
 import {defineConfig, build} from 'vite';
-import {resolve, dirname, join} from 'path';
-import {promises as fs} from 'fs';
+import {resolve, dirname} from 'path';
 import {fileURLToPath} from 'url';
 import pkg from './package.json';
 
 const version = pkg.version;
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
-function buildIndex() {
-    return {
-        name: 'build-index',
-        async closeBundle() {
-            const src = resolve(__dirname, 'index.html');
-            const dest = join(__dirname, 'dist/index.html');
-            const html = await fs.readFile(src, 'utf8');
-            await fs.writeFile(dest, html.replace(/__VERSION__/g, version));
-        },
-    };
-}
 
 function buildExample() {
     return {
@@ -39,12 +26,13 @@ export default defineConfig(({command, mode}) => {
     const isDev = command === 'serve';
 
     return {
+        root: resolve(__dirname, 'site'),
         define: {
             __VERSION__: JSON.stringify(version)
         },
-        publicDir: 'public',
+        publicDir: resolve(__dirname, 'public'),
         build: {
-            outDir: 'dist',
+            outDir: resolve(__dirname, 'dist'),
             target: 'es2015',
             emptyOutDir: false,
             sourcemap: true,
@@ -79,6 +67,6 @@ export default defineConfig(({command, mode}) => {
             port: 8002,
             open: '/',
         },
-        plugins: [buildIndex()].concat(isDev ? [buildExample()] : []),
+        plugins: [].concat(isDev ? [buildExample()] : []),
     };
 });
