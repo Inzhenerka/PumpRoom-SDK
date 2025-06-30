@@ -37,15 +37,15 @@
       <div class="tab-content border border-top-0 p-4 bg-white" id="setupTabsContent">
         <div class="tab-pane fade show active" id="npm" role="tabpanel" aria-labelledby="npm-tab">
           <p>Установите пакет и подключите его в проекте.</p>
-          <pre><code>npm install pumproom-sdk</code></pre>
-          <pre><code>import { init, authenticate } from 'pumproom-sdk';
+          <pre class="bg-light p-3 rounded" ><code>npm install pumproom-sdk</code></pre>
+          <pre class="bg-light p-3 rounded" ><code>import { init, authenticate } from 'pumproom-sdk';
 
 init({ apiKey: 'API_KEY', realm: 'inzh', cacheUser: true });
 authenticate(profileObj);</code></pre>
         </div>
         <div class="tab-pane fade" id="script" role="tabpanel" aria-labelledby="script-tab">
           <p>Добавьте UMD-бандл в вашу страницу.</p>
-          <pre><code>&lt;script src="bundles/pumproom-sdk-latest.umd.js"&gt;&lt;/script&gt;
+          <pre class="bg-light p-3 rounded" ><code>&lt;script src="bundles/pumproom-sdk-latest.umd.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   PumpRoomSdk.init({ apiKey: 'API_KEY', realm: 'inzh', cacheUser: true });
   PumpRoomSdk.authenticate(profileObj);
@@ -61,34 +61,41 @@ authenticate(profileObj);</code></pre>
           <thead>
             <tr>
               <th>Метод</th>
+              <th>Аргументы</th>
               <th>Описание</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td><code>init(config)</code></td>
-              <td>Инициализация SDK и установка конфигурации.</td>
-            </tr>
-            <tr>
-              <td><code>authenticate(profile)</code></td>
-              <td>Авторизация пользователя и кэширование токена.</td>
-            </tr>
-            <tr>
-              <td><code>getCurrentUser()</code></td>
-              <td>Возвращает текущего авторизованного пользователя.</td>
-            </tr>
-            <tr>
-              <td><code>handleFullscreenToggle()</code></td>
-              <td>Восстанавливает прокрутку после выхода из полноэкранного режима.</td>
-            </tr>
-            <tr>
-              <td><code>enforceIframeHeight(minHeight)</code></td>
-              <td>Устанавливает минимальную высоту iframe PumpRoom.</td>
-            </tr>
-            <tr>
-              <td><code>getVersion()</code></td>
-              <td>Возвращает текущую версию библиотеки.</td>
-            </tr>
+              <tr>
+                <td><code>init(config)</code></td>
+                <td><code>apiKey</code>, <code>realm</code>, <code>cacheUser?</code>, <code>minHeight?</code></td>
+                <td>Инициализация SDK и установка конфигурации.</td>
+              </tr>
+              <tr>
+                <td><code>authenticate(profile)</code></td>
+                <td><code>profile</code> – объект пользователя</td>
+                <td>Авторизация пользователя и кэширование токена.</td>
+              </tr>
+              <tr>
+                <td><code>getCurrentUser()</code></td>
+                <td>нет</td>
+                <td>Возвращает текущего авторизованного пользователя.</td>
+              </tr>
+              <tr>
+                <td><code>handleFullscreenToggle()</code></td>
+                <td>нет</td>
+                <td>Восстанавливает прокрутку после выхода из полноэкранного режима.</td>
+              </tr>
+              <tr>
+                <td><code>enforceIframeHeight(minHeight)</code></td>
+                <td><code>minHeight</code> – минимальная высота</td>
+                <td>Устанавливает минимальную высоту iframe PumpRoom.</td>
+              </tr>
+              <tr>
+                <td><code>getVersion()</code></td>
+                <td>нет</td>
+                <td>Возвращает текущую версию библиотеки.</td>
+              </tr>
           </tbody>
         </table>
       </div>
@@ -97,21 +104,21 @@ authenticate(profileObj);</code></pre>
       <h2 class="h4 mb-2">Примеры</h2>
       <div class="mb-4">
         <h3 class="h6">ES-модуль</h3>
-        <pre><code>import { init, authenticate } from 'pumproom-sdk';
+        <pre class="bg-light p-3 rounded" ><code>import { init, authenticate } from 'pumproom-sdk';
 
 init({ apiKey: 'KEY', realm: 'inzh' });
 authenticate(profileObj);</code></pre>
       </div>
       <div class="mb-4">
         <h3 class="h6">UMD-бандл</h3>
-        <pre><code>&lt;script src="bundles/pumproom-sdk-latest.umd.js"&gt;&lt;/script&gt;
+        <pre class="bg-light p-3 rounded" ><code>&lt;script src="bundles/pumproom-sdk-latest.umd.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   PumpRoomSdk.init({ apiKey: 'KEY', realm: 'inzh' });
 &lt;/script&gt;</code></pre>
       </div>
       <div>
         <h3 class="h6">Настройка высоты iframe</h3>
-        <pre><code>import { enforceIframeHeight } from 'pumproom-sdk';
+        <pre class="bg-light p-3 rounded" ><code>import { enforceIframeHeight } from 'pumproom-sdk';
 
 enforceIframeHeight(600);</code></pre>
       </div>
@@ -123,6 +130,6 @@ enforceIframeHeight(600);</code></pre>
     <small class="text-muted">&copy; PumpRoom</small>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-/9ndS8yLG0WXID9DW74bNcBRGC9KsbexxP42sVxMVO9FQPCZBwM9SOv+1pql6+Nb" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 </body>
 </html>
