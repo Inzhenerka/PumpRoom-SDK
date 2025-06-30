@@ -23,6 +23,7 @@ export interface PumpRoomMessage {
     payload?: any;
 }
 
+
 /**
  * Course information within Tilda profile.
  */
@@ -45,6 +46,12 @@ export interface TildaProfileInput {
     memberlogo?: string | null;
 }
 
+export interface LMSProfileInput {
+    email: string;
+    name: string;
+    photo_url?: string | null;
+}
+
 /**
  * Payload containing realm identifier.
  */
@@ -52,10 +59,16 @@ export interface RealmPayload {
     realm: string;
 }
 
+export interface AuthenticateOptions {
+    lms?: LMSProfileInput | null;
+    profile?: TildaProfileInput | null;
+}
+
 /**
  * Input data for authentication call.
  */
 export interface AuthInput extends RealmPayload {
+    lms?: LMSProfileInput | null;
     profile?: TildaProfileInput | null;
     url?: string | null;
 }
