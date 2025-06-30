@@ -6,8 +6,9 @@
     "declarationDir": "dist/types",
     "outDir": "dist",
     "strict": true,
-    "esModuleInterop": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
     "lib": [
       "dom",
