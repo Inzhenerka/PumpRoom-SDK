@@ -1,8 +1,8 @@
-import pkg from '../package.json';
+declare const __VERSION__: string;
 
 /**
  * Returns SDK version defined in package.json.
  */
 export function getVersion(): string {
-    return pkg.version as string;
+    return __VERSION__;
 }

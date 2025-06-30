@@ -38,6 +38,9 @@ export default defineConfig(({command, mode}) => {
     const isDev = command === 'serve';
 
     return {
+        define: {
+            __VERSION__: JSON.stringify(version)
+        },
         publicDir: 'public',
         build: {
             outDir: 'dist',

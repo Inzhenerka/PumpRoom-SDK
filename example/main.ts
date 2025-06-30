@@ -25,5 +25,3 @@ PumpRoomSdk.init({
 });
 
 PumpRoomSdk.authenticate(user);
-
-

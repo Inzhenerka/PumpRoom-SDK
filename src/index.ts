@@ -12,6 +12,8 @@ export {enforceIframeHeight} from './iframe.ts';
 export {getVersion} from './version.ts';
 export * from './types.ts';
 
+console.debug('PumpRoom SDK v' + getVersion() + ' loaded');
+
 export function init(cfg: PumpRoomConfig): void {
     setConfig(cfg)
     handleFullscreenToggle();
