@@ -1,10 +1,21 @@
-import {defineConfig, build} from 'vite';
+import {defineConfig, build, Plugin} from 'vite';
 import {resolve, dirname} from 'path';
 import {fileURLToPath} from 'url';
 import pkg from './package.json';
 
 const version = pkg.version;
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+
+function htmlVersionPlugin(): Plugin {
+    return {
+        name: 'html-version-replace',
+        transformIndexHtml(html) {
+            return html.replace(/__VERSION__/g, version);
+        },
+    };
+}
+
 
 function buildExample() {
     return {
@@ -26,7 +37,6 @@ export default defineConfig(({command, mode}) => {
     const isDev = command === 'serve';
 
     return {
-        root: resolve(__dirname, 'site'),
         define: {
             __VERSION__: JSON.stringify(version)
         },
@@ -35,38 +45,19 @@ export default defineConfig(({command, mode}) => {
             outDir: resolve(__dirname, 'dist'),
             target: 'es2015',
             emptyOutDir: false,
-            sourcemap: true,
-            lib: {
-                entry: resolve(__dirname, 'src/index.ts'),
-                name: 'PumpRoomSdk',
-            },
             rollupOptions: {
-                output: [
-                    {
-                        entryFileNames: `bundles/pumproom-sdk-v${version}.umd.js`,
-                        format: 'umd',
-                        name: 'PumpRoomSdk',
-                    },
-                    {
-                        entryFileNames: 'bundles/pumproom-sdk-latest.umd.js',
-                        format: 'umd',
-                        name: 'PumpRoomSdk',
-                    },
-                    {
-                        entryFileNames: `bundles/pumproom-sdk-v${version}.esm.js`,
-                        format: 'es',
-                    },
-                    {
-                        entryFileNames: 'bundles/pumproom-sdk-latest.esm.js',
-                        format: 'es',
-                    },
-                ],
+                input: {
+                    main: resolve(__dirname, 'index.html'),
+                },
             },
         },
         server: {
             port: 8002,
             open: '/',
         },
-        plugins: [].concat(isDev ? [buildExample()] : []),
+        plugins: [
+            htmlVersionPlugin(),
+            ...(isDev ? [buildExample()] : []),
+        ],
     };
 });

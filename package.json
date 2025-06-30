@@ -5,19 +5,21 @@
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/bundles/pumproom-sdk-latest.esm.js",
-      "require": "./dist/bundles/pumproom-sdk-latest.umd.js"
+      "import": "./dist/bundle/pumproom-sdk-latest.esm.js",
+      "require": "./dist/bundle/pumproom-sdk-latest.umd.js"
     }
   },
   "files": [
-    "dist/bundles",
+    "dist/bundle",
     "dist/types",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "build": "vite build && tsc -p tsconfig.build.json --emitDeclarationOnly",
-    "dev": "vite",
+    "build": "vite build -c vite.config.lib.ts && tsc -p tsconfig.build.json --emitDeclarationOnly && vite build -c vite.config.site.ts",
+    "build-lib": "vite build -c vite.config.lib.ts && tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "build-site": "vite build -c vite.config.site.ts",
+    "dev": "vite build -c vite.config.lib.ts && vite -c vite.config.site.ts",
     "test": "vitest run --coverage",
     "postversion": "git push && git push --tags"
   },

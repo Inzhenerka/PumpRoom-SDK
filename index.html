@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PumpRoom SDK</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+<nav class="navbar navbar-light bg-white border-bottom mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <img src="/sdk-logo.png" alt="PumpRoom SDK" height="28" class="d-inline-block align-text-top">
+            PumpRoom SDK
+        </a>
+    </div>
+</nav>
+
+<main class="container flex-grow-1">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="display-5 fw-normal mb-3 text-center">Интеграция PumpRoom с LMS</h1>
+            <p class="lead text-center">Библиотека упрощает авторизацию и обмен данными между вашей LMS и платформой
+                PumpRoom</p>
+        </div>
+    </div>
+
+    <section class="my-5">
+        <h2 class="h4 mb-3">Начало работы</h2>
+        <div class="alert alert-info" role="alert">
+            Прежде чем начать, сообщите менеджеру PumpRoom, на каких сайтах вы будете использовать систему,
+            чтобы получить уникальный ключ <code>apiKey</code> и идентификатор школы <code>realm</code>.
+        </div>
+        <ul class="nav nav-tabs" id="setupTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="script-tab" data-bs-toggle="tab" data-bs-target="#script"
+                        type="button"
+                        role="tab">
+                    Подключение к любой странице
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="npm-tab" data-bs-toggle="tab" data-bs-target="#npm" type="button"
+                        role="tab">
+                    Интеграция в проект платформы
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content border border-top-0 p-4 bg-white" id="setupTabsContent">
+            <div class="tab-pane fade show active" id="script" role="tabpanel" aria-labelledby="script-tab">
+                <p>Этот способ подойдет вам, если вы используете любую готовую LMS, которая позволяет вставлять на страницу HTML-код.</p>
+                <p>Добавьте HTML-код на страницу урока:</p>
+                <pre class="bg-light p-3 rounded"><code>&lt;script src="https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v__VERSION__.umd.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
+  PumpRoomSdk.authenticate(profileObj).catch(err => console.error('Auth error:', err));
+&lt;/script&gt;</code></pre>
+                <p>Альтернативный способ (более современный):</p>
+                <pre class="bg-light p-3 rounded"><code>&lt;script type="module">
+  import { init, authenticate } from 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v__VERSION__.esm.js';
+
+  init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
+  authenticate(profileObj).catch(err => console.error('Auth error:', err));
+&lt;/script></code></pre>
+            </div>
+            <div class="tab-pane fade" id="npm" role="tabpanel" aria-labelledby="npm-tab">
+                <p>Если вы хотите интегрировать SDK в проект своей платформы LMS, установите npm-пакет
+                    <a href="https://www.npmjs.com/package/pumproom-sdk" target="_blank" class="text-decoration-none">
+                        pumproom-sdk
+                    </a>:
+                </p>
+                <pre class="bg-light p-3 rounded"><code>npm install pumproom-sdk</code></pre>
+                <p>Затем подключите его в свой проект:</p>
+                <pre class="bg-light p-3 rounded"><code>import { init, authenticate } from 'pumproom-sdk';
+
+init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
+authenticate(profileObj).catch(err => console.error('Auth error:', err));</code></pre>
+            </div>
+        </div>
+        <p class="my-4">
+            После настройки SDK все задания PumpRoom, интегрированные на страницу урока через <code>iframe</code>,
+            начнут работать автоматически.
+        </p>
+    </section>
+
+    <section class="my-5">
+        <h2 class="h4 mb-3">Методы SDK</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Метод</th>
+                    <th>Аргументы</th>
+                    <th>Описание</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><code>init(config)</code></td>
+                    <td><code>apiKey</code>, <code>realm</code>, <code>cacheUser?</code>, <code>minHeight?</code></td>
+                    <td>Инициализация SDK и установка конфигурации.</td>
+                </tr>
+                <tr>
+                    <td><code>authenticate(profile)</code></td>
+                    <td><code>profile</code> – объект пользователя</td>
+                    <td>Авторизация пользователя и кэширование токена.</td>
+                </tr>
+                <tr>
+                    <td><code>getCurrentUser()</code></td>
+                    <td>нет</td>
+                    <td>Возвращает текущего авторизованного пользователя.</td>
+                </tr>
+                <tr>
+                    <td><code>handleFullscreenToggle()</code></td>
+                    <td>нет</td>
+                    <td>Восстанавливает прокрутку после выхода из полноэкранного режима.</td>
+                </tr>
+                <tr>
+                    <td><code>enforceIframeHeight(minHeight)</code></td>
+                    <td><code>minHeight</code> – минимальная высота</td>
+                    <td>Устанавливает минимальную высоту iframe PumpRoom.</td>
+                </tr>
+                <tr>
+                    <td><code>getVersion()</code></td>
+                    <td>нет</td>
+                    <td>Возвращает текущую версию библиотеки.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="my-5">
+        <h2 class="h4 mb-3">История версий</h2>
+        <ul class="list-unstyled">
+            <li><strong>1.0.0</strong> – первый релиз со стабильным API.</li>
+        </ul>
+    </section>
+</main>
+
+<footer class="bg-white border-top text-center py-3 mt-auto">
+    <small class="text-muted">PumpRoom</small>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+</body>
+</html>
