@@ -1,6 +1,12 @@
-import type { TildaProfileInput, AuthInput, PumpRoomUser, VerifyTokenInput, VerifyTokenResult } from './types.ts';
-import { AUTH_URL, VERIFY_URL, userStorageKey } from './constants.ts';
-import { retrieveData, storeData } from './storage.ts';
+import type {
+    AuthInput,
+    PumpRoomUser,
+    VerifyTokenInput,
+    VerifyTokenResult,
+    AuthenticateOptions,
+} from './types.ts';
+import {AUTH_URL, VERIFY_URL, userStorageKey} from './constants.ts';
+import {retrieveData, storeData} from './storage.ts';
 import {
     getConfig,
     setCurrentUser,
@@ -8,7 +14,7 @@ import {
     registerAutoListener,
     isAutoListenerRegistered,
 } from './state.ts';
-import { getPumpRoomEventMessage, sendUser } from './messaging.ts';
+import {getPumpRoomEventMessage, sendUser} from './messaging.ts';
 
 async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
     const config = getConfig();
@@ -42,7 +48,7 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
     }
 }
 
-export async function authenticate(profile: TildaProfileInput): Promise<PumpRoomUser | null> {
+export async function authenticate({lms, profile}: AuthenticateOptions = {}): Promise<PumpRoomUser | null> {
     const config = getConfig();
     if (!config) {
         throw new Error('SDK is not initialized');
@@ -63,7 +69,8 @@ export async function authenticate(profile: TildaProfileInput): Promise<PumpRoom
     if (!fromCache) {
         try {
             const body: AuthInput = {
-                profile,
+                lms: lms,
+                profile: profile,
                 realm: config.realm,
                 url: window.location.href,
             };
@@ -95,7 +102,7 @@ export async function authenticate(profile: TildaProfileInput): Promise<PumpRoom
 
     setCurrentUser(currentUser || null);
 
-    document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', { detail: currentUser }));
+    document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', {detail: currentUser}));
 
     return currentUser || null;
 }

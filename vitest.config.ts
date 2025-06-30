@@ -13,7 +13,7 @@ export default defineConfig({
             provider: 'istanbul',
             reporter: ['text', 'html', 'json-summary', 'json'],
             reportOnFailure: true,
-            exclude: ['example/**', 'vite.config.ts', 'dist'],
+            exclude: ['example/**', 'vite*.ts', 'dist'],
         },
     },
 });

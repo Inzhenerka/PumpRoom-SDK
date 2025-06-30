@@ -15,7 +15,7 @@ npm install pumproom-sdk
 Или подключите собранный UMD-бандл через тег `<script>`:
 
 ```html
-<script src="dist/bundles/pumproom-sdk-latest.umd.js"></script>
+<script src="https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v1.0.0.umd.js"></script>
 ```
 
 ## Инициализация
@@ -50,7 +50,7 @@ onMessage((msg, ev) => {
 ## Пример подключения через `<script>`
 
 ```html
-<script src="/path/to/bundles/pumproom-sdk-latest.umd.js"></script>
+<script src="https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v1.0.0.umd.js"></script>
 <script>
 PumpRoomSdk.init({ apiKey: 'KEY', realm: 'inzh', cacheUser: true });
 PumpRoomSdk.authenticate(profileObj);
@@ -60,7 +60,7 @@ PumpRoomSdk.authenticate(profileObj);
 ## Пример ES-модуля
 
 ```ts
-import { init, authenticate } from './dist/bundles/pumproom-sdk-latest.esm.js';
+import { init, authenticate } from 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v1.0.0.esm.js';
 
 init({ apiKey: 'KEY', realm: 'inzh', cacheUser: true });
 authenticate(profileObj);
@@ -126,6 +126,6 @@ bun run test
 ### Публикация
 
 При создании в репозитории тега вида `vX.Y.Z` запускается workflow. Он собирает
-проект и публикует содержимое каталога `dist/bundles` с декларациями из
+проект и публикует содержимое каталога `dist/bundle` с декларациями из
 `dist/types` в общедоступный npm. Для работы необходимо добавить токен доступа
 `NPM_TOKEN` в настройки secrets репозитория.
