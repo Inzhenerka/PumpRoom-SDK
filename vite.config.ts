@@ -13,7 +13,8 @@ function buildIndex() {
         async closeBundle() {
             const src = resolve(__dirname, 'index.html');
             const dest = join(__dirname, 'dist/index.html');
-            await fs.copyFile(src, dest);
+            const html = await fs.readFile(src, 'utf8');
+            await fs.writeFile(dest, html.replace(/__VERSION__/g, version));
         },
     };
 }
