@@ -27,6 +27,6 @@ function handleEnvironmentMessage(event: MessageEvent): void {
     }
 }
 
-export function listenEnvironment(): void {
+export function setEnvironmentListener(): void {
     window.addEventListener('message', handleEnvironmentMessage);
 }

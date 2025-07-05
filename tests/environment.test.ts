@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { sendEnvironment, listenEnvironment } from '../src/environment.js';
+import { sendEnvironment, setEnvironmentListener } from '../src/environment.js';
 import * as version from '../src/version.js';
 
 beforeEach(() => {
@@ -24,7 +24,7 @@ describe('environment helpers', () => {
   it('responds to getEnvironment message', () => {
     vi.spyOn(version, 'getVersion').mockReturnValue('2.0.0');
     const postSpy = vi.spyOn(window, 'postMessage');
-    listenEnvironment();
+    setEnvironmentListener();
     const event = new MessageEvent('message', {
       data: { service: 'pumproom', type: 'getEnvironment' },
       origin: 'https://pumproom.tech',

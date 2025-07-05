@@ -1,11 +1,8 @@
 import type {
-    AuthInput,
     PumpRoomUser,
-    VerifyTokenInput,
-    VerifyTokenResult,
     AuthenticateOptions,
 } from './types.ts';
-import {AUTH_URL, VERIFY_URL, userStorageKey} from './constants.ts';
+import {userStorageKey} from './constants.ts';
 import {retrieveData, storeData} from './storage.ts';
 import {
     getConfig,
@@ -15,28 +12,16 @@ import {
     isAutoListenerRegistered,
 } from './state.ts';
 import {getPumpRoomEventMessage, sendUser} from './messaging.ts';
+import {getApiClient} from './api-client.ts';
 
 async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
     const config = getConfig();
     if (!config) return false;
 
-    const payload: VerifyTokenInput = {
-        realm: config.realm,
-        token: user.token,
-        uid: user.uid,
-    };
-
     try {
-        const resp = await fetch(VERIFY_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-KEY': config.apiKey,
-            },
-            body: JSON.stringify(payload),
-        });
-        if (!resp.ok) return false;
-        const result = (await resp.json()) as VerifyTokenResult;
+        const apiClient = getApiClient();
+        const result = await apiClient.verifyToken(user, config.realm);
+
         if (result.is_valid) {
             user.is_admin = result.is_admin;
             storeData(userStorageKey, user);
@@ -68,27 +53,11 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
 
     if (!fromCache) {
         try {
-            const body: AuthInput = {
-                lms: lms,
-                profile: profile,
-                realm: config.realm,
-                url: window.location.href,
-            };
-            const response = await fetch(AUTH_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-KEY': config.apiKey,
-                },
-                body: JSON.stringify(body),
-            });
-            if (response.ok) {
-                currentUser = (await response.json()) as PumpRoomUser;
-                if (config.cacheUser) {
-                    storeData(userStorageKey, currentUser);
-                }
-            } else {
-                console.error('Authentication failed', response.status);
+            const apiClient = getApiClient();
+            currentUser = await apiClient.authenticate({ lms, profile }, config.realm);
+
+            if (currentUser && config.cacheUser) {
+                storeData(userStorageKey, currentUser);
             }
         } catch (err) {
             console.error('Network error', err);

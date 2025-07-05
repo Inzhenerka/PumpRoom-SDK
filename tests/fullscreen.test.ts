@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleFullscreenToggle, enforceIframeHeight } from '../src/index.js';
+import { setFullscreenListener, enforceIframeHeight } from '../src/index.js';
 
 beforeEach(() => {
   // reset listeners
@@ -8,7 +8,7 @@ beforeEach(() => {
 
 describe('fullscreen helpers', () => {
   it('restores scroll position on exit fullscreen', () => {
-    handleFullscreenToggle();
+    setFullscreenListener();
     Object.defineProperty(window, 'scrollY', { value: 120, configurable: true });
     window.dispatchEvent(new Event('scroll'));
 

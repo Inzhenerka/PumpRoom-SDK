@@ -14,7 +14,7 @@ describe('state', () => {
   });
 
   it('calls fullscreen handler when initialized via init', () => {
-    const spy = vi.spyOn(fullscreen, 'handleFullscreenToggle').mockImplementation(() => {});
+    const spy = vi.spyOn(fullscreen, 'setFullscreenListener').mockImplementation(() => {});
     init({ apiKey: 'key', realm: 'test' });
     expect(spy).toHaveBeenCalled();
   });

@@ -4,7 +4,7 @@ import {getPumpRoomEventMessage} from './messaging.ts';
 let savedScroll = 0;
 let fullscreenInitialized = false;
 
-export function handleFullscreenToggle(): void {
+export function setFullscreenListener(): void {
     if (fullscreenInitialized) return;
 
     window.addEventListener('scroll', () => {
