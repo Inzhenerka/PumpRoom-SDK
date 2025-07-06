@@ -110,11 +110,6 @@ export async function setUser(user: PumpRoomUser): Promise<PumpRoomUser | null> 
 
         if (!result.is_valid) {
             console.error('Invalid user passed to setUser');
-            if (typeof localStorage !== 'undefined') {
-                localStorage.removeItem(userStorageKey);
-            }
-            setCurrentUser(null);
-            document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', {detail: null}));
             return null;
         }
 

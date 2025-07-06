@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setUser } from '../src/auth.js';
-import { setConfig, getCurrentUser } from '../src/state.js';
+import { setConfig, getCurrentUser, setCurrentUser } from '../src/state.js';
 import { initApiClient } from '../src/api-client.js';
 import { VERIFY_URL } from '../src/constants.js';
 
@@ -9,6 +9,7 @@ beforeEach(() => {
   initApiClient('key');
   localStorage.clear();
   vi.restoreAllMocks();
+  setCurrentUser(null);
 });
 
 describe('setUser', () => {
@@ -29,6 +30,7 @@ describe('setUser', () => {
     const verifyResp = { is_valid: false, is_admin: false };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const removeSpy = vi.spyOn(localStorage, 'removeItem');
 
     const result = await setUser({ uid: '2', token: 'bad', is_admin: false });
 
@@ -36,5 +38,6 @@ describe('setUser', () => {
     expect(err).toHaveBeenCalled();
     expect(result).toBeNull();
     expect(getCurrentUser()).toBeNull();
+    expect(removeSpy).not.toHaveBeenCalled();
   });
 });
