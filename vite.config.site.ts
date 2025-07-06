@@ -4,6 +4,8 @@ import {fileURLToPath} from 'url';
 import pkg from './package.json';
 
 const version = pkg.version;
+const majorVersion = version.split('.')[0];
+const baseUrl = pkg.homepage.replace(/\/$/, '');
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 
@@ -11,7 +13,10 @@ function htmlVersionPlugin(): Plugin {
     return {
         name: 'html-version-replace',
         transformIndexHtml(html) {
-            return html.replace(/__VERSION__/g, version);
+            return html
+                .replace(/__VERSION__/g, version)
+                .replace(/__MAJOR_VERSION__/g, majorVersion)
+                .replace(/__BASE_URL__/g, baseUrl);
         },
     };
 }
@@ -38,7 +43,8 @@ export default defineConfig(({command, mode}) => {
 
     return {
         define: {
-            __VERSION__: JSON.stringify(version)
+            __VERSION__: JSON.stringify(version),
+            __BASE_URL__: JSON.stringify(baseUrl)
         },
         publicDir: resolve(__dirname, 'public'),
         build: {

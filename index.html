@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96"/>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <link rel="shortcut icon" href="/favicon.ico"/>
     <title>PumpRoom SDK</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
@@ -54,9 +54,11 @@
 
         <div class="tab-content border border-top-0 p-4 bg-white" id="setupTabsContent">
             <div class="tab-pane fade show active" id="script" role="tabpanel" aria-labelledby="script-tab">
-                <p>Этот способ подойдет вам, если вы используете любую готовую LMS, которая позволяет вставлять на страницу HTML-код.</p>
+                <p>Этот способ подойдет вам, если вы используете любую готовую LMS, которая позволяет вставлять на
+                    страницу HTML-код.</p>
+
                 <p>Добавьте HTML-код на страницу урока:</p>
-                <pre class="bg-light p-3 rounded"><code>&lt;script src="https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-latest.umd.js"&gt;&lt;/script&gt;
+                <pre class="bg-light p-3 rounded"><code>&lt;script src="__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   PumpRoomSdk.authenticate({
@@ -65,21 +67,40 @@
 &lt;/script&gt;</code></pre>
                 <p>Альтернативный способ (более современный):</p>
                 <pre class="bg-light p-3 rounded"><code>&lt;script type="module">
-  import { init, authenticate } from 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-latest.esm.js';
+  import { init, authenticate } from '__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js';
 
   init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   authenticate({
         lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
   }).catch(console.error);
 &lt;/script></code></pre>
+
+                <h5 class="mt-4 mb-3">Версии</h5>
+                <p>Вы можете использовать разные версии SDK:</p>
+                <ul>
+                    <li><strong>v1</strong> - стабильная версия __MAJOR_VERSION__.x (рекомендуется):<br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js</code><br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js</code>
+                    </li>
+                    <li><strong>latest</strong> - всегда последняя стабильная версия:<br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-latest.umd.js</code><br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-latest.esm.js</code>
+                    </li>
+                    <li><strong>v__VERSION__</strong> - конкретная версия (не рекомендуется):<br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-v__VERSION__.umd.js</code><br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-v__VERSION__.esm.js</code>
+                    </li>
+                </ul>
             </div>
+
+
             <div class="tab-pane fade" id="npm" role="tabpanel" aria-labelledby="npm-tab">
                 <p>Если вы хотите интегрировать SDK в проект своей платформы LMS, установите npm-пакет
                     <a href="https://www.npmjs.com/package/pumproom-sdk" target="_blank" class="text-decoration-none">
                         pumproom-sdk
                     </a>:
                 </p>
-                <pre class="bg-light p-3 rounded"><code>npm install pumproom-sdk</code></pre>
+                <pre class="bg-light p-3 rounded"><code>npm install pumproom-sdk@__MAJOR_VERSION__</code></pre>
                 <p>Затем подключите его в свой проект:</p>
                 <pre class="bg-light p-3 rounded"><code>import { init, authenticate } from 'pumproom-sdk';
 
@@ -91,9 +112,24 @@ authenticate({
                 <pre class="bg-light p-3 rounded"><code>import { init, setUser } from 'pumproom-sdk';
 
 init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
-setUser({ uid: 'UID', token: 'TOKEN' });</code></pre>
+setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные от authenticate()</code></pre>
+
+                <h5 class="mt-4 mb-3">Версии</h5>
+                <p>Вы можете использовать разные версии SDK:</p>
+                <ul>
+                    <li><strong>v1</strong> - стабильная версия __MAJOR_VERSION__.x (рекомендуется):<br>
+                        <code>npm install pumproom-sdk@__MAJOR_VERSION__</code>
+                    </li>
+                    <li><strong>latest</strong> - всегда последняя стабильная версия:<br>
+                        <code>npm install pumproom-sdk@latest</code>
+                    </li>
+                    <li><strong>v__VERSION__</strong> - конкретная версия (не рекомендуется):<br>
+                        <code>npm install pumproom-sdk@__VERSION__</code>
+                    </li>
+                </ul>
             </div>
         </div>
+
         <p class="my-4">
             После настройки SDK все задания PumpRoom, интегрированные на страницу урока через <code>iframe</code>,
             начнут работать автоматически.
