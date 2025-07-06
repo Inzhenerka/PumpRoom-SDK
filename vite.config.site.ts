@@ -55,6 +55,7 @@ export default defineConfig(({command, mode}) => {
             rollupOptions: {
                 input: {
                     main: resolve(__dirname, 'index.html'),
+                    site: resolve(__dirname, 'site.ts'),
                 },
             },
         },

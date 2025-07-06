@@ -7,10 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <link rel="shortcut icon" href="/favicon.ico"/>
     <title>PumpRoom SDK</title>
-    <link href="/lib/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <!-- Highlight.js CSS -->
-    <link rel="stylesheet" href="/lib/highlight.js/github.min.css">
-    <link rel="stylesheet" href="/lib/highlight.js/highlightjs-copy.min.css"/>
+    <!-- CSS will be imported by the bundled script -->
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 <nav class="navbar navbar-light bg-white border-bottom mb-4">
@@ -21,14 +18,14 @@
         </a>
         <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-                <a class="nav-link" href="/docs/index.html">Описание методов</a>
+                <a class="nav-link" href="/docs/index.html">📚 Техническая документация</a>
             </li>
         </ul>
     </div>
 </nav>
 
 <main class="container flex-grow-1">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center mt-5">
         <div class="col-lg-8">
             <h1 class="display-5 fw-normal mb-3 text-center">Интеграция PumpRoom с LMS</h1>
             <p class="lead text-center">Библиотека упрощает авторизацию и обмен данными между вашей LMS и платформой
@@ -65,7 +62,7 @@
                     страницу HTML-код.</p>
 
                 <p>Добавьте HTML-код на страницу урока:</p>
-                <pre><code class="language-html">&lt;script src="__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js"&gt;&lt;/script&gt;
+                <pre><code class="language-html border border-primary-subtle">&lt;script src="__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   PumpRoomSdk.authenticate({
@@ -73,7 +70,7 @@
   }).catch(console.error);
 &lt;/script&gt;</code></pre>
                 <p>Альтернативный способ (более современный):</p>
-                <pre><code class="language-html">&lt;script type="module"&gt;
+                <pre><code class="language-html border border-primary-subtle">&lt;script type="module"&gt;
   import { init, authenticate } from '__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js';
 
   init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
@@ -107,16 +104,16 @@
                         pumproom-sdk
                     </a>:
                 </p>
-                <pre><code class="language-bash">npm install pumproom-sdk@__MAJOR_VERSION__</code></pre>
+                <pre><code class="language-bash border border-primary-subtle">npm install pumproom-sdk@__MAJOR_VERSION__</code></pre>
                 <p>Затем подключите его в свой проект:</p>
-                <pre><code class="language-javascript">import { init, authenticate } from 'pumproom-sdk';
+                <pre><code class="language-javascript border border-primary-subtle">import { init, authenticate } from 'pumproom-sdk';
 
 init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
 authenticate({
     lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
 }).catch(console.error);</code></pre>
                 <p>Если у вас уже есть сохранённый пользователь, его можно передать напрямую:</p>
-                <pre><code class="language-javascript">import { init, setUser } from 'pumproom-sdk';
+                <pre><code class="language-javascript border border-primary-subtle">import { init, setUser } from 'pumproom-sdk';
 
 init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
 setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные от authenticate()</code></pre>
@@ -168,13 +165,7 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
     <small class="text-muted">PumpRoom</small>
 </footer>
 
-<script src="/lib/bootstrap/bootstrap.bundle.min.js"></script>
-<!-- Highlight.js JavaScript -->
-<script src="/lib/highlight.js/highlight.min.js"></script>
-<script src="/lib/highlight.js/highlightjs-copy.min.js"></script>
-<script>
-    hljs.highlightAll();
-    hljs.addPlugin(new CopyButtonPlugin({autohide: false}));
-</script>
+<!-- JS will be imported by the bundled script -->
+<script type="module" src="/site.js"></script>
 </body>
 </html>
