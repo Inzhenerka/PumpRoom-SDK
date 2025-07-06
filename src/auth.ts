@@ -114,22 +114,23 @@ export async function setUser(user: PumpRoomUser): Promise<PumpRoomUser | null> 
         }
 
         user.is_admin = result.is_admin;
-        if (config.cacheUser) {
-            storeData(userStorageKey, user);
-        }
-        setCurrentUser(user);
-
-        if (!isAutoListenerRegistered()) {
-            window.addEventListener('message', defaultUserListener);
-            registerAutoListener();
-        }
-
-        document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', {detail: user}));
-        return user;
     } catch (err) {
         console.error('Verification error', err);
         return null;
     }
+
+    if (config.cacheUser) {
+        storeData(userStorageKey, user);
+    }
+    setCurrentUser(user);
+
+    if (!isAutoListenerRegistered()) {
+        window.addEventListener('message', defaultUserListener);
+        registerAutoListener();
+    }
+
+    document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', {detail: user}));
+    return user;
 }
 
 function defaultUserListener(event: MessageEvent): void {
