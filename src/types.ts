@@ -47,8 +47,22 @@ export interface TildaProfileInput {
 }
 
 export interface LMSProfileInput {
-    email: string;
+    /**
+     * Unique identifier of the user within LMS.
+     * Can be any string. When not provided and a valid email is passed via
+     * `email`, it will be used as the identifier.
+     */
+    id?: string;
+
+    /**
+     * Optional email that can also act as identifier if `id` is missing.
+     */
+    email?: string;
+
+    /** Display name of the user */
     name: string;
+
+    /** Optional link to avatar */
     photo_url?: string | null;
 }
 

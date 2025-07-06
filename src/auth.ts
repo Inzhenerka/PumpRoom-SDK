@@ -1,6 +1,7 @@
 import type {
     PumpRoomUser,
     AuthenticateOptions,
+    LMSProfileInput,
 } from './types.ts';
 import {userStorageKey} from './constants.ts';
 import {retrieveData, storeData} from './storage.ts';
@@ -13,6 +14,26 @@ import {
 } from './state.ts';
 import {getPumpRoomEventMessage, sendUser} from './messaging.ts';
 import {getApiClient} from './api-client.ts';
+
+function isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function normalizeLmsProfile(lms?: LMSProfileInput | null): LMSProfileInput | null | undefined {
+    if (!lms) return lms;
+
+    if (lms.id && lms.email) {
+        console.warn('LMS email provided along with id; email will be ignored');
+    } else if (!lms.id && lms.email) {
+        if (isValidEmail(lms.email)) {
+            lms.id = lms.email;
+        } else {
+            console.warn('Invalid email supplied to LMS profile');
+        }
+    }
+
+    return lms;
+}
 
 async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
     const config = getConfig();
@@ -54,7 +75,8 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
     if (!fromCache) {
         try {
             const apiClient = getApiClient();
-            currentUser = await apiClient.authenticate({ lms, profile }, config.realm);
+            const normLms = normalizeLmsProfile(lms);
+            currentUser = await apiClient.authenticate({ lms: normLms, profile }, config.realm);
 
             if (currentUser && config.cacheUser) {
                 storeData(userStorageKey, currentUser);

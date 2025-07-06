@@ -32,7 +32,7 @@
     <section class="my-5">
         <h2 class="h4 mb-3">Начало работы</h2>
         <div class="alert alert-info" role="alert">
-            Прежде чем начать, сообщите менеджеру PumpRoom ваш email, чтобы получить доступ
+            Прежде чем начать, сообщите менеджеру PumpRoom ваш идентификатор (например email), чтобы получить доступ
             к <a href="http://admin.pumproom.tech/" target="_blank">админке</a>.
             Там в разделе Интеграция вы найдете API-ключ <code>apiKey</code> и идентификатор школы <code>realm</code>.
         </div>
@@ -60,7 +60,7 @@
 &lt;script&gt;
   PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   PumpRoomSdk.authenticate({
-        lms: { email: 'ПОЧТА_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+        lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
   }).catch(console.error);
 &lt;/script&gt;</code></pre>
                 <p>Альтернативный способ (более современный):</p>
@@ -69,7 +69,7 @@
 
   init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   authenticate({
-        lms: { email: 'ПОЧТА_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+        lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
   }).catch(console.error);
 &lt;/script></code></pre>
             </div>
@@ -85,7 +85,7 @@
 
 init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
 authenticate({
-    lms: { email: 'ПОЧТА_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+    lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
 }).catch(console.error);</code></pre>
             </div>
         </div>

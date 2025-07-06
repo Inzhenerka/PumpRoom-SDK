@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { authenticate } from '../src/auth.js';
 import { setConfig } from '../src/state.js';
+import { initApiClient } from '../src/api-client.js';
 import * as messaging from '../src/messaging.js';
 
 beforeEach(() => {
   setConfig({ apiKey: 'key', realm: 'test', cacheUser: false });
+  initApiClient('key');
   vi.restoreAllMocks();
 });
 
