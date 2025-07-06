@@ -1,0 +1,37 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["./src/index.ts"],
+  "entryPointStrategy": "resolve",
+  "out": "public/docs",
+  "exclude": ["**/*.test.ts", "**/tests/**", "**/node_modules/**", "**/vite-env.d.ts"],
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeExternals": true,
+  "excludeInternal": true,
+  "readme": "README.md",
+  "name": "PumpRoom SDK",
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "searchInComments": true,
+  "hideGenerator": true,
+  "customFooterHtml": "PumpRoom",
+  "navigationLinks": {
+    "Home": "/"
+  },
+  "sort": ["static-first", "visibility", "alphabetical"],
+  "githubPages": false,
+  "theme": "default",
+  "validation": {
+    "invalidLink": true,
+    "notDocumented": true
+  },
+  "visibilityFilters": {
+    "protected": true,
+    "private": false,
+    "inherited": true,
+    "external": false
+  },
+  "cleanOutputDir": true,
+  "disableSources": false,
+  "sourceLinkTemplate": "https://github.com/Inzhenerka/PumpRoom-SDK/blob/main/{path}#L{line}"
+}

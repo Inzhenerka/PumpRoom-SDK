@@ -2,45 +2,57 @@
 
 [![npm version](https://badge.fury.io/js/pumproom-sdk.svg)](https://www.npmjs.com/package/pumproom-sdk)
 
-Лёгкая библиотека для интеграции LMS с PumpRoom. Предоставляет методы для аутентификации через API и обмена сообщениями.
+Lightweight library for integrating LMS with PumpRoom. Provides methods for API authentication and message exchange.
 
-# Документация
+# SDK Usage
 
-[Инструкция по интеграции и использованию](https://pumproom-sdk.inzhenerka-cloud.com/)
+**[📖 Integration and usage guide](https://pumproom-sdk.inzhenerka-cloud.com/)**
 
-# Разработка SDK
+# SDK Development
 
-## Установка зависимостей
+## Installing Dependencies
 
-## Сборка
+Requirements:
+- Node.js >=20
+- Bun
+
+To install dependencies:
+
+```bash
+bun install
+```
+
+## Building
 
 ```bash
 bun run build
 ```
 
-Запуск сервера разработки
+## Running the Development Server
 
-Сервер запускает Vite с live reload. Лендинг отображается по адресу `/`, а
-пример из каталога `example` доступен по пути `/example/`.
+The server runs Vite with live reload. The landing page is displayed at `/`, and
+the example from the `example` directory is available at `/example/`.
 
 ```bash
 bun dev
 ```
 
-### Тестирование
+### Testing
 
-Запустить unit-тесты и получить отчёт о покрытии можно командой:
+Run unit tests and get a coverage report with the command:
 
 ```bash
 bun run test
 ```
 
-Отчёт в формате HTML появится в каталоге `coverage`.
+The HTML report will appear in the `coverage` directory.
 
-### Публикация
+### Publishing
 
-Релиз новой версии:
+Release a new version:
 
 ```bash
 npm version <patch|minor|major>
 ```
+
+This will update the version in package.json, create a git tag, and push changes to the repository.

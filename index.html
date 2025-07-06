@@ -7,8 +7,10 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
     <link rel="shortcut icon" href="/favicon.ico"/>
     <title>PumpRoom SDK</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link href="/lib/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <!-- Highlight.js CSS -->
+    <link rel="stylesheet" href="/lib/highlight.js/github.min.css">
+    <link rel="stylesheet" href="/lib/highlight.js/highlightjs-copy.min.css"/>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 <nav class="navbar navbar-light bg-white border-bottom mb-4">
@@ -17,6 +19,11 @@
             <img src="/sdk-logo.png" alt="PumpRoom SDK" height="28" class="d-inline-block align-text-top">
             PumpRoom SDK
         </a>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/docs/index.html">Описание методов</a>
+            </li>
+        </ul>
     </div>
 </nav>
 
@@ -58,7 +65,7 @@
                     страницу HTML-код.</p>
 
                 <p>Добавьте HTML-код на страницу урока:</p>
-                <pre class="bg-light p-3 rounded"><code>&lt;script src="__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js"&gt;&lt;/script&gt;
+                <pre><code class="language-html">&lt;script src="__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   PumpRoomSdk.authenticate({
@@ -66,14 +73,14 @@
   }).catch(console.error);
 &lt;/script&gt;</code></pre>
                 <p>Альтернативный способ (более современный):</p>
-                <pre class="bg-light p-3 rounded"><code>&lt;script type="module">
+                <pre><code class="language-html">&lt;script type="module"&gt;
   import { init, authenticate } from '__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js';
 
   init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   authenticate({
         lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
   }).catch(console.error);
-&lt;/script></code></pre>
+&lt;/script&gt;</code></pre>
 
                 <h5 class="mt-4 mb-3">Версии</h5>
                 <p>Вы можете использовать разные версии SDK:</p>
@@ -100,16 +107,16 @@
                         pumproom-sdk
                     </a>:
                 </p>
-                <pre class="bg-light p-3 rounded"><code>npm install pumproom-sdk@__MAJOR_VERSION__</code></pre>
+                <pre><code class="language-bash">npm install pumproom-sdk@__MAJOR_VERSION__</code></pre>
                 <p>Затем подключите его в свой проект:</p>
-                <pre class="bg-light p-3 rounded"><code>import { init, authenticate } from 'pumproom-sdk';
+                <pre><code class="language-javascript">import { init, authenticate } from 'pumproom-sdk';
 
 init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
 authenticate({
     lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
 }).catch(console.error);</code></pre>
                 <p>Если у вас уже есть сохранённый пользователь, его можно передать напрямую:</p>
-                <pre class="bg-light p-3 rounded"><code>import { init, setUser } from 'pumproom-sdk';
+                <pre><code class="language-javascript">import { init, setUser } from 'pumproom-sdk';
 
 init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
 setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные от authenticate()</code></pre>
@@ -137,6 +144,19 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
     </section>
 
     <section class="my-5">
+        <h2 class="h4 mb-3">Все возможности</h2>
+        <p>
+            Полное описание всех методов SDK, параметров инициализации и расширенных возможностей интеграции доступно в
+            технической документации.
+        </p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <a href="/docs/index.html" class="btn btn-outline-primary">
+                📚 Открыть документацию
+            </a>
+        </div>
+    </section>
+
+    <section class="my-5">
         <h2 class="h4 mb-3">История версий</h2>
         <ul class="list-unstyled">
             <li><strong>1.0.0</strong> – первый релиз со стабильным API.</li>
@@ -148,8 +168,13 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
     <small class="text-muted">PumpRoom</small>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
-        crossorigin="anonymous"></script>
+<script src="/lib/bootstrap/bootstrap.bundle.min.js"></script>
+<!-- Highlight.js JavaScript -->
+<script src="/lib/highlight.js/highlight.min.js"></script>
+<script src="/lib/highlight.js/highlightjs-copy.min.js"></script>
+<script>
+    hljs.highlightAll();
+    hljs.addPlugin(new CopyButtonPlugin({autohide: false}));
+</script>
 </body>
 </html>
