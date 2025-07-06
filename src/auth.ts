@@ -98,39 +98,41 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
     return currentUser || null;
 }
 
-export async function setUser(user: PumpRoomUser): Promise<PumpRoomUser | null> {
+export async function setUser(user: Omit<PumpRoomUser, 'is_admin'>): Promise<PumpRoomUser | null> {
     const config = getConfig();
     if (!config) {
         throw new Error('SDK is not initialized');
     }
 
+    let verified: PumpRoomUser;
+
     try {
         const apiClient = getApiClient();
-        const result = await apiClient.verifyToken(user, config.realm);
+        const result = await apiClient.verifyToken({ ...user, is_admin: false }, config.realm);
 
         if (!result.is_valid) {
             console.error('Invalid user passed to setUser');
             return null;
         }
 
-        user.is_admin = result.is_admin;
+        verified = { ...user, is_admin: result.is_admin };
     } catch (err) {
         console.error('Verification error', err);
         return null;
     }
 
     if (config.cacheUser) {
-        storeData(userStorageKey, user);
+        storeData(userStorageKey, verified);
     }
-    setCurrentUser(user);
+    setCurrentUser(verified);
 
     if (!isAutoListenerRegistered()) {
         window.addEventListener('message', defaultUserListener);
         registerAutoListener();
     }
 
-    document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', {detail: user}));
-    return user;
+    document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', {detail: verified}));
+    return verified;
 }
 
 function defaultUserListener(event: MessageEvent): void {

@@ -17,7 +17,7 @@ describe('setUser', () => {
     const verifyResp = { is_valid: true, is_admin: true };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
 
-    const user = { uid: '1', token: 'tok', is_admin: false };
+    const user = { uid: '1', token: 'tok' };
     const result = await setUser(user);
 
     expect(fetch).toHaveBeenCalledWith(VERIFY_URL, expect.any(Object));
@@ -32,7 +32,7 @@ describe('setUser', () => {
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     const removeSpy = vi.spyOn(localStorage, 'removeItem');
 
-    const result = await setUser({ uid: '2', token: 'bad', is_admin: false });
+    const result = await setUser({ uid: '2', token: 'bad' });
 
     expect(fetch).toHaveBeenCalledWith(VERIFY_URL, expect.any(Object));
     expect(err).toHaveBeenCalled();
