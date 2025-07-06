@@ -87,6 +87,11 @@ init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
 authenticate({
     lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
 }).catch(console.error);</code></pre>
+                <p>Если у вас уже есть сохранённый пользователь, его можно передать напрямую:</p>
+                <pre class="bg-light p-3 rounded"><code>import { init, setUser } from 'pumproom-sdk';
+
+init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
+setUser({ uid: 'UID', token: 'TOKEN', is_admin: false });</code></pre>
             </div>
         </div>
         <p class="my-4">

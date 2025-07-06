@@ -7,7 +7,7 @@ import {PumpRoomConfig} from './types.ts';
 import {initApiClient} from './api-client.ts';
 
 export {setConfig, getCurrentUser} from './state.ts';
-export {authenticate} from './auth.ts';
+export {authenticate, setUser} from './auth.ts';
 export {setFullscreenListener} from './fullscreen.ts';
 export {enforceIframeHeight} from './iframe.ts';
 export {getVersion} from './version.ts';

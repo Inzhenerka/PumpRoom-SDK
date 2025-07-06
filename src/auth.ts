@@ -98,6 +98,45 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
     return currentUser || null;
 }
 
+export async function setUser(user: PumpRoomUser): Promise<PumpRoomUser | null> {
+    const config = getConfig();
+    if (!config) {
+        throw new Error('SDK is not initialized');
+    }
+
+    try {
+        const apiClient = getApiClient();
+        const result = await apiClient.verifyToken(user, config.realm);
+
+        if (!result.is_valid) {
+            console.error('Invalid user passed to setUser');
+            if (typeof localStorage !== 'undefined') {
+                localStorage.removeItem(userStorageKey);
+            }
+            setCurrentUser(null);
+            document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', {detail: null}));
+            return null;
+        }
+
+        user.is_admin = result.is_admin;
+        if (config.cacheUser) {
+            storeData(userStorageKey, user);
+        }
+        setCurrentUser(user);
+
+        if (!isAutoListenerRegistered()) {
+            window.addEventListener('message', defaultUserListener);
+            registerAutoListener();
+        }
+
+        document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', {detail: user}));
+        return user;
+    } catch (err) {
+        console.error('Verification error', err);
+        return null;
+    }
+}
+
 function defaultUserListener(event: MessageEvent): void {
     const data = getPumpRoomEventMessage(event);
     if (!data) return;
