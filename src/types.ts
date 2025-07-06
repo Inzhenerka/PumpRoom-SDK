@@ -85,6 +85,7 @@ export interface AuthInput extends RealmPayload {
     lms?: LMSProfileInput | null;
     profile?: TildaProfileInput | null;
     url?: string | null;
+    sdk_version: string;
 }
 
 /**

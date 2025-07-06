@@ -6,6 +6,7 @@ import {
     AuthenticateOptions,
 } from './types.ts';
 import {AUTH_URL, VERIFY_URL} from './constants.ts';
+import {getVersion} from './version.ts';
 
 /**
  * API client for PumpRoom SDK
@@ -65,6 +66,7 @@ export class ApiClient {
                 profile: options.profile,
                 realm: realm,
                 url: typeof window !== 'undefined' ? window.location.href : null,
+                sdk_version: getVersion(),
             };
 
             const response = await fetch(AUTH_URL, {
