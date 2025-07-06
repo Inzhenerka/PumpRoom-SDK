@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96"/>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <link rel="shortcut icon" href="/favicon.ico"/>
     <title>PumpRoom SDK</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <!-- CSS will be imported by the bundled script -->
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
 <nav class="navbar navbar-light bg-white border-bottom mb-4">
@@ -17,11 +16,16 @@
             <img src="/sdk-logo.png" alt="PumpRoom SDK" height="28" class="d-inline-block align-text-top">
             PumpRoom SDK
         </a>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/docs/index.html">📚 Техническая документация</a>
+            </li>
+        </ul>
     </div>
 </nav>
 
 <main class="container flex-grow-1">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center mt-5">
         <div class="col-lg-8">
             <h1 class="display-5 fw-normal mb-3 text-center">Интеграция PumpRoom с LMS</h1>
             <p class="lead text-center">Библиотека упрощает авторизацию и обмен данными между вашей LMS и платформой
@@ -32,7 +36,7 @@
     <section class="my-5">
         <h2 class="h4 mb-3">Начало работы</h2>
         <div class="alert alert-info" role="alert">
-            Прежде чем начать, сообщите менеджеру PumpRoom ваш email, чтобы получить доступ
+            Прежде чем начать, сообщите менеджеру PumpRoom ваш Email, чтобы получить доступ
             к <a href="http://admin.pumproom.tech/" target="_blank">админке</a>.
             Там в разделе Интеграция вы найдете API-ключ <code>apiKey</code> и идентификатор школы <code>realm</code>.
         </div>
@@ -54,45 +58,99 @@
 
         <div class="tab-content border border-top-0 p-4 bg-white" id="setupTabsContent">
             <div class="tab-pane fade show active" id="script" role="tabpanel" aria-labelledby="script-tab">
-                <p>Этот способ подойдет вам, если вы используете любую готовую LMS, которая позволяет вставлять на страницу HTML-код.</p>
+                <p>Этот способ подойдет вам, если вы используете любую готовую LMS, которая позволяет вставлять на
+                    страницу HTML-код.</p>
+
                 <p>Добавьте HTML-код на страницу урока:</p>
-                <pre class="bg-light p-3 rounded"><code>&lt;script src="https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-latest.umd.js"&gt;&lt;/script&gt;
+                <pre><code class="language-html border border-primary-subtle">&lt;script src="__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   PumpRoomSdk.authenticate({
-        lms: { email: 'ПОЧТА_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+        lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
   }).catch(console.error);
 &lt;/script&gt;</code></pre>
                 <p>Альтернативный способ (более современный):</p>
-                <pre class="bg-light p-3 rounded"><code>&lt;script type="module">
-  import { init, authenticate } from 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-latest.esm.js';
+                <pre><code class="language-html border border-primary-subtle">&lt;script type="module"&gt;
+  import { init, authenticate } from '__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js';
 
   init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   authenticate({
-        lms: { email: 'ПОЧТА_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+        lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
   }).catch(console.error);
-&lt;/script></code></pre>
+&lt;/script&gt;</code></pre>
+
+                <h5 class="mt-4 mb-3">Версии</h5>
+                <p>Вы можете использовать разные версии SDK:</p>
+                <ul>
+                    <li><strong>v1</strong> - стабильная версия __MAJOR_VERSION__.x (рекомендуется):<br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js</code><br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js</code>
+                    </li>
+                    <li><strong>latest</strong> - всегда последняя стабильная версия:<br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-latest.umd.js</code><br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-latest.esm.js</code>
+                    </li>
+                    <li><strong>v__VERSION__</strong> - конкретная версия (не рекомендуется):<br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-v__VERSION__.umd.js</code><br>
+                        <code>__BASE_URL__/bundle/pumproom-sdk-v__VERSION__.esm.js</code>
+                    </li>
+                </ul>
             </div>
+
+
             <div class="tab-pane fade" id="npm" role="tabpanel" aria-labelledby="npm-tab">
                 <p>Если вы хотите интегрировать SDK в проект своей платформы LMS, установите npm-пакет
                     <a href="https://www.npmjs.com/package/pumproom-sdk" target="_blank" class="text-decoration-none">
                         pumproom-sdk
                     </a>:
                 </p>
-                <pre class="bg-light p-3 rounded"><code>npm install pumproom-sdk</code></pre>
+                <pre><code class="language-bash border border-primary-subtle">npm install pumproom-sdk@__MAJOR_VERSION__</code></pre>
                 <p>Затем подключите его в свой проект:</p>
-                <pre class="bg-light p-3 rounded"><code>import { init, authenticate } from 'pumproom-sdk';
+                <pre><code class="language-javascript border border-primary-subtle">import { init, authenticate } from 'pumproom-sdk';
 
 init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
 authenticate({
-    lms: { email: 'ПОЧТА_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+    lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
 }).catch(console.error);</code></pre>
+                <p>Если у вас уже есть сохранённый пользователь, его можно передать напрямую:</p>
+                <pre><code class="language-javascript border border-primary-subtle">import { init, setUser } from 'pumproom-sdk';
+
+init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
+setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные от authenticate()</code></pre>
+
+                <h5 class="mt-4 mb-3">Версии</h5>
+                <p>Вы можете использовать разные версии SDK:</p>
+                <ul>
+                    <li><strong>v1</strong> - стабильная версия __MAJOR_VERSION__.x (рекомендуется):<br>
+                        <code>npm install pumproom-sdk@__MAJOR_VERSION__</code>
+                    </li>
+                    <li><strong>latest</strong> - всегда последняя стабильная версия:<br>
+                        <code>npm install pumproom-sdk@latest</code>
+                    </li>
+                    <li><strong>v__VERSION__</strong> - конкретная версия (не рекомендуется):<br>
+                        <code>npm install pumproom-sdk@__VERSION__</code>
+                    </li>
+                </ul>
             </div>
         </div>
+
         <p class="my-4">
             После настройки SDK все задания PumpRoom, интегрированные на страницу урока через <code>iframe</code>,
             начнут работать автоматически.
         </p>
+    </section>
+
+    <section class="my-5">
+        <h2 class="h4 mb-3">Все возможности</h2>
+        <p>
+            Полное описание всех методов SDK, параметров инициализации и расширенных возможностей интеграции доступно в
+            технической документации.
+        </p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <a href="/docs/index.html" class="btn btn-outline-primary">
+                📚 Открыть документацию
+            </a>
+        </div>
     </section>
 
     <section class="my-5">
@@ -107,8 +165,7 @@ authenticate({
     <small class="text-muted">PumpRoom</small>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
-        crossorigin="anonymous"></script>
+<!-- JS will be imported by the bundled script -->
+<script type="module" src="/site.js"></script>
 </body>
 </html>

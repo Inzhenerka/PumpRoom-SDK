@@ -4,7 +4,7 @@ const apiKey = import.meta.env.VITE_PUMPROOM_API_KEY;
 const realm = import.meta.env.VITE_PUMPROOM_REALM;
 
 const profile = {
-    email: 'demo_user@inzhenerka.tech',
+    id: 'demo_user@inzhenerka.tech',
     name: 'demo_user',
 };
 

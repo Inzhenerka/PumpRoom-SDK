@@ -4,6 +4,7 @@ import {fileURLToPath} from 'url';
 import pkg from './package.json';
 
 const version = pkg.version;
+const majorVersion = version.split('.')[0]; // Извлекаем первую цифру версии
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({command, mode}) => {
@@ -34,11 +35,20 @@ export default defineConfig(({command, mode}) => {
                         name: 'PumpRoomSdk',
                     },
                     {
+                        entryFileNames: `bundle/pumproom-sdk-v${majorVersion}.umd.js`,
+                        format: 'umd',
+                        name: 'PumpRoomSdk',
+                    },
+                    {
                         entryFileNames: `bundle/pumproom-sdk-v${version}.esm.js`,
                         format: 'es',
                     },
                     {
                         entryFileNames: 'bundle/pumproom-sdk-latest.esm.js',
+                        format: 'es',
+                    },
+                    {
+                        entryFileNames: `bundle/pumproom-sdk-v${majorVersion}.esm.js`,
                         format: 'es',
                     },
                 ],

@@ -2,10 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { authenticate } from '../src/auth.js';
 import { setConfig, getCurrentUser } from '../src/state.js';
 import { setCurrentUser } from '../src/state.js';
+import { initApiClient } from '../src/api-client.js';
 import { AUTH_URL, VERIFY_URL } from '../src/constants.js';
 
 beforeEach(() => {
   setConfig({ apiKey: 'key', realm: 'test' });
+  initApiClient('key');
   localStorage.clear();
   vi.restoreAllMocks();
   setCurrentUser(null);
@@ -63,5 +65,27 @@ describe('authenticate', () => {
 
     expect(user).toBeNull();
     expect(getCurrentUser()).toBeNull();
+  });
+
+  it('uses email as id when id is missing', async () => {
+    const response = { uid: '4', token: 'tok', is_admin: false };
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
+
+    await authenticate({ lms: { email: 'test@example.com', name: 'User' } });
+
+    const call = (fetch as unknown as vi.Mock).mock.calls[0][1];
+    expect(call.body).toContain('"id":"test@example.com"');
+  });
+
+  it('warns when both id and email provided', async () => {
+    const response = { uid: '5', token: 'tok', is_admin: false };
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    await authenticate({ lms: { id: '10', email: 'foo@bar.com', name: 'U' } });
+
+    expect(warn).toHaveBeenCalled();
+    const call = (fetch as unknown as vi.Mock).mock.calls[0][1];
+    expect(call.body).toContain('"id":"10"');
   });
 });

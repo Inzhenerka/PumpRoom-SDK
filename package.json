@@ -16,17 +16,23 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "vite build -c vite.config.lib.ts && tsc -p tsconfig.build.json --emitDeclarationOnly && vite build -c vite.config.site.ts",
+    "build": "vite build -c vite.config.lib.ts && tsc -p tsconfig.build.json --emitDeclarationOnly && npm run docs && vite build -c vite.config.site.ts",
     "build-lib": "vite build -c vite.config.lib.ts && tsc -p tsconfig.build.json --emitDeclarationOnly",
-    "build-site": "vite build -c vite.config.site.ts",
-    "dev": "vite build -c vite.config.lib.ts && vite -c vite.config.site.ts",
+    "build-site": "npm run docs && vite build -c vite.config.site.ts",
+    "dev": "vite build -c vite.config.lib.ts && npm run docs && vite -c vite.config.site.ts",
+    "docs": "typedoc --options typedoc.json --skipErrorChecking",
     "test": "vitest run --coverage",
     "postversion": "git push && git push --tags"
   },
   "devDependencies": {
     "@types/node": "^24.0.7",
     "@vitest/coverage-istanbul": "^3.2.4",
+    "bootstrap": "^5.3.7",
+    "highlight.js": "^11.11.1",
+    "highlightjs-copy": "^1.0.6",
     "jsdom": "^26.1.0",
+    "sass": "^1.89.2",
+    "typedoc": "^0.28.7",
     "typescript": "^5.2.2",
     "vite": "^6.3.5",
     "vitest": "^3.2.4"
