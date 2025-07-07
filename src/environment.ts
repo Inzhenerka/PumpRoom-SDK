@@ -1,14 +1,16 @@
 /**
  * Environment management module for PumpRoom SDK
- * 
+ *
  * This module handles environment information for PumpRoom,
  * including sending environment details to PumpRoom iframes
  * and setting up listeners for environment-related messages.
- * 
+ *
  * @module Environment
  */
 import {getPumpRoomEventMessage} from './messaging.ts';
 import {getVersion} from './version.ts';
+import type {InstanceContext} from './types.ts';
+import {registerInstance} from './instance.ts';
 
 /**
  * Environment information sent to PumpRoom iframes
@@ -22,7 +24,7 @@ export interface PumpRoomEnvironment {
 
 /**
  * Builds the environment information object
- * 
+ *
  * @returns The environment information
  * @internal
  */
@@ -35,7 +37,7 @@ function buildEnvironment(): PumpRoomEnvironment {
 
 /**
  * Sends environment information to a target window
- * 
+ *
  * @param target - The window to send the environment information to
  * @param origin - The origin of the target window
  */
@@ -46,13 +48,18 @@ export function sendEnvironment(target: Window, origin: string): void {
 
 /**
  * Handles environment-related messages from PumpRoom iframes
- * 
+ *
  * @param event - The message event
  * @internal
  */
 function handleEnvironmentMessage(event: MessageEvent): void {
     const data = getPumpRoomEventMessage(event);
     if (data?.type === 'getEnvironment') {
+        const instanceContext: InstanceContext = data.payload;
+
+        // Register the instance using the instance module
+        registerInstance(instanceContext);
+
         if (event.source) {
             sendEnvironment(event.source as Window, event.origin);
         }
@@ -61,10 +68,11 @@ function handleEnvironmentMessage(event: MessageEvent): void {
 
 /**
  * Sets up a listener for environment-related messages
- * 
+ *
  * This function adds an event listener to the window to handle
  * messages requesting environment information from PumpRoom iframes.
  */
 export function setEnvironmentListener(): void {
     window.addEventListener('message', handleEnvironmentMessage);
 }
+

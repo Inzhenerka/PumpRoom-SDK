@@ -1,7 +1,6 @@
 import {defineConfig, build, Plugin} from 'vite';
 import {resolve, dirname} from 'path';
 import {fileURLToPath} from 'url';
-import fs from 'fs';
 import pkg from './package.json';
 
 const version = pkg.version;

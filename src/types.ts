@@ -1,23 +1,23 @@
 /**
  * Types module for PumpRoom SDK
- * 
+ *
  * This module contains all the type definitions used throughout the SDK,
  * including user information, configuration, and API interfaces.
- * 
+ *
  * @module Types
  * @category Interfaces
  */
 
 /**
  * Identity provider names used by PumpRoom
- * 
+ *
  * These are the authentication providers supported by the PumpRoom platform.
  */
 export type IdentityProviderType = 'tilda' | 'telegram';
 
 /**
  * Information about an authenticated user
- * 
+ *
  * This interface represents a user that has been authenticated with the PumpRoom service.
  */
 export interface PumpRoomUser {
@@ -31,7 +31,7 @@ export interface PumpRoomUser {
 
 /**
  * Message format exchanged with PumpRoom via postMessage
- * 
+ *
  * This interface defines the structure of messages sent between
  * the SDK and PumpRoom iframes using the window.postMessage API.
  */
@@ -46,7 +46,7 @@ export interface PumpRoomMessage {
 
 /**
  * Course information within Tilda profile
- * 
+ *
  * This interface represents a course that a user is enrolled in
  * when authenticating via Tilda.
  */
@@ -61,7 +61,7 @@ export interface CourseInput {
 
 /**
  * User profile representation expected by PumpRoom authentication API
- * 
+ *
  * This interface represents a user profile from Tilda that is used
  * for authentication with the PumpRoom service.
  */
@@ -84,7 +84,7 @@ export interface TildaProfileInput {
 
 /**
  * User profile from a Learning Management System (LMS)
- * 
+ *
  * This interface represents a user profile from an LMS that is used
  * for authentication with the PumpRoom service.
  */
@@ -110,7 +110,7 @@ export interface LMSProfileInput {
 
 /**
  * Payload containing realm identifier
- * 
+ *
  * This interface is used as a base for requests that require a realm identifier.
  */
 export interface RealmPayload {
@@ -120,7 +120,7 @@ export interface RealmPayload {
 
 /**
  * Options for the authenticate function
- * 
+ *
  * This interface defines the options that can be passed to the authenticate function
  * to specify the user profile information.
  */
@@ -133,7 +133,7 @@ export interface AuthenticateOptions {
 
 /**
  * Input data for authentication call
- * 
+ *
  * This interface defines the data sent to the authentication endpoint.
  */
 export interface AuthInput extends RealmPayload {
@@ -149,7 +149,7 @@ export interface AuthInput extends RealmPayload {
 
 /**
  * Result returned by authentication endpoint
- * 
+ *
  * This interface defines the data returned by the authentication endpoint
  * when authentication is successful.
  */
@@ -168,7 +168,7 @@ export interface AuthResult {
 
 /**
  * Input data for token verification call
- * 
+ *
  * This interface defines the data sent to the token verification endpoint.
  */
 export interface VerifyTokenInput extends RealmPayload {
@@ -180,7 +180,7 @@ export interface VerifyTokenInput extends RealmPayload {
 
 /**
  * Result returned by token verification endpoint
- * 
+ *
  * This interface defines the data returned by the token verification endpoint.
  */
 export interface VerifyTokenResult {
@@ -192,7 +192,7 @@ export interface VerifyTokenResult {
 
 /**
  * Configuration for initializing the SDK
- * 
+ *
  * This interface defines the configuration options that can be passed
  * to the init function to configure the SDK.
  */
@@ -209,10 +209,10 @@ export interface PumpRoomConfig {
 
 /**
  * Internal configuration used by the SDK
- * 
+ *
  * This interface extends PumpRoomConfig with default values applied.
  * It is used internally by the SDK.
- * 
+ *
  * @internal
  */
 export interface InternalConfig {
@@ -224,4 +224,23 @@ export interface InternalConfig {
     cacheUser: boolean;
     /** Minimum height for PumpRoom iframes in pixels */
     minHeight?: number;
+}
+
+/**
+ * Context information for a PumpRoom instance
+ *
+ * This interface represents the context of a PumpRoom instance,
+ * containing identification and metadata used for instance registration and management.
+ */
+export interface InstanceContext {
+    /** Unique identifier for the instance */
+    instanceUid: string;
+    /** Name of the repository associated with the instance */
+    repoName: string;
+    /** Name of the task associated with the instance */
+    taskName: string;
+    /** Realm identifier that determines the context of operations */
+    realm: string;
+    /** Optional tags associated with the instance */
+    tags: string | undefined;
 }

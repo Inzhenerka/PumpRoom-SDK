@@ -18,8 +18,9 @@ import {initApiClient} from './api-client.ts';
 export {getCurrentUser} from './state.ts';
 export {authenticate, setUser} from './auth.ts';
 export {getVersion} from './version.ts';
+export {getInstances} from './instance.ts';
 export type {
-    PumpRoomConfig, PumpRoomUser, AuthenticateOptions, LMSProfileInput, TildaProfileInput, CourseInput
+    PumpRoomConfig, PumpRoomUser, AuthenticateOptions, LMSProfileInput, TildaProfileInput, CourseInput, InstanceContext
 } from './types.ts';
 
 console.debug('PumpRoom SDK v' + getVersion() + ' loaded');
