@@ -104,7 +104,8 @@
                         pumproom-sdk
                     </a>:
                 </p>
-                <pre><code class="language-bash border border-primary-subtle">npm install pumproom-sdk@__MAJOR_VERSION__</code></pre>
+                <pre><code
+                        class="language-bash border border-primary-subtle">npm install pumproom-sdk@__MAJOR_VERSION__</code></pre>
                 <p>Затем подключите его в свой проект:</p>
                 <pre><code class="language-javascript border border-primary-subtle">import { init, authenticate } from 'pumproom-sdk';
 
@@ -155,8 +156,20 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
 
     <section class="my-5">
         <h2 class="h4 mb-3">История версий</h2>
-        <ul class="list-unstyled">
-            <li><strong>1.0.0</strong> – первый релиз со стабильным API.</li>
+        <ul class="list-unstyled1">
+            <li class="mt-3">
+                <div><strong>1.1.0 – новые возможности авторизации.</strong></div>
+                <div>
+                    <code>authorize</code> теперь принимает <code>id</code> студента в произвольном формате,
+                    а <code>email</code> это альтернатива <code>id</code> с валидацией почты.
+                </div>
+                <div>
+                    Метод <code>setUser</code> позволяет вместо авторизации передать заранее сохраненные параметры
+                    пользователя, полученные после авторизации.
+                </div>
+            </li>
+
+            <li class="mt-3"><strong>1.0.0 – первый релиз со стабильным API.</strong></li>
         </ul>
     </section>
 </main>
