@@ -1,6 +1,6 @@
 {
   "name": "pumproom-sdk",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Lightweight SDK for integrating Learning Management Systems with PumpRoom platform",
   "exports": {
     ".": {
