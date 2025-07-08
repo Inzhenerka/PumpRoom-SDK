@@ -42,6 +42,8 @@ export type {
     TaskDetails,
     LoadedTaskData,
     ResultData,
+    SubmissionStatus,
+    SubmissionResult,
 } from './types/index.ts';
 
 console.debug('PumpRoom SDK v' + getVersion() + ' loaded');

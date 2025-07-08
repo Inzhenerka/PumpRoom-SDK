@@ -6,8 +6,11 @@ import {
     LoadedTaskData,
 } from "./index.ts";
 
+/**
+ * Union of all message types understood by the SDK.
+ */
 export type PumpRoomMessageType =
-    'getEnvironment'
+    | 'getEnvironment'
     | 'setEnvironment'
     | 'toggleFullscreen'
     | 'setPumpRoomUser'
@@ -30,6 +33,11 @@ export type PumpRoomMessageType =
  *
  * This interface defines the common structure of all messages exchanged with PumpRoom.
  * Specific message types extend this interface with their own payload types.
+ *
+ * @example
+ * ```typescript
+ * const msg: PumproomMessage = { service: 'pumproom', type: 'getStatus' };
+ * ```
  */
 export interface PumproomMessage<T = any> {
     /** Service identifier, always 'pumproom' for PumpRoom messages */
@@ -86,6 +94,9 @@ export interface GetPumpRoomUserMessage extends PumproomMessage {
 }
 
 
+/**
+ * Message for setting a text prompt inside the iframe.
+ */
 export interface SetPromptMessage extends PumproomMessage {
     type: 'setPrompt';
     payload: {
@@ -94,10 +105,16 @@ export interface SetPromptMessage extends PumproomMessage {
 }
 
 
+/**
+ * Message for requesting task status.
+ */
 export interface GetStatusMessage extends PumproomMessage {
     type: 'getStatus';
 }
 
+/**
+ * Message used by the iframe to report its current task status.
+ */
 export interface ReportStatusMessage extends PumproomMessage {
     type: 'reportStatus';
     payload: {
@@ -105,16 +122,25 @@ export interface ReportStatusMessage extends PumproomMessage {
     };
 }
 
+/**
+ * Notification that a task has been loaded inside the iframe.
+ */
 export interface OnTaskLoadedMessage extends PumproomMessage {
     type: 'onTaskLoaded';
     payload: LoadedTaskData;
 }
 
+/**
+ * Notification that a task has been submitted.
+ */
 export interface OnTaskSubmittedMessage extends PumproomMessage {
     type: 'onTaskSubmitted';
     payload: LoadedTaskData;
 }
 
+/**
+ * Indicates that a result is ready to be fetched.
+ */
 export interface OnResultReadyMessage extends PumproomMessage {
     type: 'onResultReady';
     payload: ResultData;

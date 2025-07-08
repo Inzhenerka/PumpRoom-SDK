@@ -66,5 +66,17 @@ export default defineConfig(({command, mode}) => {
             htmlVersionPlugin(),
             ...(isDev ? [buildExample()] : []),
         ],
+        css: {
+            preprocessorOptions: {
+                scss: {
+                    silenceDeprecations: [
+                        'import',
+                        'mixed-decls',
+                        'color-functions',
+                        'global-builtin',
+                    ],
+                },
+            },
+        },
     };
 });

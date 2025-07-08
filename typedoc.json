@@ -14,7 +14,7 @@
   "categorizeByGroup": true,
   "searchInComments": true,
   "hideGenerator": true,
-  "customFooterHtml": "PumpRoom",
+  "customFooterHtml": "PumpRoom SDK",
   "navigationLinks": {
     "Home": "/"
   },
