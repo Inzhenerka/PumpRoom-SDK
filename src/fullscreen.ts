@@ -6,7 +6,6 @@
  * 
  * @module Fullscreen
  */
-import {PUMPROOM_DOMAINS} from './constants.ts';
 import {getPumpRoomEventMessage} from './messaging.ts';
 
 /** Saved scroll position to restore when exiting fullscreen mode */
@@ -33,9 +32,9 @@ export function setFullscreenListener(): void {
     });
 
     window.addEventListener('message', (event: MessageEvent) => {
-        const data = getPumpRoomEventMessage(event);
+        const data = getPumpRoomEventMessage(event, 'toggleFullscreen');
         if (!data) return;
-        if (data.type === 'toggleFullscreen' && data.payload?.fullscreenState === false) {
+        if (!data.payload.fullscreenState) {
             window.scrollTo({
                 top: savedScroll || 0,
                 left: 0,

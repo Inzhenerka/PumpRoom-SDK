@@ -1,46 +1,38 @@
 /**
  * Messaging module for PumpRoom SDK
- * 
+ *
  * This module provides utilities for handling messages between
  * the SDK and PumpRoom iframes, including validating and sending messages.
- * 
+ *
  * @module Messaging
  */
-import type {PumpRoomMessage} from './types.ts';
-import {getCurrentUser} from './state.ts';
+import type {
+    PumpRoomMessageType,
+    MessageReturnType,
+} from './types.ts';
 
 /**
  * Extracts and validates a PumpRoom message from a MessageEvent
- * 
+ *
  * This function checks if the event data is a valid PumpRoom message
  * by verifying that it has the correct service identifier and a type.
- * 
+ * It returns a strongly typed message based on the message type.
+ *
+ * @template T - The type of message to extract, must be one of PumproomMessageType
  * @param event - The message event to extract data from
- * @returns The PumpRoom message or null if the event doesn't contain a valid message
+ * @param target_type - The expected message type
+ * @returns The strongly typed PumpRoom message or null if the event doesn't contain a valid message of the expected type
  */
-export function getPumpRoomEventMessage(event: MessageEvent): PumpRoomMessage | null {
-    if (event.data?.service !== 'pumproom') return null;
-    if (!event.data?.type) return null;
-    return event.data;
-}
-
-/**
- * Sends the current user information to a target window
- * 
- * This function retrieves the current authenticated user and sends
- * it to the specified target window using the PumpRoom message format.
- * If no user is authenticated, the function does nothing.
- * 
- * @param target - The window to send the user information to
- * @param origin - The origin of the target window
- */
-export function sendUser(target: Window, origin: string): void {
-    const user = getCurrentUser();
-    if (!user) return;
-    const message: PumpRoomMessage = {
-        service: 'pumproom',
-        type: 'setPumpRoomUser',
-        payload: user,
-    };
-    target.postMessage(message, origin);
+export function getPumpRoomEventMessage<T extends PumpRoomMessageType>(
+    event: MessageEvent,
+    target_type: T
+): MessageReturnType<T> | null {
+    // Basic validation of the message
+    if (!event.data || typeof event.data !== 'object') return null;
+    if (event.data.service !== 'pumproom') return null;
+    if (!event.data.type || typeof event.data.type !== 'string') return null;
+    // If target_type is specified, only return messages of that type
+    if (target_type && event.data.type !== target_type) return null;
+    // Return the message with the appropriate type
+    return event.data as any;
 }

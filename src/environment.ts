@@ -9,7 +9,7 @@
  */
 import {getPumpRoomEventMessage} from './messaging.ts';
 import {getVersion} from './version.ts';
-import type {InstanceContext, OnInitCallback} from './types.ts';
+import type {SetEnvironmentMessage, OnInitCallback} from './types.ts';
 import {registerInstance} from './instance.ts';
 
 /** Stores the callback function to be executed on initialization */
@@ -77,8 +77,12 @@ function buildEnvironment(): PumpRoomEnvironment {
  * @param origin - The origin of the target window
  */
 export function sendEnvironment(target: Window, origin: string): void {
-    const env = buildEnvironment();
-    target.postMessage({service: 'pumproom', type: 'setEnvironment', payload: env}, origin);
+    const message: SetEnvironmentMessage = {
+        service: 'pumproom',
+        type: 'setEnvironment',
+        payload: buildEnvironment(),
+    }
+    target.postMessage(message, origin);
 }
 
 /**
@@ -88,23 +92,20 @@ export function sendEnvironment(target: Window, origin: string): void {
  * @internal
  */
 function handleEnvironmentMessage(event: MessageEvent): void {
-    const data = getPumpRoomEventMessage(event);
-    if (data?.type === 'getEnvironment') {
-        const instanceContext: InstanceContext = data.payload;
+    const data = getPumpRoomEventMessage(event, 'getEnvironment');
+    if (!data) return
+    // Register the instance using the instance module
+    registerInstance(data.payload);
 
-        // Register the instance using the instance module
-        registerInstance(instanceContext);
+    if (event.source) {
+        sendEnvironment(event.source as Window, event.origin);
+    }
 
-        if (event.source) {
-            sendEnvironment(event.source as Window, event.origin);
-        }
-
-        // Execute the on init callback if it's set
-        if (onInitCallback) {
-            // Call the callback, which may return a Promise
-            const result = onInitCallback(instanceContext);
-            // No need to await the Promise as we're not using the result
-        }
+    // Execute the on init callback if it's set
+    if (onInitCallback) {
+        // Call the callback, which may return a Promise
+        const result = onInitCallback(data.payload);
+        // No need to await the Promise as we're not using the result
     }
 }
 

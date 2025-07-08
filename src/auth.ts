@@ -1,15 +1,15 @@
 /**
  * Authentication module for PumpRoom SDK
- * 
+ *
  * This module handles user authentication, verification, and management.
  * It provides functions for authenticating users and setting user information.
- * 
+ *
  * @module Authentication
  */
 import type {
     PumpRoomUser,
     AuthenticateOptions,
-    LMSProfileInput,
+    LMSProfileInput, SetPumpRoomUserMessage,
 } from './types.ts';
 import {userStorageKey} from './constants.ts';
 import {retrieveData, storeData} from './storage.ts';
@@ -20,12 +20,12 @@ import {
     registerAutoListener,
     isAutoListenerRegistered,
 } from './state.ts';
-import {getPumpRoomEventMessage, sendUser} from './messaging.ts';
+import {getPumpRoomEventMessage} from './messaging.ts';
 import {getApiClient} from './api-client.ts';
 
 /**
  * Validates an email address format
- * 
+ *
  * @param email - The email address to validate
  * @returns True if the email is valid, false otherwise
  * @internal
@@ -36,10 +36,10 @@ function isValidEmail(email: string): boolean {
 
 /**
  * Normalizes the LMS profile data
- * 
+ *
  * If an email is provided without an ID, and the email is valid,
  * it will be used as the ID.
- * 
+ *
  * @param lms - The LMS profile data to normalize
  * @returns The normalized LMS profile data
  * @internal
@@ -62,7 +62,7 @@ function normalizeLmsProfile(lms?: LMSProfileInput | null): LMSProfileInput | nu
 
 /**
  * Verifies a cached user token with the API
- * 
+ *
  * @param user - The user to verify
  * @returns Promise resolving to true if the token is valid, false otherwise
  * @internal
@@ -88,23 +88,23 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
 
 /**
  * Authenticates a user with the PumpRoom service
- * 
+ *
  * This function attempts to authenticate a user using the provided options.
  * If caching is enabled, it will first try to use a cached user.
- * 
+ *
  * @param options - Authentication options containing LMS and/or profile data
  * @returns Promise resolving to the authenticated user or null if authentication failed
  * @example
  * ```typescript
  * import { authenticate } from 'pumproom-sdk';
- * 
+ *
  * const user = await authenticate({
  *   lms: {
  *     id: 'user123',
  *     name: 'John Doe'
  *   }
  * });
- * 
+ *
  * if (user) {
  *   console.log('Authenticated as', user.uid);
  * }
@@ -132,7 +132,7 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
         try {
             const apiClient = getApiClient();
             const normLms = normalizeLmsProfile(lms);
-            currentUser = await apiClient.authenticate({ lms: normLms, profile }, config.realm);
+            currentUser = await apiClient.authenticate({lms: normLms, profile}, config.realm);
 
             if (currentUser && config.cacheUser) {
                 storeData(userStorageKey, currentUser);
@@ -156,21 +156,21 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
 
 /**
  * Sets a user directly without going through the authentication flow
- * 
+ *
  * This function verifies the provided user token and sets it as the current user
  * if valid. This is useful when you already have a valid user token.
- * 
+ *
  * @param user - The user object containing uid and token
  * @returns Promise resolving to the verified user or null if verification failed
  * @example
  * ```typescript
  * import { setUser } from 'pumproom-sdk';
- * 
+ *
  * const user = await setUser({
  *   uid: 'user123',
  *   token: 'valid-token'
  * });
- * 
+ *
  * if (user) {
  *   console.log('User set successfully');
  * }
@@ -186,14 +186,14 @@ export async function setUser(user: Omit<PumpRoomUser, 'is_admin'>): Promise<Pum
 
     try {
         const apiClient = getApiClient();
-        const result = await apiClient.verifyToken({ ...user, is_admin: false }, config.realm);
+        const result = await apiClient.verifyToken({...user, is_admin: false}, config.realm);
 
         if (!result.is_valid) {
             console.error('Invalid user passed to setUser');
             return null;
         }
 
-        verified = { ...user, is_admin: result.is_admin };
+        verified = {...user, is_admin: result.is_admin};
     } catch (err) {
         console.error('Verification error', err);
         return null;
@@ -214,17 +214,36 @@ export async function setUser(user: Omit<PumpRoomUser, 'is_admin'>): Promise<Pum
 }
 
 /**
+ * Sends user information to a target window
+ *
+ * This function creates a setPumpRoomUser message with the provided user
+ * and sends it to the source window of the event.
+ *
+ * @param event - The message event containing source and origin information
+ * @param user - The user information to send
+ * @internal
+ */
+export function sendUserMessage(event: MessageEvent, user: PumpRoomUser): void {
+    const message: SetPumpRoomUserMessage = {
+        service: 'pumproom',
+        type: 'setPumpRoomUser',
+        payload: user,
+    };
+    (event.source as Window).postMessage(message, event.origin);
+}
+
+/**
  * Default event listener for handling user-related messages
- * 
+ *
  * @param event - The message event
  * @internal
  */
 function defaultUserListener(event: MessageEvent): void {
-    const data = getPumpRoomEventMessage(event);
+    const data = getPumpRoomEventMessage(event, 'getPumpRoomUser');
     if (!data) return;
     const user = getCurrentUser();
     if (!user) return;
-    if (data.type === 'getPumpRoomUser') {
-        sendUser(event.source as Window, event.origin);
+    if (event.source) {
+        sendUserMessage(event, user);
     }
 }
