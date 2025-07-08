@@ -15,18 +15,7 @@
  */
 export type IdentityProviderType = 'tilda' | 'telegram';
 
-/**
- * Message types used in PumpRoom communication
- * 
- * This type defines all possible message types that can be exchanged
- * between the SDK and PumpRoom iframes.
- */
-export type PumpRoomMessageType =
-    'getEnvironment'
-    | 'setEnvironment'
-    | 'toggleFullscreen'
-    | 'setPumpRoomUser'
-    | 'getPumpRoomUser';
+export type SubmissionStatus = 'success' | 'fail' | 'internal_error'
 
 /**
  * Information about an authenticated user
@@ -41,88 +30,6 @@ export interface PumpRoomUser {
     /** Flag indicating whether the user has admin privileges */
     is_admin: boolean;
 }
-
-/**
- * Message format exchanged with PumpRoom via postMessage
- *
- * This interface defines the structure of messages sent between
- * the SDK and PumpRoom iframes using the window.postMessage API.
- */
-/**
- * Base interface for all PumpRoom messages
- *
- * This interface defines the common structure of all messages exchanged with PumpRoom.
- * Specific message types extend this interface with their own payload types.
- */
-export interface PumproomMessage<T = any> {
-    /** Service identifier, always 'pumproom' for PumpRoom messages */
-    service: 'pumproom';
-    /** Message type that determines how the message is handled */
-    type: PumpRoomMessageType;
-    /** Payload containing additional data specific to the message type */
-    payload?: T;
-}
-
-/**
- * Message for toggling fullscreen mode
- */
-export interface ToggleFullscreenMessage extends PumproomMessage {
-    /** Message type is always 'toggleFullscreen' for fullscreen toggle messages */
-    type: 'toggleFullscreen';
-    payload: FullscreenMessagePayload;
-}
-
-/**
- * Message for setting environment variables
- */
-export interface SetEnvironmentMessage extends PumproomMessage {
-    /** Message type is always 'setEnvironment' for environment setting messages */
-    type: 'setEnvironment';
-}
-
-/**
- * Message for getting environment variables
- */
-export interface GetEnvironmentMessage extends PumproomMessage {
-    /** Message type is always 'getEnvironment' for environment getting messages */
-    type: 'getEnvironment';
-    payload: InstanceContext;
-}
-
-/**
- * Message for setting the PumpRoom user
- */
-export interface SetPumpRoomUserMessage extends PumproomMessage {
-    /** Message type is always 'setPumpRoomUser' for user setting messages */
-    type: 'setPumpRoomUser';
-    payload: PumpRoomUser;
-}
-
-/**
- * Message for getting the PumpRoom user
- */
-export interface GetPumpRoomUserMessage extends PumproomMessage {
-    /** Message type is always 'getPumpRoomUser' for user getting messages */
-    type: 'getPumpRoomUser';
-}
-
-
-/**
- * Type mapping from message type to corresponding message interface
- * 
- * This type uses conditional types to map from a PumpRoomMessageType
- * to the corresponding message interface, allowing for strongly typed
- * message handling based on the message type.
- * 
- * @template T - The message type to map
- */
-export type MessageReturnType<T extends PumpRoomMessageType> =
-    T extends 'toggleFullscreen' ? ToggleFullscreenMessage :
-        T extends 'setEnvironment' ? SetEnvironmentMessage :
-            T extends 'getEnvironment' ? GetEnvironmentMessage :
-                T extends 'setPumpRoomUser' ? SetPumpRoomUserMessage :
-                    T extends 'getPumpRoomUser' ? GetPumpRoomUserMessage :
-                            PumproomMessage;
 
 /**
  * Course information within Tilda profile
@@ -331,11 +238,14 @@ export type OnInitCallback = (instanceContext: InstanceContext) => void | Promis
 
 /**
  * Payload for fullscreen toggle messages
- * 
+ *
  * This interface defines the payload structure for messages
  * that toggle the fullscreen state of PumpRoom iframes.
  */
-export interface FullscreenMessagePayload {
+export interface FullscreenParameters {
     /** Flag indicating whether fullscreen mode is active */
     fullscreenState: boolean;
 }
+
+export type TaskStatus = 'loading' | 'ready' | 'error';
+

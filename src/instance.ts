@@ -6,7 +6,7 @@
  *
  * @module Instance
  */
-import type {InstanceContext} from './types.ts';
+import type {InstanceContext} from './types/index.ts';
 
 /**
  * State for storing registered instances

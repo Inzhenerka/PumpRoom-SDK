@@ -6,7 +6,7 @@
  * 
  * @module State
  */
-import type {PumpRoomUser, PumpRoomConfig, InternalConfig} from './types.ts';
+import type {PumpRoomUser, PumpRoomConfig, InternalConfig} from './types/index.ts';
 
 /** Internal configuration storage */
 let config: InternalConfig | null = null;

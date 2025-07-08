@@ -4,7 +4,7 @@ import {
     VerifyTokenResult,
     PumpRoomUser,
     AuthenticateOptions,
-} from './types.ts';
+} from './types/index.ts';
 import {AUTH_URL, VERIFY_URL} from './constants.ts';
 import {getVersion} from './version.ts';
 

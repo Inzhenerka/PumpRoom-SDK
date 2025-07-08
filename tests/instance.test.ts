@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { registerInstance, getInstances } from '../src/instance.js';
 import { setEnvironmentListener } from '../src/environment.js';
-import type { InstanceContext } from '../src/types.js';
+import type { InstanceContext } from '../src/types/index.js';
 
 // Since we can't directly access the private instanceRegistry, we'll use
 // a different approach for testing. We'll create a fresh test for each case

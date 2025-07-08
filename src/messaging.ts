@@ -9,7 +9,7 @@
 import type {
     PumpRoomMessageType,
     MessageReturnType,
-} from './types.ts';
+} from './types/messages.js';
 
 /**
  * Extracts and validates a PumpRoom message from a MessageEvent

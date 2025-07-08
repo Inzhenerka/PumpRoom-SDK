@@ -9,7 +9,8 @@
  */
 import {getPumpRoomEventMessage} from './messaging.ts';
 import {getVersion} from './version.ts';
-import type {SetEnvironmentMessage, OnInitCallback} from './types.ts';
+import type {OnInitCallback} from './types/index.ts';
+import type {SetEnvironmentMessage} from './types/messages.js';
 import {registerInstance} from './instance.ts';
 
 /** Stores the callback function to be executed on initialization */

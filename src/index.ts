@@ -12,7 +12,7 @@ import {setFullscreenListener} from './fullscreen.ts';
 import {enforceIframeHeight} from './iframe.ts';
 import {setEnvironmentListener, setOnInitCallback} from './environment.ts';
 import {getVersion} from './version.ts';
-import {PumpRoomConfig} from './types.ts';
+import {PumpRoomConfig} from './types/index.ts';
 import {initApiClient} from './api-client.ts';
 
 export {getCurrentUser} from './state.ts';
@@ -29,7 +29,7 @@ export type {
     CourseInput,
     InstanceContext,
     OnInitCallback
-} from './types.ts';
+} from './types/index.ts';
 
 console.debug('PumpRoom SDK v' + getVersion() + ' loaded');
 

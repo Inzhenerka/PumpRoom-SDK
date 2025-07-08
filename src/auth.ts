@@ -6,11 +6,8 @@
  *
  * @module Authentication
  */
-import type {
-    PumpRoomUser,
-    AuthenticateOptions,
-    LMSProfileInput, SetPumpRoomUserMessage,
-} from './types.ts';
+import type {PumpRoomUser, AuthenticateOptions, LMSProfileInput} from './types/index.ts';
+import type {SetPumpRoomUserMessage} from './types/messages.ts';
 import {userStorageKey} from './constants.ts';
 import {retrieveData, storeData} from './storage.ts';
 import {
