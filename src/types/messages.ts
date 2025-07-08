@@ -1,10 +1,9 @@
 import {
-    InstanceContext,
     PumpRoomUser,
     TaskStatus,
     EnvironmentData,
-    TaskDetails,
-    SubmissionResult,
+    ResultData,
+    LoadedTaskData,
 } from "./index.ts";
 
 export type PumpRoomMessageType =
@@ -108,26 +107,17 @@ export interface ReportStatusMessage extends PumproomMessage {
 
 export interface OnTaskLoadedMessage extends PumproomMessage {
     type: 'onTaskLoaded';
-    payload: {
-        instanceContext: InstanceContext,
-        task: TaskDetails,
-    };
+    payload: LoadedTaskData;
 }
 
 export interface OnTaskSubmittedMessage extends PumproomMessage {
     type: 'onTaskSubmitted';
-    payload: {
-        instanceContext: InstanceContext,
-        task: TaskDetails,
-    }
+    payload: LoadedTaskData;
 }
 
 export interface OnResultReadyMessage extends PumproomMessage {
     type: 'onResultReady';
-    payload: {
-        instanceContext: InstanceContext,
-        result: SubmissionResult,
-    }
+    payload: ResultData;
 }
 
 
