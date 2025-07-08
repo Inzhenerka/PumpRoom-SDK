@@ -270,6 +270,10 @@ export interface SubmissionResult {
     stdout: string | null;
 }
 
+/**
+ * Data provided to callbacks after the SDK receives environment information.
+ */
 export interface EnvironmentData {
+    /** Context information about the current instance */
     instanceContext: InstanceContext;
 }

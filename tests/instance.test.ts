@@ -128,10 +128,10 @@ describe('instance module', () => {
 
     // Create and dispatch a getEnvironment message event
     const event = new MessageEvent('message', {
-      data: { 
-        service: 'pumproom', 
+      data: {
+        service: 'pumproom',
         type: 'getEnvironment',
-        payload: instanceContext
+        payload: { instanceContext }
       },
       origin: 'https://pumproom.tech',
       source: window

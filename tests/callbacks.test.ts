@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { setOnInitCallback, setOnTaskLoadedCallback } from '../src/callbacks.ts';
+import {
+  setOnInitCallback,
+  setOnTaskLoadedCallback,
+  executeOnInitCallback,
+  handleTaskLoadedMessage,
+} from '../src/callbacks.ts';
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -22,12 +27,8 @@ describe('callbacks module', () => {
     // Set the callback
     setOnInitCallback(mockCallback);
 
-    // Simulate the execution of the callback
-    // This is done by dispatching a message event in the actual code
-    // but we'll directly call the internal function for testing
-    // We need to access the internal function, so we'll use the module's exports
-    const callbacksModule = require('../src/callbacks.ts');
-    callbacksModule.executeOnInitCallback(mockInstanceContext);
+    // Directly execute the callback using the internal helper
+    executeOnInitCallback(mockInstanceContext);
 
     // Verify the callback was called with the correct instance context
     expect(mockCallback).toHaveBeenCalledWith(mockInstanceContext);
@@ -54,8 +55,7 @@ describe('callbacks module', () => {
     setOnInitCallback(mockAsyncCallback);
 
     // Simulate the execution of the callback
-    const callbacksModule = require('../src/callbacks.ts');
-    callbacksModule.executeOnInitCallback(mockInstanceContext);
+    executeOnInitCallback(mockInstanceContext);
 
     // Verify the callback was called with the correct instance context
     expect(mockAsyncCallback).toHaveBeenCalledWith(mockInstanceContext);
@@ -103,8 +103,7 @@ describe('callbacks module', () => {
     });
 
     // Simulate handling the message
-    const callbacksModule = require('../src/callbacks.ts');
-    callbacksModule.handleTaskLoadedMessage(event);
+    handleTaskLoadedMessage(event);
 
     // Verify the callback was called with the correct payload
     expect(mockCallback).toHaveBeenCalledWith({
@@ -153,8 +152,7 @@ describe('callbacks module', () => {
     });
 
     // Simulate handling the message
-    const callbacksModule = require('../src/callbacks.ts');
-    callbacksModule.handleTaskLoadedMessage(event);
+    handleTaskLoadedMessage(event);
 
     // Verify the callback was called with the correct payload
     expect(mockAsyncCallback).toHaveBeenCalledWith({
