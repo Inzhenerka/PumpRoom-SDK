@@ -17,9 +17,14 @@ const instanceRegistry: Record<string, InstanceContext> = {};
 
 /**
  * Registers an instance context
- * 
+ *
  * @param instanceContext - The instance context to register
  * @internal
+ *
+ * @example
+ * ```typescript
+ * registerInstance({ instanceUid: '1', repoName: 'repo', taskName: 'task', realm: 'test', tags: undefined });
+ * ```
  */
 export function registerInstance(instanceContext: InstanceContext): void {
     if (instanceContext && instanceContext.instanceUid) {
@@ -29,8 +34,14 @@ export function registerInstance(instanceContext: InstanceContext): void {
 
 /**
  * Gets all registered instances
- * 
+ *
  * @returns A record mapping instance UIDs to their contexts
+ *
+ * @example
+ * ```typescript
+ * const instances = getInstances();
+ * console.log(Object.keys(instances));
+ * ```
  */
 export function getInstances(): Record<string, InstanceContext> {
     return {...instanceRegistry};

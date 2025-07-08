@@ -19,8 +19,14 @@ let fullscreenInitialized = false;
  * This function sets up two event listeners:
  * 1. A scroll listener to save the current scroll position
  * 2. A message listener to restore the scroll position when exiting fullscreen mode
- * 
+ *
  * The function ensures that the listeners are only initialized once.
+ *
+ * @example
+ * ```typescript
+ * // Enable fullscreen scroll preservation
+ * setFullscreenListener();
+ * ```
  */
 export function setFullscreenListener(): void {
     if (fullscreenInitialized) return;

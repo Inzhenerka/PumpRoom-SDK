@@ -22,6 +22,16 @@ import type {
  * @param event - The message event to extract data from
  * @param target_type - The expected message type
  * @returns The strongly typed PumpRoom message or null if the event doesn't contain a valid message of the expected type
+ *
+ * @example
+ * ```typescript
+ * window.addEventListener('message', (e) => {
+ *   const msg = getPumpRoomEventMessage(e, 'toggleFullscreen');
+ *   if (msg) {
+ *     console.log('Fullscreen state:', msg.payload.fullscreenState);
+ *   }
+ * });
+ * ```
  */
 export function getPumpRoomEventMessage<T extends PumpRoomMessageType>(
     event: MessageEvent,

@@ -16,6 +16,11 @@
  * 
  * @param key - The key to retrieve data for
  * @returns The parsed data object or null if retrieval or parsing failed
+ *
+ * @example
+ * ```typescript
+ * const user = retrieveData('user');
+ * ```
  */
 export function retrieveData(key: string): Record<any, any> | null {
     if (typeof localStorage === 'undefined') return null;
@@ -36,6 +41,11 @@ export function retrieveData(key: string): Record<any, any> | null {
  * 
  * @param key - The key to store data under
  * @param data - The data object to store
+ *
+ * @example
+ * ```typescript
+ * storeData('user', { id: 1 });
+ * ```
  */
 export function storeData(key: string, data: Record<any, any>): void {
     if (typeof localStorage === 'undefined') return;

@@ -17,8 +17,13 @@ let autoListenerRegistered = false;
 
 /**
  * Sets the SDK configuration
- * 
+ *
  * @param cfg - The configuration object provided by the user
+ *
+ * @example
+ * ```typescript
+ * setConfig({ apiKey: 'key', realm: 'academy', cacheUser: true });
+ * ```
  */
 export function setConfig(cfg: PumpRoomConfig): void {
     const {cacheUser = true, ...rest} = cfg;
@@ -45,8 +50,16 @@ export function setCurrentUser(user: PumpRoomUser | null): void {
 
 /**
  * Gets the current authenticated user
- * 
+ *
  * @returns The current user or null if not authenticated
+ *
+ * @example
+ * ```typescript
+ * const user = getCurrentUser();
+ * if (user) {
+ *   console.log('Logged in as', user.uid);
+ * }
+ * ```
  */
 export function getCurrentUser(): PumpRoomUser | null {
     return currentUser;
@@ -63,6 +76,13 @@ export function isAutoListenerRegistered(): boolean {
 
 /**
  * Marks the automatic message listener as registered
+ *
+ * @example
+ * ```typescript
+ * if (!isAutoListenerRegistered()) {
+ *   registerAutoListener();
+ * }
+ * ```
  */
 export function registerAutoListener(): void {
     autoListenerRegistered = true;

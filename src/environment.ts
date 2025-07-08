@@ -39,10 +39,20 @@ function buildEnvironment(): PumpRoomEnvironment {
 }
 
 /**
- * Sends environment information to a target window
+ * Sends environment information to a target window.
+ *
+ * This helper is mostly used internally when the SDK receives an
+ * {@link GetEnvironmentMessage}. It can also be used in custom integrations
+ * to manually send environment data to an iframe.
  *
  * @param target - The window to send the environment information to
  * @param origin - The origin of the target window
+ *
+ * @example
+ * ```typescript
+ * const iframe = document.querySelector('iframe')!;
+ * sendEnvironment(iframe.contentWindow!, '*');
+ * ```
  */
 export function sendEnvironment(target: Window, origin: string): void {
     const message: SetEnvironmentMessage = {
@@ -74,10 +84,15 @@ function handleEnvironmentMessage(event: MessageEvent): void {
 }
 
 /**
- * Sets up a listener for environment-related messages
+ * Sets up a listener for environment-related messages.
  *
- * This function adds an event listener to the window to handle
- * messages requesting environment information from PumpRoom iframes.
+ * After calling this function the SDK will automatically respond to
+ * environment requests coming from embedded PumpRoom iframes.
+ *
+ * @example
+ * ```typescript
+ * setEnvironmentListener();
+ * ```
  */
 export function setEnvironmentListener(): void {
     window.addEventListener('message', handleEnvironmentMessage);
