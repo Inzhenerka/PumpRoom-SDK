@@ -35,7 +35,7 @@
 
     <section class="my-5">
         <h2 class="h4 mb-3">Начало работы</h2>
-        <div class="alert alert-info" role="alert">
+        <div class="alert alert-info bg-primary-subtle border-primary" role="alert">
             Прежде чем начать, сообщите менеджеру PumpRoom ваш Email, чтобы получить доступ
             к <a href="http://admin.pumproom.tech/" target="_blank">админке</a>.
             Там в разделе Интеграция вы найдете API-ключ <code>apiKey</code> и идентификатор школы <code>realm</code>.
@@ -86,7 +86,7 @@
                         <code>__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js</code><br>
                         <code>__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js</code>
                     </li>
-                    <li><strong>latest</strong> - всегда последняя стабильная версия:<br>
+                    <li><strong>latest</strong> - всегда последняя версия:<br>
                         <code>__BASE_URL__/bundle/pumproom-sdk-latest.umd.js</code><br>
                         <code>__BASE_URL__/bundle/pumproom-sdk-latest.esm.js</code>
                     </li>
@@ -125,7 +125,7 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
                     <li><strong>v1</strong> - стабильная версия __MAJOR_VERSION__.x (рекомендуется):<br>
                         <code>npm install pumproom-sdk@__MAJOR_VERSION__</code>
                     </li>
-                    <li><strong>latest</strong> - всегда последняя стабильная версия:<br>
+                    <li><strong>latest</strong> - всегда последняя версия:<br>
                         <code>npm install pumproom-sdk@latest</code>
                     </li>
                     <li><strong>v__VERSION__</strong> - конкретная версия (не рекомендуется):<br>
@@ -138,6 +138,25 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
         <p class="my-4">
             После настройки SDK все задания PumpRoom, интегрированные на страницу урока через <code>iframe</code>,
             начнут работать автоматически.
+        </p>
+    </section>
+
+    <section class="my-5">
+        <h2 class="h4 mb-3">Функции жизненного цикла</h2>
+        <p>
+            SDK позволяет задавать коллбэки на разные этапы работы с заданием: инициализация, загрузка задания,
+            отправка решения и получение результата. Это дает возможность интегрировать логику вашей LMS
+            с событиями жизненного цикла заданий PumpRoom, например:
+        </p>
+        <ul>
+            <li>Сразу обрабатывать и сохранять результат выполнения задачи без запросов на API-бэкенд</li>
+            <li>Последовательно открывать контент урока при выполнении задания</li>
+            <li>Извлекать информацию о задании (название, описание, статус)</li>
+            <li>Замерять время загрузки и выполнения задания</li>
+        </ul>
+        <p>
+            Подробное описание всех доступных коллбэков и примеры их использования доступны в
+            <a href="/docs/index.html">Технической документации</a>.
         </p>
     </section>
 
@@ -158,6 +177,15 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
         <h2 class="h4 mb-3">История версий</h2>
         <ul class="list-unstyled1">
             <li class="mt-3">
+                <div><strong>1.2.0 – колбэки жизненного цикла.</strong></div>
+                <div>
+                    Добавлены методы <code>setOnInitCallback</code>, <code>setOnTaskLoadedCallback</code>,
+                    <code>setOnTaskSubmittedCallback</code>, <code>setOnResultReadyCallback</code>
+                    для задания колбэков, которые SDK вызовет при изменении статуса задания.
+                </div>
+            </li>
+
+            <li class="mt-3">
                 <div><strong>1.1.0 – новые возможности авторизации.</strong></div>
                 <div>
                     <code>authorize</code> теперь принимает <code>id</code> студента в произвольном формате,
@@ -169,13 +197,18 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
                 </div>
             </li>
 
-            <li class="mt-3"><strong>1.0.0 – первый релиз со стабильным API.</strong></li>
+            <li class="mt-3">
+                <div><strong>1.0.0 – первый релиз со стабильным API.</strong></div>
+                <div>
+                    Авторизация пользователя для заданий PumpRoom, встроенных через iframe.
+                </div>
+            </li>
         </ul>
     </section>
 </main>
 
 <footer class="bg-white border-top text-center py-3 mt-auto">
-    <small class="text-muted">PumpRoom</small>
+    <small class="text-muted">PumpRoom SDK v__VERSION__</small>
 </footer>
 
 <!-- JS will be imported by the bundled script -->
