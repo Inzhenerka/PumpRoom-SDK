@@ -185,6 +185,52 @@ describe('sendUserMessage', () => {
   });
 });
 
+describe('default user listener', () => {
+  it('responds to getPumpRoomUser messages', async () => {
+    const response = { uid: '9', token: 'tok', is_admin: false };
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
+
+    await authenticate({ lms: { id: 'u', name: 'User' } });
+
+    const postSpy = vi.spyOn(window, 'postMessage');
+    const event = new MessageEvent('message', {
+      data: { service: 'pumproom', type: 'getPumpRoomUser' },
+      origin: 'https://pumproom.tech',
+      source: window
+    });
+
+    window.dispatchEvent(event);
+
+    expect(postSpy).toHaveBeenCalledWith(
+      {
+        service: 'pumproom',
+        type: 'setPumpRoomUser',
+        payload: response
+      },
+      'https://pumproom.tech'
+    );
+  });
+
+  it('does nothing when current user is null', async () => {
+    const verifyResp = { is_valid: true, is_admin: false };
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
+
+    await setUser({ uid: '1', token: 't' });
+    setCurrentUser(null);
+
+    const postSpy = vi.spyOn(window, 'postMessage');
+    const event = new MessageEvent('message', {
+      data: { service: 'pumproom', type: 'getPumpRoomUser' },
+      origin: 'https://pumproom.tech',
+      source: window
+    });
+
+    window.dispatchEvent(event);
+
+    expect(postSpy).not.toHaveBeenCalled();
+  });
+});
+
 // Additional tests for user message handling would go here
 // These tests are simplified to avoid mocking issues
 
