@@ -15,3 +15,7 @@ PumpRoomSdk.init({
 });
 
 PumpRoomSdk.authenticate({lms: profile}).catch(console.error);
+
+PumpRoomSdk.setOnInitCallback(async (instanceContext) => {
+    console.log('Instance initialized:', instanceContext);
+});

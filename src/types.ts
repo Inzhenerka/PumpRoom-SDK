@@ -244,3 +244,6 @@ export interface InstanceContext {
     /** Optional tags associated with the instance */
     tags: string | undefined;
 }
+
+/** Callback function type for on initialization */
+export type OnInitCallback = (instanceContext: InstanceContext) => void | Promise<void>;
