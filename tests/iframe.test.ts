@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import * as iframe from '../src/iframe.js';
-import { init } from '../src/index.js';
+import * as iframe from '../src/iframe.ts';
+import { init } from '../src/index.ts';
 
 beforeEach(() => {
   vi.restoreAllMocks();

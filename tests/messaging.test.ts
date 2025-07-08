@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { getPumpRoomEventMessage } from '../src/messaging.js';
+import { getPumpRoomEventMessage } from '../src/messaging.ts';
 
 describe('messaging', () => {
   it('validates message structure', () => {

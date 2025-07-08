@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { retrieveData, storeData } from '../src/storage.js';
-import {userStorageKey} from "../src/constants.js";
+import { retrieveData, storeData } from '../src/storage.ts';
+import {userStorageKey} from "../src/constants.ts";
 
 beforeEach(() => {
   localStorage.clear();

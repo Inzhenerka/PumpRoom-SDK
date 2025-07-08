@@ -2,7 +2,9 @@ import {
     InstanceContext,
     PumpRoomUser,
     TaskStatus,
-    SubmissionStatus,
+    EnvironmentData,
+    TaskDetails,
+    SubmissionResult,
 } from "./index.ts";
 
 export type PumpRoomMessageType =
@@ -64,7 +66,7 @@ export interface SetEnvironmentMessage extends PumproomMessage {
 export interface GetEnvironmentMessage extends PumproomMessage {
     /** Message type is always 'getEnvironment' for environment getting messages */
     type: 'getEnvironment';
-    payload: InstanceContext;
+    payload: EnvironmentData;
 }
 
 /**
@@ -108,10 +110,7 @@ export interface OnTaskLoadedMessage extends PumproomMessage {
     type: 'onTaskLoaded';
     payload: {
         instanceContext: InstanceContext,
-        task: {
-            uid: string,
-            description: string | null,
-        },
+        task: TaskDetails,
     };
 }
 
@@ -119,10 +118,7 @@ export interface OnTaskSubmittedMessage extends PumproomMessage {
     type: 'onTaskSubmitted';
     payload: {
         instanceContext: InstanceContext,
-        task: {
-            uid: string,
-            description: string | null,
-        },
+        task: TaskDetails,
     }
 }
 
@@ -130,12 +126,7 @@ export interface OnResultReadyMessage extends PumproomMessage {
     type: 'onResultReady';
     payload: {
         instanceContext: InstanceContext,
-        result: {
-            submissionUid: string,
-            status: SubmissionStatus,
-            message: string | null,
-            stdout: string | null,
-        },
+        result: SubmissionResult,
     }
 }
 

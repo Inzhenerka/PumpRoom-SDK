@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { setUser } from '../src/auth.js';
-import { setConfig, getCurrentUser, setCurrentUser } from '../src/state.js';
-import { initApiClient } from '../src/api-client.js';
-import { VERIFY_URL } from '../src/constants.js';
+import { setUser } from '../src/auth.ts';
+import { setConfig, getCurrentUser, setCurrentUser } from '../src/state.ts';
+import { initApiClient } from '../src/api-client.ts';
+import { VERIFY_URL } from '../src/constants.ts';
 
 beforeEach(() => {
   setConfig({ apiKey: 'key', realm: 'test' });

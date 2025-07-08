@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { authenticate } from '../src/auth.js';
-import { setConfig, setCurrentUser, isAutoListenerRegistered, registerAutoListener } from '../src/state.js';
-import { initApiClient } from '../src/api-client.js';
+import { authenticate } from '../src/auth.ts';
+import { setConfig, setCurrentUser, isAutoListenerRegistered, registerAutoListener } from '../src/state.ts';
+import { initApiClient } from '../src/api-client.ts';
 
 // Mock the state module to control isAutoListenerRegistered
-vi.mock('../src/state.js', async () => {
-  const actual = await vi.importActual('../src/state.js');
+vi.mock('../src/state.ts', async () => {
+  const actual = await vi.importActual('../src/state.ts');
   return {
     ...actual,
     isAutoListenerRegistered: vi.fn(),

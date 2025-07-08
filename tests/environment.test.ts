@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { sendEnvironment, setEnvironmentListener, setOnInitCallback } from '../src/environment.js';
-import * as version from '../src/version.js';
+import { sendEnvironment, setEnvironmentListener } from '../src/environment.ts';
+import { setOnInitCallback } from '../src/callbacks.ts';
+import * as version from '../src/version.ts';
 
 beforeEach(() => {
   vi.restoreAllMocks();

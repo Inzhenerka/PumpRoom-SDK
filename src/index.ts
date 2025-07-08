@@ -10,7 +10,8 @@
 import {setConfig} from './state.js';
 import {setFullscreenListener} from './fullscreen.ts';
 import {enforceIframeHeight} from './iframe.ts';
-import {setEnvironmentListener, setOnInitCallback} from './environment.ts';
+import {setEnvironmentListener} from './environment.ts';
+import {setTaskListener} from './callbacks.ts';
 import {getVersion} from './version.ts';
 import {PumpRoomConfig} from './types/index.ts';
 import {initApiClient} from './api-client.ts';
@@ -19,7 +20,7 @@ export {getCurrentUser} from './state.ts';
 export {authenticate, setUser} from './auth.ts';
 export {getVersion} from './version.ts';
 export {getInstances} from './instance.ts';
-export {setOnInitCallback} from './environment.ts';
+export {setOnInitCallback, setOnTaskLoadedCallback} from './callbacks.ts';
 export type {
     PumpRoomConfig,
     PumpRoomUser,
@@ -28,7 +29,9 @@ export type {
     TildaProfileInput,
     CourseInput,
     InstanceContext,
-    OnInitCallback
+    OnInitCallback,
+    OnTaskLoadedCallback,
+    EnvironmentData,
 } from './types/index.ts';
 
 console.debug('PumpRoom SDK v' + getVersion() + ' loaded');
@@ -57,6 +60,7 @@ export function init(cfg: PumpRoomConfig): void {
     initApiClient(cfg.apiKey);
     setFullscreenListener();
     setEnvironmentListener();
+    setTaskListener();
     if (cfg.minHeight) {
         enforceIframeHeight(cfg.minHeight);
     }

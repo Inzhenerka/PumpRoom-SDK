@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { authenticate, setUser, sendUserMessage } from '../src/auth.js';
-import { setConfig, getCurrentUser, isAutoListenerRegistered, registerAutoListener } from '../src/state.js';
-import { setCurrentUser } from '../src/state.js';
-import { initApiClient } from '../src/api-client.js';
-import { AUTH_URL, VERIFY_URL } from '../src/constants.js';
-import { getPumpRoomEventMessage } from '../src/messaging.js';
+import { authenticate, setUser, sendUserMessage } from '../src/auth.ts';
+import { setConfig, getCurrentUser, isAutoListenerRegistered, registerAutoListener } from '../src/state.ts';
+import { setCurrentUser } from '../src/state.ts';
+import { initApiClient } from '../src/api-client.ts';
+import { AUTH_URL, VERIFY_URL } from '../src/constants.ts';
+import { getPumpRoomEventMessage } from '../src/messaging.ts';
 
 beforeEach(() => {
   setConfig({ apiKey: 'key', realm: 'test' });

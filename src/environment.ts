@@ -9,44 +9,11 @@
  */
 import {getPumpRoomEventMessage} from './messaging.ts';
 import {getVersion} from './version.ts';
-import type {OnInitCallback} from './types/index.ts';
 import type {SetEnvironmentMessage} from './types/messages.js';
 import {registerInstance} from './instance.ts';
+import {executeOnInitCallback} from './callbacks.ts';
 
-/** Stores the callback function to be executed on initialization */
-let onInitCallback: OnInitCallback | null = null;
-
-/**
- * Sets a callback function to be executed on initialization
- *
- * This function allows setting a callback that will be executed immediately
- * after processing the getEnvironment message, with the instanceContext passed to it.
- * The callback can be either synchronous or asynchronous (async function).
- *
- * @param callback - The callback function to execute on initialization (can be async)
- * @example
- * ```typescript
- * // Set a synchronous callback to be executed on initialization
- * setOnInitCallback((instanceContext) => {
- *   console.log('Instance initialized:', instanceContext);
- *   // Perform actions with the instanceContext
- *   console.log('Instance UID:', instanceContext.instanceUid);
- *   console.log('Repository:', instanceContext.repoName);
- *   console.log('Task:', instanceContext.taskName);
- * });
- *
- * // Set an asynchronous callback to be executed on initialization
- * setOnInitCallback(async (instanceContext) => {
- *   console.log('Instance initialized:', instanceContext);
- *   // Perform async actions with the instanceContext
- *   await someAsyncOperation(instanceContext);
- *   console.log('Async operations completed');
- * });
- * ```
- */
-export function setOnInitCallback(callback: OnInitCallback): void {
-    onInitCallback = callback;
-}
+// The setOnInitCallback function has been moved to callbacks.ts
 
 /**
  * Environment information sent to PumpRoom iframes
@@ -96,18 +63,14 @@ function handleEnvironmentMessage(event: MessageEvent): void {
     const data = getPumpRoomEventMessage(event, 'getEnvironment');
     if (!data) return
     // Register the instance using the instance module
-    registerInstance(data.payload);
+    registerInstance(data.payload.instanceContext);
 
     if (event.source) {
         sendEnvironment(event.source as Window, event.origin);
     }
 
-    // Execute the on init callback if it's set
-    if (onInitCallback) {
-        // Call the callback, which may return a Promise
-        const result = onInitCallback(data.payload);
-        // No need to await the Promise as we're not using the result
-    }
+    // Execute the on init callback if it's set (using the callbacks module)
+    executeOnInitCallback(data.payload);
 }
 
 /**

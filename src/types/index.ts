@@ -233,7 +233,15 @@ export interface InstanceContext {
 }
 
 /** Callback function type for on initialization */
-export type OnInitCallback = (instanceContext: InstanceContext) => void | Promise<void>;
+export type OnInitCallback = (data: EnvironmentData) => void | Promise<void>;
+
+/** Callback function type for when a task is loaded */
+export type OnTaskLoadedCallback = (
+    data: {
+        instanceContext: InstanceContext,
+        task: TaskDetails
+    }
+) => void | Promise<void>;
 
 
 /**
@@ -249,3 +257,19 @@ export interface FullscreenParameters {
 
 export type TaskStatus = 'loading' | 'ready' | 'error';
 
+export interface TaskDetails {
+    uid: string;
+    description: string | null;
+}
+
+export interface SubmissionResult {
+    taskUid: string;
+    submissionUid: string;
+    status: SubmissionStatus;
+    message: string | null;
+    stdout: string | null;
+}
+
+export interface EnvironmentData {
+    instanceContext: InstanceContext;
+}
