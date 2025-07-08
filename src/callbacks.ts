@@ -7,13 +7,25 @@
  * @module Callbacks
  */
 import {getPumpRoomEventMessage} from './messaging.ts';
-import type {OnInitCallback, OnTaskLoadedCallback, EnvironmentData} from './types/index.ts';
+import type {
+    OnInitCallback, 
+    OnTaskLoadedCallback, 
+    OnTaskSubmittedCallback,
+    OnResultReadyCallback,
+    EnvironmentData
+} from './types/index.ts';
 
 /** Stores the callback function to be executed on initialization */
 let onInitCallback: OnInitCallback | null = null;
 
 /** Stores the callback function to be executed when a task is loaded */
 let onTaskLoadedCallback: OnTaskLoadedCallback | null = null;
+
+/** Stores the callback function to be executed when a task is submitted */
+let onTaskSubmittedCallback: OnTaskSubmittedCallback | null = null;
+
+/** Stores the callback function to be executed when a result is ready */
+let onResultReadyCallback: OnResultReadyCallback | null = null;
 
 /**
  * Sets a callback function to be executed on initialization
@@ -80,6 +92,71 @@ export function setOnTaskLoadedCallback(callback: OnTaskLoadedCallback): void {
 }
 
 /**
+ * Sets a callback function to be executed when a task is submitted
+ *
+ * This function allows setting a callback that will be executed when
+ * an onTaskSubmitted message is received, with the payload containing instanceContext and task
+ * information passed to it. The callback can be either synchronous or
+ * asynchronous (async function).
+ *
+ * @param callback - The callback function to execute when a task is submitted (can be async)
+ * @example
+ * ```typescript
+ * // Set a synchronous callback to be executed when a task is submitted
+ * setOnTaskSubmittedCallback((payload) => {
+ *   console.log('Task submitted:', payload.task);
+ *   console.log('Task UID:', payload.task.uid);
+ *   console.log('Task Description:', payload.task.description);
+ *   console.log('Instance UID:', payload.instanceContext.instanceUid);
+ * });
+ *
+ * // Set an asynchronous callback to be executed when a task is submitted
+ * setOnTaskSubmittedCallback(async (payload) => {
+ *   console.log('Task submitted:', payload.task);
+ *   // Perform async actions with the task information
+ *   await someAsyncOperation(payload.task);
+ *   console.log('Async operations completed');
+ * });
+ * ```
+ */
+export function setOnTaskSubmittedCallback(callback: OnTaskSubmittedCallback): void {
+    onTaskSubmittedCallback = callback;
+}
+
+/**
+ * Sets a callback function to be executed when a result is ready
+ *
+ * This function allows setting a callback that will be executed when
+ * an onResultReady message is received, with the payload containing instanceContext and result
+ * information passed to it. The callback can be either synchronous or
+ * asynchronous (async function).
+ *
+ * @param callback - The callback function to execute when a result is ready (can be async)
+ * @example
+ * ```typescript
+ * // Set a synchronous callback to be executed when a result is ready
+ * setOnResultReadyCallback((payload) => {
+ *   console.log('Result ready:', payload.result);
+ *   console.log('Task UID:', payload.result.taskUid);
+ *   console.log('Submission UID:', payload.result.submissionUid);
+ *   console.log('Status:', payload.result.status);
+ *   console.log('Instance UID:', payload.instanceContext.instanceUid);
+ * });
+ *
+ * // Set an asynchronous callback to be executed when a result is ready
+ * setOnResultReadyCallback(async (payload) => {
+ *   console.log('Result ready:', payload.result);
+ *   // Perform async actions with the result information
+ *   await someAsyncOperation(payload.result);
+ *   console.log('Async operations completed');
+ * });
+ * ```
+ */
+export function setOnResultReadyCallback(callback: OnResultReadyCallback): void {
+    onResultReadyCallback = callback;
+}
+
+/**
  * Executes the onInitCallback if it's set
  *
  * @param data - callback data
@@ -112,11 +189,49 @@ export function handleTaskLoadedMessage(event: MessageEvent): void {
 }
 
 /**
+ * Handles onTaskSubmitted messages from PumpRoom iframes
+ *
+ * @param event - The message event
+ * @internal
+ */
+export function handleTaskSubmittedMessage(event: MessageEvent): void {
+    const data = getPumpRoomEventMessage(event, 'onTaskSubmitted');
+    if (!data) return;
+
+    // Execute the onTaskSubmitted callback if it's set
+    if (onTaskSubmittedCallback) {
+        // Call the callback, which may return a Promise
+        const result = onTaskSubmittedCallback(data.payload);
+        // No need to await the Promise as we're not using the result
+    }
+}
+
+/**
+ * Handles onResultReady messages from PumpRoom iframes
+ *
+ * @param event - The message event
+ * @internal
+ */
+export function handleResultReadyMessage(event: MessageEvent): void {
+    const data = getPumpRoomEventMessage(event, 'onResultReady');
+    if (!data) return;
+
+    // Execute the onResultReady callback if it's set
+    if (onResultReadyCallback) {
+        // Call the callback, which may return a Promise
+        const result = onResultReadyCallback(data.payload);
+        // No need to await the Promise as we're not using the result
+    }
+}
+
+/**
  * Sets up a listener for task-related messages
  *
- * This function adds an event listener to the window to handle
- * messages related to task loading from PumpRoom iframes.
+ * This function adds event listeners to the window to handle
+ * messages related to tasks and results from PumpRoom iframes.
  */
 export function setTaskListener(): void {
     window.addEventListener('message', handleTaskLoadedMessage);
+    window.addEventListener('message', handleTaskSubmittedMessage);
+    window.addEventListener('message', handleResultReadyMessage);
 }

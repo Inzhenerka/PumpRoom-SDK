@@ -27,7 +27,11 @@ describe('environment helpers', () => {
     const postSpy = vi.spyOn(window, 'postMessage');
     setEnvironmentListener();
     const event = new MessageEvent('message', {
-      data: { service: 'pumproom', type: 'getEnvironment' },
+      data: {
+        service: 'pumproom',
+        type: 'getEnvironment',
+        payload: { instanceContext: { instanceUid: 'test', repoName: '', taskName: '', realm: '', tags: '' } }
+      },
       origin: 'https://pumproom.tech',
       source: window
     });
@@ -64,10 +68,10 @@ describe('environment helpers', () => {
 
     // Create and dispatch a getEnvironment message event with the mock instance context
     const event = new MessageEvent('message', {
-      data: { 
-        service: 'pumproom', 
+      data: {
+        service: 'pumproom',
         type: 'getEnvironment',
-        payload: mockInstanceContext
+        payload: { instanceContext: mockInstanceContext }
       },
       origin: 'https://pumproom.tech',
       source: window
@@ -75,7 +79,7 @@ describe('environment helpers', () => {
     window.dispatchEvent(event);
 
     // Verify the callback was called with the correct instance context
-    expect(mockCallback).toHaveBeenCalledWith(mockInstanceContext);
+    expect(mockCallback).toHaveBeenCalledWith({ instanceContext: mockInstanceContext });
   });
 
   it('executes asynchronous onInitCallback when getEnvironment message is received', async () => {
@@ -103,10 +107,10 @@ describe('environment helpers', () => {
 
     // Create and dispatch a getEnvironment message event with the mock instance context
     const event = new MessageEvent('message', {
-      data: { 
-        service: 'pumproom', 
+      data: {
+        service: 'pumproom',
         type: 'getEnvironment',
-        payload: mockInstanceContext
+        payload: { instanceContext: mockInstanceContext }
       },
       origin: 'https://pumproom.tech',
       source: window
@@ -114,7 +118,7 @@ describe('environment helpers', () => {
     window.dispatchEvent(event);
 
     // Verify the callback was called with the correct instance context
-    expect(mockAsyncCallback).toHaveBeenCalledWith(mockInstanceContext);
+    expect(mockAsyncCallback).toHaveBeenCalledWith({ instanceContext: mockInstanceContext });
 
     // Wait for any pending promises to resolve
     await new Promise(resolve => setTimeout(resolve, 20));

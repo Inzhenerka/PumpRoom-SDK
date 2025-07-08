@@ -236,13 +236,13 @@ export interface InstanceContext {
 export type OnInitCallback = (data: EnvironmentData) => void | Promise<void>;
 
 /** Callback function type for when a task is loaded */
-export type OnTaskLoadedCallback = (
-    data: {
-        instanceContext: InstanceContext,
-        task: TaskDetails
-    }
-) => void | Promise<void>;
+export type OnTaskLoadedCallback = (data: LoadedTaskData) => void | Promise<void>;
 
+/** Callback function type for when a task is submitted */
+export type OnTaskSubmittedCallback = (data: LoadedTaskData) => void | Promise<void>;
+
+/** Callback function type for when a result is ready */
+export type OnResultReadyCallback = (data: ResultData) => void | Promise<void>;
 
 /**
  * Payload for fullscreen toggle messages
@@ -270,6 +270,20 @@ export interface SubmissionResult {
     stdout: string | null;
 }
 
+/**
+ * Data provided to callbacks after the SDK receives environment information.
+ */
 export interface EnvironmentData {
+    /** Context information about the current instance */
     instanceContext: InstanceContext;
+}
+
+export interface LoadedTaskData {
+    instanceContext: InstanceContext;
+    task: TaskDetails;
+}
+
+export interface ResultData {
+    instanceContext: InstanceContext,
+    result: SubmissionResult,
 }

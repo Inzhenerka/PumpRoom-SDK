@@ -20,7 +20,12 @@ export {getCurrentUser} from './state.ts';
 export {authenticate, setUser} from './auth.ts';
 export {getVersion} from './version.ts';
 export {getInstances} from './instance.ts';
-export {setOnInitCallback, setOnTaskLoadedCallback} from './callbacks.ts';
+export {
+    setOnInitCallback, 
+    setOnTaskLoadedCallback, 
+    setOnTaskSubmittedCallback, 
+    setOnResultReadyCallback
+} from './callbacks.ts';
 export type {
     PumpRoomConfig,
     PumpRoomUser,
@@ -31,7 +36,12 @@ export type {
     InstanceContext,
     OnInitCallback,
     OnTaskLoadedCallback,
+    OnTaskSubmittedCallback,
+    OnResultReadyCallback,
     EnvironmentData,
+    TaskDetails,
+    LoadedTaskData,
+    ResultData,
 } from './types/index.ts';
 
 console.debug('PumpRoom SDK v' + getVersion() + ' loaded');
