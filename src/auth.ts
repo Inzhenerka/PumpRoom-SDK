@@ -8,7 +8,7 @@
  */
 import type {PumpRoomUser, AuthenticateOptions, LMSProfileInput} from './types/index.ts';
 import type {SetPumpRoomUserMessage} from './types/messages.ts';
-import {userStorageKey} from './constants.ts';
+import {USER_STORAGE_KEY} from './constants.ts';
 import {retrieveData, storeData} from './storage.ts';
 import {
     getConfig,
@@ -16,7 +16,7 @@ import {
     getCurrentUser,
     registerAutoListener,
     isAutoListenerRegistered,
-} from './state.ts';
+} from './globals.ts';
 import {getPumpRoomEventMessage} from './messaging.ts';
 import {getApiClient} from './api-client.ts';
 
@@ -74,7 +74,7 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
 
         if (result.is_valid) {
             user.is_admin = result.is_admin;
-            storeData(userStorageKey, user);
+            storeData(USER_STORAGE_KEY, user);
         }
         return result.is_valid;
     } catch (err) {
@@ -116,12 +116,12 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
     let currentUser = getCurrentUser();
     let fromCache = false;
     if (config.cacheUser) {
-        const cachedUser = retrieveData(userStorageKey) as PumpRoomUser;
+        const cachedUser = retrieveData(USER_STORAGE_KEY) as PumpRoomUser;
         if (cachedUser && (await verifyCachedUser(cachedUser))) {
             currentUser = cachedUser;
             fromCache = true;
         } else if (cachedUser && typeof localStorage !== 'undefined') {
-            localStorage.removeItem(userStorageKey);
+            localStorage.removeItem(USER_STORAGE_KEY);
         }
     }
 
@@ -132,7 +132,7 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
             currentUser = await apiClient.authenticate({lms: normLms, profile}, config.realm);
 
             if (currentUser && config.cacheUser) {
-                storeData(userStorageKey, currentUser);
+                storeData(USER_STORAGE_KEY, currentUser);
             }
         } catch (err) {
             console.error('Network error', err);
@@ -197,7 +197,7 @@ export async function setUser(user: Omit<PumpRoomUser, 'is_admin'>): Promise<Pum
     }
 
     if (config.cacheUser) {
-        storeData(userStorageKey, verified);
+        storeData(USER_STORAGE_KEY, verified);
     }
     setCurrentUser(verified);
 

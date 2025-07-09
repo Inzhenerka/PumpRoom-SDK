@@ -7,11 +7,12 @@
  * @module Fullscreen
  */
 import {getPumpRoomEventMessage} from './messaging.ts';
-
-/** Saved scroll position to restore when exiting fullscreen mode */
-let savedScroll = 0;
-/** Flag to prevent multiple initializations of the fullscreen listener */
-let fullscreenInitialized = false;
+import {
+    getSavedScroll,
+    setSavedScroll,
+    isFullscreenInitialized,
+    setFullscreenInitialized
+} from './globals.ts';
 
 /**
  * Sets up event listeners for handling fullscreen mode
@@ -29,11 +30,11 @@ let fullscreenInitialized = false;
  * ```
  */
 export function setFullscreenListener(): void {
-    if (fullscreenInitialized) return;
+    if (isFullscreenInitialized()) return;
 
     window.addEventListener('scroll', () => {
         if (window.scrollY) {
-            savedScroll = window.scrollY;
+            setSavedScroll(window.scrollY);
         }
     });
 
@@ -42,11 +43,11 @@ export function setFullscreenListener(): void {
         if (!data) return;
         if (!data.payload.fullscreenState) {
             window.scrollTo({
-                top: savedScroll || 0,
+                top: getSavedScroll() || 0,
                 left: 0,
                 behavior: 'instant',
             });
         }
     });
-    fullscreenInitialized = true;
+    setFullscreenInitialized();
 }

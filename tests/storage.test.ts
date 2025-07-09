@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { retrieveData, storeData } from '../src/storage.ts';
-import {userStorageKey} from "../src/constants.ts";
+import {USER_STORAGE_KEY} from "../src/constants.ts";
 
 beforeEach(() => {
   localStorage.clear();
@@ -8,18 +8,18 @@ beforeEach(() => {
 
 describe('storage', () => {
   it('returns null when storage empty', () => {
-    expect(retrieveData(userStorageKey)).toBeNull();
+    expect(retrieveData(USER_STORAGE_KEY)).toBeNull();
   });
 
   it('saves and reads user', () => {
     const user = { uid: 'u', token: 't', is_admin: false };
-    storeData(userStorageKey, user);
-    expect(retrieveData(userStorageKey)).toEqual(user);
+    storeData(USER_STORAGE_KEY, user);
+    expect(retrieveData(USER_STORAGE_KEY)).toEqual(user);
   });
 
   it('handles JSON parse error', () => {
     localStorage.setItem('pumproomUser', '{bad json');
-    expect(retrieveData(userStorageKey)).toBeNull();
+    expect(retrieveData(USER_STORAGE_KEY)).toBeNull();
   });
 
   it('ignores storage failures', () => {
@@ -31,7 +31,7 @@ describe('storage', () => {
       removeItem: orig.removeItem.bind(orig),
     } as any;
     const user = { uid: 'u', token: 't', is_admin: false };
-    expect(() => storeData(userStorageKey, user)).not.toThrow();
+    expect(() => storeData(USER_STORAGE_KEY, user)).not.toThrow();
     global.localStorage = orig;
   });
 });

@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as fullscreen from '../src/fullscreen.ts';
-import { setConfig, getConfig, setCurrentUser, getCurrentUser } from '../src/state.ts';
+import { setConfig, getConfig, setCurrentUser, getCurrentUser } from '../src/globals.ts';
 import { init } from '../src/index.ts';
 
 beforeEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('state', () => {
+describe('globals', () => {
   it('initializes config', () => {
     setConfig({ apiKey: 'key', realm: 'test' });
     expect(getConfig()).toEqual({ apiKey: 'key', realm: 'test', cacheUser: true });

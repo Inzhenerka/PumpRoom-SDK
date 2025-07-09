@@ -28,4 +28,4 @@ export const PUMPROOM_DOMAINS = [
 ] as const;
 
 /** Key used for storing user data in localStorage */
-export const userStorageKey = 'pumproomUser'
+export const USER_STORAGE_KEY = 'pumproomUser'

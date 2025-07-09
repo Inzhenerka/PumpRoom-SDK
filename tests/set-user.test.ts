@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setUser } from '../src/auth.ts';
-import { setConfig, getCurrentUser, setCurrentUser } from '../src/state.ts';
+import { setConfig, getCurrentUser, setCurrentUser } from '../src/globals.ts';
 import { initApiClient } from '../src/api-client.ts';
 import { VERIFY_URL } from '../src/constants.ts';
 

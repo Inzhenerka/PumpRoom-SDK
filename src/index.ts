@@ -7,7 +7,7 @@
  * @module PumpRoomSDK
  */
 
-import {setConfig} from './state.js';
+import {setConfig} from './globals.ts';
 import {setFullscreenListener} from './fullscreen.ts';
 import {enforceIframeHeight} from './iframe.ts';
 import {setEnvironmentListener} from './environment.ts';
@@ -16,7 +16,7 @@ import {getVersion} from './version.ts';
 import {PumpRoomConfig} from './types/index.ts';
 import {initApiClient} from './api-client.ts';
 
-export {getCurrentUser} from './state.ts';
+export {getCurrentUser} from './globals.ts';
 export {authenticate, setUser} from './auth.ts';
 export {getVersion} from './version.ts';
 export {getInstances} from './instance.ts';

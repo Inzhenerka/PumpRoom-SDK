@@ -7,6 +7,16 @@
  * @module Callbacks
  */
 import {getPumpRoomEventMessage} from './messaging.ts';
+import {
+    setOnInitCallback as setOnInitCallbackGlobal,
+    getOnInitCallback,
+    setOnTaskLoadedCallback as setOnTaskLoadedCallbackGlobal,
+    getOnTaskLoadedCallback,
+    setOnTaskSubmittedCallback as setOnTaskSubmittedCallbackGlobal,
+    getOnTaskSubmittedCallback,
+    setOnResultReadyCallback as setOnResultReadyCallbackGlobal,
+    getOnResultReadyCallback
+} from './globals.ts';
 import type {
     OnInitCallback, 
     OnTaskLoadedCallback, 
@@ -14,18 +24,6 @@ import type {
     OnResultReadyCallback,
     EnvironmentData
 } from './types/index.ts';
-
-/** Stores the callback function to be executed on initialization */
-let onInitCallback: OnInitCallback | null = null;
-
-/** Stores the callback function to be executed when a task is loaded */
-let onTaskLoadedCallback: OnTaskLoadedCallback | null = null;
-
-/** Stores the callback function to be executed when a task is submitted */
-let onTaskSubmittedCallback: OnTaskSubmittedCallback | null = null;
-
-/** Stores the callback function to be executed when a result is ready */
-let onResultReadyCallback: OnResultReadyCallback | null = null;
 
 /**
  * Sets a callback function to be executed on initialization
@@ -56,7 +54,7 @@ let onResultReadyCallback: OnResultReadyCallback | null = null;
  * ```
  */
 export function setOnInitCallback(callback: OnInitCallback): void {
-    onInitCallback = callback;
+    setOnInitCallbackGlobal(callback);
 }
 
 /**
@@ -88,7 +86,7 @@ export function setOnInitCallback(callback: OnInitCallback): void {
  * ```
  */
 export function setOnTaskLoadedCallback(callback: OnTaskLoadedCallback): void {
-    onTaskLoadedCallback = callback;
+    setOnTaskLoadedCallbackGlobal(callback);
 }
 
 /**
@@ -120,7 +118,7 @@ export function setOnTaskLoadedCallback(callback: OnTaskLoadedCallback): void {
  * ```
  */
 export function setOnTaskSubmittedCallback(callback: OnTaskSubmittedCallback): void {
-    onTaskSubmittedCallback = callback;
+    setOnTaskSubmittedCallbackGlobal(callback);
 }
 
 /**
@@ -153,7 +151,7 @@ export function setOnTaskSubmittedCallback(callback: OnTaskSubmittedCallback): v
  * ```
  */
 export function setOnResultReadyCallback(callback: OnResultReadyCallback): void {
-    onResultReadyCallback = callback;
+    setOnResultReadyCallbackGlobal(callback);
 }
 
 /**
@@ -163,9 +161,10 @@ export function setOnResultReadyCallback(callback: OnResultReadyCallback): void 
  * @internal
  */
 export function executeOnInitCallback(data: EnvironmentData): void {
-    if (onInitCallback) {
+    const callback = getOnInitCallback();
+    if (callback) {
         // Call the callback, which may return a Promise
-        onInitCallback(data);
+        callback(data);
         // No need to await the Promise as we're not using the result
     }
 }
@@ -181,9 +180,10 @@ export function handleTaskLoadedMessage(event: MessageEvent): void {
     if (!data) return;
 
     // Execute the onTaskLoaded callback if it's set
-    if (onTaskLoadedCallback) {
+    const callback = getOnTaskLoadedCallback();
+    if (callback) {
         // Call the callback, which may return a Promise
-        const result = onTaskLoadedCallback(data.payload);
+        const result = callback(data.payload);
         // No need to await the Promise as we're not using the result
     }
 }
@@ -199,9 +199,10 @@ export function handleTaskSubmittedMessage(event: MessageEvent): void {
     if (!data) return;
 
     // Execute the onTaskSubmitted callback if it's set
-    if (onTaskSubmittedCallback) {
+    const callback = getOnTaskSubmittedCallback();
+    if (callback) {
         // Call the callback, which may return a Promise
-        const result = onTaskSubmittedCallback(data.payload);
+        const result = callback(data.payload);
         // No need to await the Promise as we're not using the result
     }
 }
@@ -217,9 +218,10 @@ export function handleResultReadyMessage(event: MessageEvent): void {
     if (!data) return;
 
     // Execute the onResultReady callback if it's set
-    if (onResultReadyCallback) {
+    const callback = getOnResultReadyCallback();
+    if (callback) {
         // Call the callback, which may return a Promise
-        const result = onResultReadyCallback(data.payload);
+        const result = callback(data.payload);
         // No need to await the Promise as we're not using the result
     }
 }

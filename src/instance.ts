@@ -6,14 +6,8 @@
  *
  * @module Instance
  */
+import {registerInstance as registerInstanceGlobal, getInstances as getInstancesGlobal} from './globals.ts';
 import type {InstanceContext} from './types/index.ts';
-
-/**
- * State for storing registered instances
- * Maps instanceUid to InstanceContext
- * @internal
- */
-const instanceRegistry: Record<string, InstanceContext> = {};
 
 /**
  * Registers an instance context
@@ -27,9 +21,7 @@ const instanceRegistry: Record<string, InstanceContext> = {};
  * ```
  */
 export function registerInstance(instanceContext: InstanceContext): void {
-    if (instanceContext && instanceContext.instanceUid) {
-        instanceRegistry[instanceContext.instanceUid] = instanceContext;
-    }
+    registerInstanceGlobal(instanceContext);
 }
 
 /**
@@ -44,5 +36,5 @@ export function registerInstance(instanceContext: InstanceContext): void {
  * ```
  */
 export function getInstances(): Record<string, InstanceContext> {
-    return {...instanceRegistry};
+    return getInstancesGlobal();
 }

@@ -127,8 +127,7 @@ export class ApiClient {
     }
 }
 
-// Create a singleton instance
-let apiClientInstance: ApiClient | null = null;
+import { setApiClientInstance, getApiClientInstance } from './globals.ts';
 
 /**
  * Initialize the API client with the API key.
@@ -145,7 +144,7 @@ let apiClientInstance: ApiClient | null = null;
  * ```
  */
 export function initApiClient(apiKey: string): void {
-    apiClientInstance = new ApiClient(apiKey);
+    setApiClientInstance(new ApiClient(apiKey));
 }
 
 /**
@@ -161,7 +160,5 @@ export function initApiClient(apiKey: string): void {
  * ```
  */
 export function getApiClient(): ApiClient {
-    if (!apiClientInstance) {
-        throw new Error('API client is not initialized. Call initApiClient first.');
-    }
-    return apiClientInstance;}
+    return getApiClientInstance();
+}
