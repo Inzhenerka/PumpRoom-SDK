@@ -5,9 +5,9 @@ import {
     PumpRoomUser,
     AuthenticateOptions,
     State,
-    GetStatesResponse,
-    SetStatesResponse,
+    StatesResponse,
 } from './types/index.ts';
+import {getCurrentNormalizedUrl} from "./utils.js";
 import {AUTH_URL, VERIFY_URL, GET_STATES_URL, SET_STATES_URL} from './constants.ts';
 import {getVersion} from './version.ts';
 
@@ -98,7 +98,7 @@ export class ApiClient {
             lms: options.lms,
             profile: options.profile,
             realm: realm,
-            url: typeof window !== 'undefined' ? window.location.href : null,
+            url: getCurrentNormalizedUrl(),
             sdk_version: getVersion(),
         };
 
@@ -128,6 +128,7 @@ export class ApiClient {
      * @returns Promise resolving to the fetched states
      * @throws Error if the request fails
      *
+     * @experimental
      * @example
      * ```typescript
      * try {
@@ -138,7 +139,7 @@ export class ApiClient {
      * }
      * ```
      */
-    async fetchStates(stateNames: string[], user: PumpRoomUser): Promise<GetStatesResponse> {
+    async fetchStates(stateNames: string[], user: PumpRoomUser): Promise<StatesResponse> {
         const response = await fetch(GET_STATES_URL, {
             method: 'POST',
             headers: {
@@ -147,7 +148,7 @@ export class ApiClient {
             },
             body: JSON.stringify({
                 user: user,
-                url: typeof window !== 'undefined' ? window.location.href : null,
+                url: getCurrentNormalizedUrl(),
                 state_names: stateNames,
                 sdk_version: getVersion()
             })
@@ -157,7 +158,7 @@ export class ApiClient {
             throw new Error(`Request error: ${response.status} ${response.statusText}`);
         }
 
-        return await response.json() as GetStatesResponse;
+        return await response.json() as StatesResponse;
     }
 
     /**
@@ -170,6 +171,7 @@ export class ApiClient {
      * @returns Promise resolving to the result of the operation
      * @throws Error if the request fails
      *
+     * @experimental
      * @example
      * ```typescript
      * try {
@@ -183,7 +185,7 @@ export class ApiClient {
      * }
      * ```
      */
-    async storeStates(states: State[], user: PumpRoomUser): Promise<SetStatesResponse> {
+    async storeStates(states: State[], user: PumpRoomUser): Promise<StatesResponse> {
         const response = await fetch(SET_STATES_URL, {
             method: 'POST',
             headers: {
@@ -192,7 +194,7 @@ export class ApiClient {
             },
             body: JSON.stringify({
                 user: user,
-                url: typeof window !== 'undefined' ? window.location.href : null,
+                url: getCurrentNormalizedUrl(),
                 states: states,
                 sdk_version: getVersion()
             })
@@ -202,7 +204,7 @@ export class ApiClient {
             throw new Error(`Request error: ${response.status} ${response.statusText}`);
         }
 
-        return await response.json() as SetStatesResponse;
+        return await response.json() as StatesResponse;
     }
 }
 

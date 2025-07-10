@@ -6,7 +6,7 @@
  *
  * @module Instance
  */
-import {registerInstance as registerInstanceGlobal, getInstances as getInstancesGlobal} from './globals.ts';
+import {registerTaskInstance as registerInstanceGlobal, getTaskInstances as getInstancesGlobal} from './globals.ts';
 import type {InstanceContext} from './types/index.ts';
 
 /**
@@ -20,7 +20,7 @@ import type {InstanceContext} from './types/index.ts';
  * registerInstance({ instanceUid: '1', repoName: 'repo', taskName: 'task', realm: 'test', tags: undefined });
  * ```
  */
-export function registerInstance(instanceContext: InstanceContext): void {
+export function registerTaskInstance(instanceContext: InstanceContext): void {
     registerInstanceGlobal(instanceContext);
 }
 
@@ -28,13 +28,14 @@ export function registerInstance(instanceContext: InstanceContext): void {
  * Gets all registered instances
  *
  * @returns A record mapping instance UIDs to their contexts
- *
+ * @category Tasks
+ * @public
  * @example
  * ```typescript
  * const instances = getInstances();
  * console.log(Object.keys(instances));
  * ```
  */
-export function getInstances(): Record<string, InstanceContext> {
+export function getTaskInstances(): Record<string, InstanceContext> {
     return getInstancesGlobal();
 }

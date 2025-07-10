@@ -3,23 +3,38 @@
  *
  * This module provides functionality for managing user states on the backend.
  * It allows registering, fetching, storing, and clearing states.
+ * States are also cached in localStorage for faster access during page load.
  *
  * @module States
+ * @category States
+ * @experimental
  */
 
 import {getCurrentUser, registerStates, getRegisteredStates, resetRegisteredStates} from './globals.ts';
 import {getApiClient} from './api-client.ts';
-import type {State, GetStatesResponse, SetStatesResponse} from './types/index.ts';
+import {saveStatesToLocalStorage, getStatesFromLocalStorage} from './storage.ts';
+import type {State, StatesResponse, StateOutput, StatesCallback} from './types/index.ts';
+import {StateDataType} from './types/index.ts';
+
 
 /**
  * Fetches states from the backend
  *
  * This function retrieves the values of the specified states from the backend.
+ * It first checks localStorage for cached values and then fetches from the backend.
+ * After fetching from the backend, it updates the localStorage cache.
+ *
+ * If a callback is provided, it will be called twice:
+ * 1. First with cached states (if available)
+ * 2. Then with states fetched from the server
  *
  * @param stateNames - Array of state names to fetch
+ * @param callback - Optional callback function that will be called with states
  * @returns Promise resolving to the fetched states
  * @throws Error if stateNames is not a non-empty array or if user is not authenticated
  *
+ * @category States
+ * @experimental
  * @example
  * ```typescript
  * // Using async/await
@@ -30,13 +45,19 @@ import type {State, GetStatesResponse, SetStatesResponse} from './types/index.ts
  *   console.error(error);
  * }
  *
+ * // Using callback for immediate rendering with lazy loading
+ * fetchStates(['userPreferences', 'lastVisitedPage'], (states) => {
+ *   console.log('Received states:', states);
+ *   // Update UI with the states
+ * });
+ *
  * // Using Promise chain
  * fetchStates(['userPreferences', 'lastVisitedPage'])
  *   .then(states => console.log(states))
  *   .catch(error => console.error(error));
  * ```
  */
-export async function fetchStates(stateNames: string[]): Promise<GetStatesResponse> {
+export async function fetchStates(stateNames: string[], callback?: StatesCallback): Promise<StatesResponse> {
     // Validate stateNames parameter
     if (!Array.isArray(stateNames) || stateNames.length === 0) {
         throw new Error('stateNames must be non-empty array of strings');
@@ -53,11 +74,31 @@ export async function fetchStates(stateNames: string[]): Promise<GetStatesRespon
         throw new Error('User is not authenticated');
     }
 
+    // Check localStorage for cached states
+    const cachedStates = getStatesFromLocalStorage(stateNames, currentUser.uid);
+
+    // If we have cached states and a callback, call the callback with the cached states
+    if (cachedStates.length > 0) {
+        if (callback) {
+            callback({states: cachedStates});
+        }
+    }
+
     // Get the API client
     const apiClient = getApiClient();
 
-    // Use the API client to fetch states
-    return apiClient.fetchStates(stateNames, currentUser);
+    // Use the API client to fetch states from the backend
+    const response = await apiClient.fetchStates(stateNames, currentUser);
+
+    // Update localStorage with the fetched states
+    saveStatesToLocalStorage(response.states, currentUser.uid);
+
+    // If we have a callback, call it with the fetched states
+    if (callback) {
+        callback(response);
+    }
+
+    return response;
 }
 
 // State interface is now imported from types/index.ts
@@ -65,12 +106,14 @@ export async function fetchStates(stateNames: string[]): Promise<GetStatesRespon
 /**
  * Stores states to the backend
  *
- * This function saves the provided states to the backend.
+ * This function saves the provided states to the backend and also updates the localStorage cache.
  *
  * @param states - Array of state objects to store
  * @returns Promise resolving to the result of the operation
  * @throws Error if states is not an array or if user is not authenticated
  *
+ * @category States
+ * @experimental
  * @example
  * ```typescript
  * // Using async/await
@@ -93,7 +136,7 @@ export async function fetchStates(stateNames: string[]): Promise<GetStatesRespon
  *   .catch(error => console.error(error));
  * ```
  */
-export async function storeStates(states: State[]): Promise<SetStatesResponse> {
+export async function storeStates(states: State[]): Promise<StatesResponse> {
     // Validate states parameter
     if (!Array.isArray(states)) {
         throw new Error('states parameter must be array of objects');
@@ -114,18 +157,35 @@ export async function storeStates(states: State[]): Promise<SetStatesResponse> {
     const apiClient = getApiClient();
 
     // Use the API client to store states
-    return apiClient.storeStates(states, currentUser);
+    const response = await apiClient.storeStates(states, currentUser);
+
+    // Convert State[] to StateOutput[] for localStorage
+    const stateOutputs: StateOutput[] = states.map(state => ({
+        name: state.name,
+        value: state.value,
+        // Determine data_type based on value type
+        data_type: state.value === null ? StateDataType.null :
+            typeof state.value === 'boolean' ? StateDataType.bool :
+                typeof state.value === 'number' ? StateDataType.int : StateDataType.str
+    }));
+
+    saveStatesToLocalStorage(stateOutputs, currentUser.uid);
+
+    return response;
 }
 
 /**
  * Clears states on the backend
  *
- * This function sets the values of the specified states to null on the backend.
+ * This function sets the values of the specified states to null on the backend
+ * and also updates the localStorage cache.
  *
  * @param stateNames - Array of state names to clear
  * @returns Promise resolving to the result of the operation
  * @throws Error if stateNames is not a non-empty array
  *
+ * @category States
+ * @experimental
  * @example
  * ```typescript
  * // Using async/await
@@ -142,7 +202,7 @@ export async function storeStates(states: State[]): Promise<SetStatesResponse> {
  *   .catch(error => console.error(error));
  * ```
  */
-export async function clearStates(stateNames: string[]): Promise<SetStatesResponse> {
+export async function clearStates(stateNames: string[]): Promise<StatesResponse> {
     // Validate stateNames parameter
     if (!Array.isArray(stateNames) || stateNames.length === 0) {
         throw new Error('stateNames must be non-empty array of strings');
@@ -155,6 +215,7 @@ export async function clearStates(stateNames: string[]): Promise<SetStatesRespon
     }));
 
     // Use the existing storeStates function to save the empty states
+    // This will also update the localStorage cache
     return storeStates(emptyStates);
 }
 
@@ -163,6 +224,8 @@ export async function clearStates(stateNames: string[]): Promise<SetStatesRespon
  *
  * @returns Array of registered state names
  *
+ * @category States
+ * @experimental
  * @example
  * ```typescript
  * const states = getRegisteredStates();

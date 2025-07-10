@@ -10,8 +10,9 @@
 import {getPumpRoomEventMessage} from './messaging.ts';
 import {getVersion} from './version.ts';
 import type {SetEnvironmentMessage} from './types/messages.js';
-import {registerInstance} from './instance.ts';
+import {registerTaskInstance} from './instance.ts';
 import {executeOnInitCallback} from './callbacks.ts';
+import {getCurrentNormalizedUrl} from './utils.ts';
 
 // The setOnInitCallback function has been moved to callbacks.ts
 
@@ -32,8 +33,12 @@ export interface PumpRoomEnvironment {
  * @internal
  */
 function buildEnvironment(): PumpRoomEnvironment {
+    const pageURL = getCurrentNormalizedUrl();
+    if (!pageURL) {
+        throw new Error('Unable to determine current page URL');
+    }
     return {
-        pageURL: window.location.href,
+        pageURL: pageURL,
         sdkVersion: getVersion(),
     };
 }
@@ -73,7 +78,7 @@ function handleEnvironmentMessage(event: MessageEvent): void {
     const data = getPumpRoomEventMessage(event, 'getEnvironment');
     if (!data) return
     // Register the instance using the instance module
-    registerInstance(data.payload.instanceContext);
+    registerTaskInstance(data.payload.instanceContext);
 
     if (event.source) {
         sendEnvironment(event.source as Window, event.origin);

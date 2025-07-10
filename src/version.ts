@@ -20,6 +20,8 @@ declare const __VERSION__: string;
  * which is injected into the build by the build system.
  * 
  * @returns The SDK version string
+ * @category Initialization
+ * @public
  * @example
  * ```typescript
  * import { getVersion } from 'pumproom-sdk';

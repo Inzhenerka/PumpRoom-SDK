@@ -73,6 +73,8 @@ export function setCurrentUser(user: PumpRoomUser | null): void {
  *
  * @returns The current user or null if not authenticated
  *
+ * @category Authentication
+ * @public
  * @example
  * ```typescript
  * const user = getCurrentUser();
@@ -153,7 +155,7 @@ export function setFullscreenInitialized(): void {
  * registerInstance({ instanceUid: '1', repoName: 'repo', taskName: 'task', realm: 'test', tags: undefined });
  * ```
  */
-export function registerInstance(instanceContext: InstanceContext): void {
+export function registerTaskInstance(instanceContext: InstanceContext): void {
     if (instanceContext && instanceContext.instanceUid) {
         instanceRegistry[instanceContext.instanceUid] = instanceContext;
     }
@@ -170,7 +172,7 @@ export function registerInstance(instanceContext: InstanceContext): void {
  * console.log(Object.keys(instances));
  * ```
  */
-export function getInstances(): Record<string, InstanceContext> {
+export function getTaskInstances(): Record<string, InstanceContext> {
     return {...instanceRegistry};
 }
 
@@ -276,7 +278,8 @@ export function getApiClientInstance(): ApiClient {
  * 
  * @param stateNames - Array of state names to register
  * @throws Error if stateNames is not an array
- * 
+ *
+ * @experimental
  * @example
  * ```typescript
  * registerStates(['userPreferences', 'lastVisitedPage']);
@@ -298,7 +301,9 @@ export function registerStates(stateNames: string[]): void {
  * Gets the list of registered state names
  * 
  * @returns Array of registered state names
- * 
+ *
+ * @category States
+ * @experimental
  * @example
  * ```typescript
  * const states = getRegisteredStates();
@@ -313,7 +318,8 @@ export function getRegisteredStates(): string[] {
  * Resets the list of registered state names
  * 
  * This function is primarily used for testing purposes.
- * 
+ *
+ * @experimental
  * @internal
  */
 export function resetRegisteredStates(): void {

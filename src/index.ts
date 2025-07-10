@@ -1,9 +1,18 @@
 /**
- * PumpRoom SDK - Main entry point
+ * PumpRoom SDK
  *
  * This module provides the main functionality for integrating with the PumpRoom platform.
  * It handles initialization, authentication, and user management.
- *
+ * @categoryDescription Initialization
+ *  Functions for initializing and configuring the SDK. They must be called before using any other SDK functionality.
+ * @categoryDescription Authentication
+ *  Functions for user authentication and management, including setting and retrieving user information.
+ * @categoryDescription Callbacks
+ *  Functions for setting up event handlers and callback functions that respond to SDK lifecycle events.
+ * @categoryDescription Tasks
+ *  Functions for working with task instances and retrieving task-related information.
+ * @categoryDescription States
+ *  [Experimental] Functions for managing persistent state data, including storing, retrieving, and clearing application states.
  * @module PumpRoomSDK
  */
 
@@ -19,7 +28,7 @@ import {initApiClient} from './api-client.ts';
 export {getCurrentUser} from './globals.ts';
 export {authenticate, setUser} from './auth.ts';
 export {getVersion} from './version.ts';
-export {getInstances} from './instance.ts';
+export {getTaskInstances} from './instance.ts';
 export {
     setOnInitCallback, 
     setOnTaskLoadedCallback, 
@@ -53,8 +62,8 @@ export type {
     State,
     StateOutput,
     StateDataType,
-    GetStatesResponse,
-    SetStatesResponse,
+    StatesResponse,
+    StatesCallback,
 } from './types/index.ts';
 
 console.debug('PumpRoom SDK v' + getVersion() + ' loaded');
@@ -66,6 +75,8 @@ console.debug('PumpRoom SDK v' + getVersion() + ' loaded');
  * It sets up the API client, event listeners, and iframe configuration.
  *
  * @param cfg - The SDK configuration object
+ * @category Initialization
+ * @public
  * @example
  * ```typescript
  * import { init } from 'pumproom-sdk';

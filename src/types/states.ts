@@ -5,6 +5,7 @@
  * 
  * @module Types/States
  * @category States
+ * @experimental
  */
 
 /**
@@ -12,6 +13,7 @@
  * 
  * @public
  * @category States
+ * @experimental
  */
 export enum StateDataType {
     /** Boolean value */
@@ -29,6 +31,7 @@ export enum StateDataType {
  * 
  * @public
  * @category States
+ * @experimental
  */
 export interface State {
     /** Name of the state */
@@ -42,6 +45,7 @@ export interface State {
  * 
  * @public
  * @category States
+ * @experimental
  */
 export interface StateOutput extends State {
     /** Data type of the state value */
@@ -49,29 +53,22 @@ export interface StateOutput extends State {
 }
 
 /**
- * Response from the get_states API endpoint
+ * Response from the states API endpoints
  * 
  * @public
  * @category States
+ * @experimental
  */
-export interface GetStatesResponse {
-    /** Status of the operation */
-    status: 'success' | 'error';
-    /** Optional error message */
-    error?: string;
+export interface StatesResponse {
     /** Array of state objects */
     states: StateOutput[];
 }
 
 /**
- * Response from the set_states API endpoint
+ * Callback function type for receiving states
  * 
  * @public
  * @category States
+ * @experimental
  */
-export interface SetStatesResponse {
-    /** Status of the operation */
-    status: 'success' | 'error';
-    /** Optional error message */
-    error?: string;
-}
+export type StatesCallback = (states: StatesResponse) => void;

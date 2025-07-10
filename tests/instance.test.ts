@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { registerInstance, getInstances } from '../src/instance.ts';
+import { registerTaskInstance, getTaskInstances } from '../src/instance.ts';
 import { setEnvironmentListener } from '../src/environment.ts';
 import type { InstanceContext } from '../src/types/index.ts';
 
@@ -24,10 +24,10 @@ describe('instance module', () => {
     };
 
     // Register the instance
-    registerInstance(instanceContext);
+    registerTaskInstance(instanceContext);
 
     // Get all instances and verify our instance is included
-    const instances = getInstances();
+    const instances = getTaskInstances();
     expect(instances).toHaveProperty('test-instance-123');
     expect(instances['test-instance-123']).toEqual(instanceContext);
   });
@@ -42,14 +42,14 @@ describe('instance module', () => {
     } as InstanceContext;
 
     // Get the current instances to check the count before
-    const beforeInstances = getInstances();
+    const beforeInstances = getTaskInstances();
     const beforeCount = Object.keys(beforeInstances).length;
 
     // Try to register the invalid instance
-    registerInstance(invalidInstance);
+    registerTaskInstance(invalidInstance);
 
     // Get instances again and verify no new instance was added
-    const afterInstances = getInstances();
+    const afterInstances = getTaskInstances();
     const afterCount = Object.keys(afterInstances).length;
     expect(afterCount).toBe(beforeCount);
   });
@@ -64,17 +64,17 @@ describe('instance module', () => {
       tags: 'test-tags'
     };
 
-    registerInstance(instanceContext);
+    registerTaskInstance(instanceContext);
 
     // Get instances and modify the returned object
-    const instances = getInstances();
+    const instances = getTaskInstances();
     instances['copy-test-instance'] = {
       ...instanceContext,
       repoName: 'modified-repo'
     };
 
     // Get instances again and verify the original wasn't modified
-    const newInstances = getInstances();
+    const newInstances = getTaskInstances();
     expect(newInstances['copy-test-instance'].repoName).toBe('test-repo');
   });
 
@@ -97,15 +97,15 @@ describe('instance module', () => {
     };
 
     // Get current instances to check the count before
-    const beforeInstances = getInstances();
+    const beforeInstances = getTaskInstances();
     const beforeCount = Object.keys(beforeInstances).length;
 
     // Register both instances
-    registerInstance(instance1);
-    registerInstance(instance2);
+    registerTaskInstance(instance1);
+    registerTaskInstance(instance2);
 
     // Get instances again and verify both were added
-    const afterInstances = getInstances();
+    const afterInstances = getTaskInstances();
     expect(afterInstances).toHaveProperty('multi-test-1');
     expect(afterInstances).toHaveProperty('multi-test-2');
     expect(Object.keys(afterInstances).length).toBe(beforeCount + 2);
@@ -140,7 +140,7 @@ describe('instance module', () => {
     window.dispatchEvent(event);
 
     // Verify the instance was registered through the environment module
-    const instances = getInstances();
+    const instances = getTaskInstances();
     expect(instances).toHaveProperty('env-test-instance');
     expect(instances['env-test-instance']).toEqual(instanceContext);
   });
