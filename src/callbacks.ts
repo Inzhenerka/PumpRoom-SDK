@@ -33,6 +33,8 @@ import type {
  * The callback can be either synchronous or asynchronous (async function).
  *
  * @param callback - The callback function to execute on initialization (can be async)
+ * @category Callbacks
+ * @public
  * @example
  * ```typescript
  * // Set a synchronous callback to be executed on initialization
@@ -66,6 +68,8 @@ export function setOnInitCallback(callback: OnInitCallback): void {
  * asynchronous (async function).
  *
  * @param callback - The callback function to execute when a task is loaded (can be async)
+ * @category Callbacks
+ * @public
  * @example
  * ```typescript
  * // Set a synchronous callback to be executed when a task is loaded
@@ -98,6 +102,8 @@ export function setOnTaskLoadedCallback(callback: OnTaskLoadedCallback): void {
  * asynchronous (async function).
  *
  * @param callback - The callback function to execute when a task is submitted (can be async)
+ * @category Callbacks
+ * @public
  * @example
  * ```typescript
  * // Set a synchronous callback to be executed when a task is submitted
@@ -130,6 +136,8 @@ export function setOnTaskSubmittedCallback(callback: OnTaskSubmittedCallback): v
  * asynchronous (async function).
  *
  * @param callback - The callback function to execute when a result is ready (can be async)
+ * @category Callbacks
+ * @public
  * @example
  * ```typescript
  * // Set a synchronous callback to be executed when a result is ready

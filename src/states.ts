@@ -5,6 +5,7 @@
  * It allows registering, fetching, storing, and clearing states.
  *
  * @module States
+ * @category States
  * @experimental
  */
 
@@ -21,6 +22,7 @@ import type {State, GetStatesResponse, SetStatesResponse} from './types/index.ts
  * @returns Promise resolving to the fetched states
  * @throws Error if stateNames is not a non-empty array or if user is not authenticated
  *
+ * @category States
  * @experimental
  * @example
  * ```typescript
@@ -73,6 +75,7 @@ export async function fetchStates(stateNames: string[]): Promise<GetStatesRespon
  * @returns Promise resolving to the result of the operation
  * @throws Error if states is not an array or if user is not authenticated
  *
+ * @category States
  * @experimental
  * @example
  * ```typescript
@@ -129,6 +132,7 @@ export async function storeStates(states: State[]): Promise<SetStatesResponse> {
  * @returns Promise resolving to the result of the operation
  * @throws Error if stateNames is not a non-empty array
  *
+ * @category States
  * @experimental
  * @example
  * ```typescript
@@ -167,6 +171,8 @@ export async function clearStates(stateNames: string[]): Promise<SetStatesRespon
  *
  * @returns Array of registered state names
  *
+ * @category States
+ * @experimental
  * @example
  * ```typescript
  * const states = getRegisteredStates();

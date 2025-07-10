@@ -73,6 +73,8 @@ export function setCurrentUser(user: PumpRoomUser | null): void {
  *
  * @returns The current user or null if not authenticated
  *
+ * @category Authentication
+ * @public
  * @example
  * ```typescript
  * const user = getCurrentUser();
@@ -153,7 +155,7 @@ export function setFullscreenInitialized(): void {
  * registerInstance({ instanceUid: '1', repoName: 'repo', taskName: 'task', realm: 'test', tags: undefined });
  * ```
  */
-export function registerInstance(instanceContext: InstanceContext): void {
+export function registerTaskInstance(instanceContext: InstanceContext): void {
     if (instanceContext && instanceContext.instanceUid) {
         instanceRegistry[instanceContext.instanceUid] = instanceContext;
     }
@@ -170,7 +172,7 @@ export function registerInstance(instanceContext: InstanceContext): void {
  * console.log(Object.keys(instances));
  * ```
  */
-export function getInstances(): Record<string, InstanceContext> {
+export function getTaskInstances(): Record<string, InstanceContext> {
     return {...instanceRegistry};
 }
 
@@ -300,6 +302,7 @@ export function registerStates(stateNames: string[]): void {
  * 
  * @returns Array of registered state names
  *
+ * @category States
  * @experimental
  * @example
  * ```typescript

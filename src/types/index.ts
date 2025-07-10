@@ -24,7 +24,7 @@ export type IdentityProviderType = 'tilda' | 'telegram';
  * Status of a task submission
  *
  * @public
- * @category Submission
+ * @category Callbacks
  */
 export type SubmissionStatus = 'success' | 'fail' | 'internal_error';
 
@@ -225,7 +225,7 @@ export interface VerifyTokenResult {
  * to the init function to configure the SDK.
  *
  * @public
- * @category Configuration
+ * @category Initialization
  */
 export interface PumpRoomConfig {
     /** API key for authenticating with the PumpRoom API */
@@ -271,7 +271,7 @@ export interface InternalConfig {
  * containing identification and metadata used for instance registration and management.
  *
  * @public
- * @category Instance
+ * @category Callbacks
  */
 export interface InstanceContext {
     /** Unique identifier for the instance */
@@ -336,7 +336,7 @@ export interface FullscreenParameters {
  * Status of a task loading process
  *
  * @public
- * @category Tasks
+ * @category Callbacks
  */
 export type TaskStatus = 'loading' | 'ready' | 'error';
 
@@ -344,7 +344,7 @@ export type TaskStatus = 'loading' | 'ready' | 'error';
  * Detailed information about a task
  *
  * @public
- * @category Tasks
+ * @category Callbacks
  */
 export interface TaskDetails {
     /** Unique identifier of the task */
@@ -357,7 +357,7 @@ export interface TaskDetails {
  * Result of a task submission
  *
  * @public
- * @category Submission
+ * @category Callbacks
  */
 export interface SubmissionResult {
     /** Unique identifier of the task */
@@ -376,7 +376,7 @@ export interface SubmissionResult {
  * Data provided to callbacks after the SDK receives environment information
  *
  * @public
- * @category Environment
+ * @category Callbacks
  */
 export interface EnvironmentData {
     /** Context information about the current instance */
@@ -387,7 +387,7 @@ export interface EnvironmentData {
  * Data provided to callbacks when a task is loaded
  *
  * @public
- * @category Tasks
+ * @category Callbacks
  */
 export interface LoadedTaskData {
     /** Context information about the current instance */
@@ -400,7 +400,7 @@ export interface LoadedTaskData {
  * Data provided to callbacks when a result is ready
  *
  * @public
- * @category Results
+ * @category Callbacks
  */
 export interface ResultData {
     /** Context information about the current instance */

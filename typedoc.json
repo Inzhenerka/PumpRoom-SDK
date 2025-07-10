@@ -1,9 +1,10 @@
 {
   "$schema": "https://typedoc.org/schema.json",
+  "tsconfig": "tsconfig.build.json",
   "entryPoints": ["./src/index.ts"],
   "entryPointStrategy": "resolve",
   "out": "public/docs",
-  "exclude": ["**/*.test.ts", "**/tests/**", "**/node_modules/**", "**/vite-env.d.ts"],
+  "exclude": ["**/node_modules/**", "**/vite-env.d.ts"],
   "excludePrivate": true,
   "excludeProtected": false,
   "excludeExternals": true,
@@ -11,7 +12,8 @@
   "readme": "README.md",
   "name": "PumpRoom SDK",
   "includeVersion": true,
-  "categorizeByGroup": true,
+  "categorizeByGroup": false,
+  "categoryOrder": ["Initialization", "Authentication", "Callbacks", "Tasks", "*"],
   "searchInComments": true,
   "hideGenerator": true,
   "customFooterHtml": "PumpRoom SDK",
@@ -26,10 +28,18 @@
     "notDocumented": true
   },
   "visibilityFilters": {
-    "protected": true,
+    "protected": false,
     "private": false,
-    "inherited": true,
-    "external": false
+    "inherited": false,
+    "external": false,
+    "@experimental": true
+  },
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true,
+    "includeFolders": true,
+    "compactFolders": false,
+    "excludeReferences": false
   },
   "cleanOutputDir": true,
   "disableSources": false,
