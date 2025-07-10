@@ -24,23 +24,29 @@
     </div>
 
     <div class="row mb-4">
-        <div class="col">
-            <h2 class="h5 text-primary">Тестирование модуля states.ts</h2>
+        <div class="col col-lg-6">
+            <h2 class="h5 text-primary mb-4">Тестирование состояний</h2>
             <div class="card">
                 <div class="card-body">
                     <div class="mb-3">
-                        <h3 class="h6">Настройки</h3>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="checkbox1">
                             <label class="form-check-label" for="checkbox1">
-                                Настройка 1
+                                Пример состояния 1
                             </label>
                         </div>
                         <div class="form-check mb-2">
                             <input class="form-check-input" type="checkbox" id="checkbox2">
                             <label class="form-check-label" for="checkbox2">
-                                Настройка 2
+                                Пример состояния 2
                             </label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="textInput" class="form-label">Пример состояния 3 - текстовый ввод:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="textInput" placeholder="Введите текст...">
+                                <button class="btn btn-primary" type="button" id="sendBtn">Отправить</button>
+                            </div>
                         </div>
                         <button class="btn btn-danger" id="clearStatesBtn">Очистить состояния</button>
                     </div>
@@ -51,14 +57,14 @@
 
     <div class="row mb-5">
         <div class="col">
-            <h2 class="h5 text-primary">Чат с помощником</h2>
+            <h2 class="h5 text-primary">Пример задания</h2>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-8 offset-2">
+        <div class="col col-lg-8 offset-lg-2">
             <iframe
-                    src="http://dev-pumproom.inzhenerka-cloud.com/?repo_name=Demo-Pumping&task_name=_helper"
+                    src="http://pumproom.inzhenerka-cloud.com/?repo_name=Base-Pumping&task_name=language_example"
                     height="600px"
                     width="100%"
                     allow="clipboard-write; fullscreen;"
