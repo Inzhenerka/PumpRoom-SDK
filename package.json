@@ -20,6 +20,7 @@
     "build-lib": "vite build -c vite.config.lib.ts && tsc -p tsconfig.build.json --emitDeclarationOnly",
     "build-site": "bun run docs && vite build -c vite.config.site.ts",
     "dev": "vite build -c vite.config.lib.ts && bun run docs && vite -c vite.config.site.ts",
+    "preview": "vite preview -c vite.config.site.ts",
     "docs": "typedoc --options typedoc.json",
     "test": "vitest run --coverage",
     "postversion": "git push && git push --tags"

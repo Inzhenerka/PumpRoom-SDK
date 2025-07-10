@@ -149,8 +149,6 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
 
     setCurrentUser(currentUser);
 
-    document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', {detail: currentUser}));
-
     return currentUser;
 }
 
@@ -211,7 +209,6 @@ export async function setUser(user: Omit<PumpRoomUser, 'is_admin'>): Promise<Pum
         registerAutoListener();
     }
 
-    document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', {detail: verified}));
     return verified;
 }
 

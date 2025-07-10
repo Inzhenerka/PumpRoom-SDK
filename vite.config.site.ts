@@ -41,7 +41,11 @@ export default defineConfig(({command, mode}) => {
             },
         },
         server: {
-            port: 8002,
+            port: 8005,
+            open: '/',
+        },
+        preview: {
+            port: 8005,
             open: '/',
         },
         plugins: [

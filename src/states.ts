@@ -80,7 +80,7 @@ export async function fetchStates(stateNames: string[], callback?: StatesCallbac
     // If we have cached states and a callback, call the callback with the cached states
     if (cachedStates.length > 0) {
         if (callback) {
-            callback(cachedStates);
+            callback({states: cachedStates});
         }
     }
 
@@ -95,7 +95,7 @@ export async function fetchStates(stateNames: string[], callback?: StatesCallbac
 
     // If we have a callback, call it with the fetched states
     if (callback) {
-        callback(response.states);
+        callback(response);
     }
 
     return response;

@@ -71,4 +71,4 @@ export interface StatesResponse {
  * @category States
  * @experimental
  */
-export type StatesCallback = (states: StateOutput[]) => void;
+export type StatesCallback = (states: StatesResponse) => void;
