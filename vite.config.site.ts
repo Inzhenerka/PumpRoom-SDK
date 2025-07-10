@@ -21,26 +21,7 @@ function htmlVersionPlugin(): Plugin {
     };
 }
 
-
-function buildExample() {
-    return {
-        name: 'build-example',
-        async closeBundle() {
-            await build({
-                root: resolve(__dirname, 'example'),
-                publicDir: false,
-                build: {
-                    emptyOutDir: false,
-                    outDir: resolve(__dirname, 'dist/example'),
-                },
-            });
-        },
-    };
-}
-
 export default defineConfig(({command, mode}) => {
-    const isDev = command === 'serve';
-
     return {
         define: {
             __VERSION__: JSON.stringify(version),
@@ -55,6 +36,7 @@ export default defineConfig(({command, mode}) => {
                 input: {
                     main: resolve(__dirname, 'index.html'),
                     site: resolve(__dirname, 'site.ts'),
+                    example: resolve(__dirname, 'example/index.html'),
                 },
             },
         },
@@ -64,7 +46,6 @@ export default defineConfig(({command, mode}) => {
         },
         plugins: [
             htmlVersionPlugin(),
-            ...(isDev ? [buildExample()] : []),
         ],
         css: {
             preprocessorOptions: {

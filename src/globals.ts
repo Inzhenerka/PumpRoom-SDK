@@ -32,6 +32,8 @@ let onTaskSubmittedCallback: OnTaskSubmittedCallback | null = null;
 let onResultReadyCallback: OnResultReadyCallback | null = null;
 /** Singleton instance of the API client */
 let apiClientInstance: ApiClient | null = null;
+/** List of registered state names */
+let registeredStates: string[] = [];
 
 /**
  * Sets the SDK configuration
@@ -264,4 +266,56 @@ export function getApiClientInstance(): ApiClient {
         throw new Error('API client is not initialized. Call initApiClient first.');
     }
     return apiClientInstance;
+}
+
+/**
+ * Registers state names for tracking
+ * 
+ * This function adds the provided state names to the list of registered states
+ * if they are not already registered.
+ * 
+ * @param stateNames - Array of state names to register
+ * @throws Error if stateNames is not an array
+ * 
+ * @example
+ * ```typescript
+ * registerStates(['userPreferences', 'lastVisitedPage']);
+ * ```
+ */
+export function registerStates(stateNames: string[]): void {
+    if (!Array.isArray(stateNames)) {
+        throw new Error('stateNames must be an array');
+    }
+
+    stateNames.forEach(state => {
+        if (!registeredStates.includes(state)) {
+            registeredStates.push(state);
+        }
+    });
+}
+
+/**
+ * Gets the list of registered state names
+ * 
+ * @returns Array of registered state names
+ * 
+ * @example
+ * ```typescript
+ * const states = getRegisteredStates();
+ * console.log(states); // ['userPreferences', 'lastVisitedPage']
+ * ```
+ */
+export function getRegisteredStates(): string[] {
+    return [...registeredStates];
+}
+
+/**
+ * Resets the list of registered state names
+ * 
+ * This function is primarily used for testing purposes.
+ * 
+ * @internal
+ */
+export function resetRegisteredStates(): void {
+    registeredStates = [];
 }

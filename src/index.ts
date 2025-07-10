@@ -26,6 +26,12 @@ export {
     setOnTaskSubmittedCallback, 
     setOnResultReadyCallback
 } from './callbacks.ts';
+export {
+    fetchStates,
+    storeStates,
+    clearStates,
+    getRegisteredStates
+} from './states.ts';
 export type {
     PumpRoomConfig,
     PumpRoomUser,
@@ -44,6 +50,9 @@ export type {
     ResultData,
     SubmissionStatus,
     SubmissionResult,
+    State,
+    GetStatesResponse,
+    SetStatesResponse,
 } from './types/index.ts';
 
 console.debug('PumpRoom SDK v' + getVersion() + ' loaded');

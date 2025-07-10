@@ -4,8 +4,11 @@ import {
     VerifyTokenResult,
     PumpRoomUser,
     AuthenticateOptions,
+    State,
+    GetStatesResponse,
+    SetStatesResponse,
 } from './types/index.ts';
-import {AUTH_URL, VERIFY_URL} from './constants.ts';
+import {AUTH_URL, VERIFY_URL, GET_STATES_URL, SET_STATES_URL} from './constants.ts';
 import {getVersion} from './version.ts';
 
 /**
@@ -56,25 +59,20 @@ export class ApiClient {
             uid: user.uid,
         };
 
-        try {
-            const resp = await fetch(VERIFY_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-KEY': this.apiKey,
-                },
-                body: JSON.stringify(payload),
-            });
+        const resp = await fetch(VERIFY_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-KEY': this.apiKey,
+            },
+            body: JSON.stringify(payload),
+        });
 
-            if (!resp.ok) {
-                return {is_valid: false, is_admin: false};
-            }
-
-            return await resp.json() as VerifyTokenResult;
-        } catch (err) {
-            console.error('Verification error', err);
-            return {is_valid: false, is_admin: false};
+        if (!resp.ok) {
+            throw new Error(`User verification error: ${resp.status} ${resp.statusText}`);
         }
+
+        return await resp.json() as VerifyTokenResult;
     }
 
     /**
@@ -95,39 +93,120 @@ export class ApiClient {
      * }
      * ```
      */
-    async authenticate(options: AuthenticateOptions, realm: string): Promise<PumpRoomUser | null> {
-        try {
-            const body: AuthInput = {
-                lms: options.lms,
-                profile: options.profile,
-                realm: realm,
-                url: typeof window !== 'undefined' ? window.location.href : null,
-                sdk_version: getVersion(),
-            };
+    async authenticate(options: AuthenticateOptions, realm: string): Promise<PumpRoomUser> {
+        const body: AuthInput = {
+            lms: options.lms,
+            profile: options.profile,
+            realm: realm,
+            url: typeof window !== 'undefined' ? window.location.href : null,
+            sdk_version: getVersion(),
+        };
 
-            const response = await fetch(AUTH_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-KEY': this.apiKey,
-                },
-                body: JSON.stringify(body),
-            });
+        const response = await fetch(AUTH_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-KEY': this.apiKey,
+            },
+            body: JSON.stringify(body),
+        });
 
-            if (response.ok) {
-                return await response.json() as PumpRoomUser;
-            } else {
-                console.error('Authentication failed', response.status);
-                return null;
-            }
-        } catch (err) {
-            console.error('Network error', err);
-            return null;
+        if (response.ok) {
+            return await response.json() as PumpRoomUser;
+        } else {
+            throw new Error(`Authentication error: ${response.status} ${response.statusText}`);
         }
+    }
+
+    /**
+     * Fetches states from the backend
+     *
+     * This method retrieves the values of the specified states from the backend.
+     *
+     * @param stateNames - Array of state names to fetch
+     * @param user - The authenticated user
+     * @returns Promise resolving to the fetched states
+     * @throws Error if the request fails
+     *
+     * @example
+     * ```typescript
+     * try {
+     *   const states = await client.fetchStates(['userPreferences', 'lastVisitedPage'], user);
+     *   console.log(states);
+     * } catch (error) {
+     *   console.error(error);
+     * }
+     * ```
+     */
+    async fetchStates(stateNames: string[], user: PumpRoomUser): Promise<GetStatesResponse> {
+        const response = await fetch(GET_STATES_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-KEY': this.apiKey,
+            },
+            body: JSON.stringify({
+                user: user,
+                url: typeof window !== 'undefined' ? window.location.href : null,
+                state_names: stateNames,
+                sdk_version: getVersion()
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Request error: ${response.status} ${response.statusText}`);
+        }
+
+        return await response.json() as GetStatesResponse;
+    }
+
+    /**
+     * Stores states to the backend
+     *
+     * This method saves the provided states to the backend.
+     *
+     * @param states - Array of state objects to store
+     * @param user - The authenticated user
+     * @returns Promise resolving to the result of the operation
+     * @throws Error if the request fails
+     *
+     * @example
+     * ```typescript
+     * try {
+     *   const result = await client.storeStates([
+     *     { name: 'userPreferences', value: 'dark' },
+     *     { name: 'lastVisitedPage', value: '/dashboard' }
+     *   ], user);
+     *   console.log(result);
+     * } catch (error) {
+     *   console.error(error);
+     * }
+     * ```
+     */
+    async storeStates(states: State[], user: PumpRoomUser): Promise<SetStatesResponse> {
+        const response = await fetch(SET_STATES_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-KEY': this.apiKey,
+            },
+            body: JSON.stringify({
+                user: user,
+                url: typeof window !== 'undefined' ? window.location.href : null,
+                states: states,
+                sdk_version: getVersion()
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Request error: ${response.status} ${response.statusText}`);
+        }
+
+        return await response.json() as SetStatesResponse;
     }
 }
 
-import { setApiClientInstance, getApiClientInstance } from './globals.ts';
+import {setApiClientInstance, getApiClientInstance} from './globals.ts';
 
 /**
  * Initialize the API client with the API key.

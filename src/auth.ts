@@ -107,7 +107,7 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
  * }
  * ```
  */
-export async function authenticate({lms, profile}: AuthenticateOptions = {}): Promise<PumpRoomUser | null> {
+export async function authenticate({lms, profile}: AuthenticateOptions = {}): Promise<PumpRoomUser> {
     const config = getConfig();
     if (!config) {
         throw new Error('SDK is not initialized');
@@ -126,29 +126,29 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
     }
 
     if (!fromCache) {
-        try {
-            const apiClient = getApiClient();
-            const normLms = normalizeLmsProfile(lms);
-            currentUser = await apiClient.authenticate({lms: normLms, profile}, config.realm);
+        const apiClient = getApiClient();
+        const normLms = normalizeLmsProfile(lms);
+        currentUser = await apiClient.authenticate({lms: normLms, profile}, config.realm);
 
-            if (currentUser && config.cacheUser) {
-                storeData(USER_STORAGE_KEY, currentUser);
-            }
-        } catch (err) {
-            console.error('Network error', err);
+        if (config.cacheUser) {
+            storeData(USER_STORAGE_KEY, currentUser);
         }
     }
 
-    if (currentUser && !isAutoListenerRegistered()) {
+    if (!currentUser) {
+        throw new Error('Authentication failed');
+    }
+
+    if (!isAutoListenerRegistered()) {
         window.addEventListener('message', defaultUserListener);
         registerAutoListener();
     }
 
-    setCurrentUser(currentUser || null);
+    setCurrentUser(currentUser);
 
     document.dispatchEvent(new CustomEvent('itAuthenticationCompleted', {detail: currentUser}));
 
-    return currentUser || null;
+    return currentUser;
 }
 
 /**
@@ -211,25 +211,6 @@ export async function setUser(user: Omit<PumpRoomUser, 'is_admin'>): Promise<Pum
 }
 
 /**
- * Sends user information to a target window
- *
- * This function creates a setPumpRoomUser message with the provided user
- * and sends it to the source window of the event.
- *
- * @param event - The message event containing source and origin information
- * @param user - The user information to send
- * @internal
- */
-export function sendUserMessage(event: MessageEvent, user: PumpRoomUser): void {
-    const message: SetPumpRoomUserMessage = {
-        service: 'pumproom',
-        type: 'setPumpRoomUser',
-        payload: user,
-    };
-    (event.source as Window).postMessage(message, event.origin);
-}
-
-/**
  * Default event listener for handling user-related messages
  *
  * @param event - The message event
@@ -241,6 +222,11 @@ function defaultUserListener(event: MessageEvent): void {
     const user = getCurrentUser();
     if (!user) return;
     if (event.source) {
-        sendUserMessage(event, user);
+        const message: SetPumpRoomUserMessage = {
+            service: 'pumproom',
+            type: 'setPumpRoomUser',
+            payload: user,
+        };
+        (event.source as Window).postMessage(message, event.origin);
     }
 }

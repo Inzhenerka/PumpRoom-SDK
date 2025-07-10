@@ -11,10 +11,16 @@
 export const API_BASE_URL = 'https://pumproom-api.inzhenerka-cloud.com';
 
 /** URL for the authentication endpoint */
-export const AUTH_URL = `${API_BASE_URL}/tracker/authenticate`;
+export const AUTH_URL = `${API_BASE_URL}/auth/authenticate`;
 
 /** URL for the token verification endpoint */
-export const VERIFY_URL = `${API_BASE_URL}/tracker/verify_token`;
+export const VERIFY_URL = `${API_BASE_URL}/auth/verify_token`;
+
+/** URL to load states from backend */
+export const GET_STATES_URL = `${API_BASE_URL}/tracker/get_states`;
+
+/** URL to store states on backend */
+export const SET_STATES_URL = `${API_BASE_URL}/tracker/set_states`;
 
 /** 
  * List of domains that are considered PumpRoom domains

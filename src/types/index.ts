@@ -2,11 +2,13 @@
  * Types module for PumpRoom SDK
  *
  * This module contains all the type definitions used throughout the SDK,
- * including user information, configuration, and API interfaces.
+ * including user information, configuration, API interfaces, and state management.
  *
  * @module Types
  * @category Core
  */
+
+export * from './states.ts';
 
 /**
  * Identity provider names used by PumpRoom
