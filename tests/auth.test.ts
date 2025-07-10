@@ -1,16 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { authenticate, setUser, sendUserMessage } from '../src/auth.ts';
+import { authenticate, setUser } from '../src/auth.ts';
 import { setConfig, getCurrentUser, isAutoListenerRegistered, registerAutoListener, setCurrentUser } from '../src/globals.ts';
-import { initApiClient } from '../src/api-client.ts';
 import { AUTH_URL, VERIFY_URL } from '../src/constants.ts';
 import { getPumpRoomEventMessage } from '../src/messaging.ts';
 
+import { setupSdk } from './test-utils.ts';
+
 beforeEach(() => {
-  setConfig({ apiKey: 'key', realm: 'test' });
-  initApiClient('key');
-  localStorage.clear();
-  vi.restoreAllMocks();
-  setCurrentUser(null);
+  setupSdk();
 });
 
 describe('authenticate', () => {
@@ -26,6 +23,7 @@ describe('authenticate', () => {
   });
 
   it('uses cached user when verified', async () => {
+    setConfig({ apiKey: 'key', realm: 'test', cacheUser: true });
     const cached = { uid: '2', token: 'cached', is_admin: true };
     localStorage.setItem('pumproomUser', JSON.stringify(cached));
 
@@ -39,6 +37,7 @@ describe('authenticate', () => {
   });
 
   it('clears invalid cached user', async () => {
+    setConfig({ apiKey: 'key', realm: 'test', cacheUser: true });
     const cached = { uid: '3', token: 'bad', is_admin: false };
     localStorage.setItem('pumproomUser', JSON.stringify(cached));
 
@@ -57,13 +56,13 @@ describe('authenticate', () => {
     expect(user).toEqual(authResp);
   });
 
-  it('returns null on auth error', async () => {
+  it('throws on auth error', async () => {
     setConfig({ apiKey: 'key', realm: 'test', cacheUser: false });
-    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 });
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500, statusText: 'fail' });
 
-    const user = await authenticate({ login: 'l', name: 'n', istutor: false, lang: 'en', projectid: '1' });
-
-    expect(user).toBeNull();
+    await expect(
+      authenticate({ login: 'l', name: 'n', istutor: false, lang: 'en', projectid: '1' })
+    ).rejects.toThrow('Authentication error');
     expect(getCurrentUser()).toBeNull();
   });
 
@@ -162,27 +161,6 @@ describe('email validation', () => {
   });
 });
 
-describe('sendUserMessage', () => {
-  it('sends user information to target window', () => {
-    const user = { uid: '123', token: 'token', is_admin: false };
-    const postMessageMock = vi.fn();
-    const event = {
-      source: { postMessage: postMessageMock },
-      origin: 'https://example.com'
-    } as unknown as MessageEvent;
-
-    sendUserMessage(event, user);
-
-    expect(postMessageMock).toHaveBeenCalledWith(
-      {
-        service: 'pumproom',
-        type: 'setPumpRoomUser',
-        payload: user
-      },
-      'https://example.com'
-    );
-  });
-});
 
 describe('default user listener', () => {
   it('responds to getPumpRoomUser messages', async () => {
@@ -243,9 +221,7 @@ describe('error handling in authentication', () => {
     global.fetch = vi.fn().mockRejectedValue(new Error('API error'));
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const result = await authenticate();
-
+    await expect(authenticate()).rejects.toThrow('API error');
     expect(errorSpy).toHaveBeenCalled();
-    expect(result).not.toEqual(user);
   });
 });

@@ -1,13 +1,39 @@
 import {describe, it, expect, vi, beforeEach, afterEach} from 'vitest';
+
+let mockRegisteredStates: string[] = [];
+
+vi.mock('../src/globals.ts', async () => {
+    const actual = await vi.importActual<typeof import('../src/globals.ts')>('../src/globals.ts');
+    return {
+        ...actual,
+        getCurrentUser: vi.fn(),
+        registerStates: vi.fn((stateNames: string[]) => {
+            if (!Array.isArray(stateNames)) {
+                throw new Error('stateNames must be an array');
+            }
+            stateNames.forEach(state => {
+                if (!mockRegisteredStates.includes(state)) {
+                    mockRegisteredStates.push(state);
+                }
+            });
+        }),
+        getRegisteredStates: vi.fn(() => [...mockRegisteredStates]),
+        resetRegisteredStates: vi.fn(() => {
+            mockRegisteredStates = [];
+        }),
+    };
+});
+
 import {
     fetchStates,
     storeStates,
     clearStates,
     getRegisteredStates,
-    resetRegisteredStates
+    resetRegisteredStates,
 } from '../src/states.ts';
 import * as globals from '../src/globals.ts';
 import * as version from '../src/version.ts';
+import { mockUser, setupSdk } from './test-utils.ts';
 
 // Mock fetch
 global.fetch = vi.fn();
@@ -15,29 +41,10 @@ global.fetch = vi.fn();
 // Mock version
 vi.spyOn(version, 'getVersion').mockReturnValue('1.2.0');
 
-// Mock globals.ts
-let mockRegisteredStates: string[] = [];
-
-vi.mock('../src/globals.ts', () => ({
-    getCurrentUser: vi.fn(),
-    registerStates: vi.fn((stateNames: string[]) => {
-        if (!Array.isArray(stateNames)) {
-            throw new Error('stateNames must be an array');
-        }
-        stateNames.forEach(state => {
-            if (!mockRegisteredStates.includes(state)) {
-                mockRegisteredStates.push(state);
-            }
-        });
-    }),
-    getRegisteredStates: vi.fn(() => [...mockRegisteredStates]),
-    resetRegisteredStates: vi.fn(() => {
-        mockRegisteredStates = [];
-    }),
-}));
-
 describe('states', () => {
     beforeEach(() => {
+        setupSdk();
+        global.fetch = vi.fn();
         vi.resetAllMocks();
         // Reset the fetch mock
         (global.fetch as any).mockReset();
@@ -71,7 +78,7 @@ describe('states', () => {
     describe('fetchStates', () => {
         it('fetches states from the backend', async () => {
             // Mock the getCurrentUser function
-            vi.mocked(globals.getCurrentUser).mockReturnValue({uid: '1', token: 't', is_admin: false});
+            vi.mocked(globals.getCurrentUser).mockReturnValue(mockUser);
 
             // Mock the fetch response
             const mockResponse = {
@@ -94,9 +101,10 @@ describe('states', () => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-API-KEY': 'key',
                     },
                     body: JSON.stringify({
-                        user: {uid: '1', token: 't', is_admin: false},
+                        user: mockUser,
                         url: window.location.href,
                         state_names: ['test1', 'test2'],
                         sdk_version: '1.2.0'
@@ -129,7 +137,7 @@ describe('states', () => {
 
         it('throws an error if the fetch request fails', async () => {
             // Mock the getCurrentUser function
-            vi.mocked(globals.getCurrentUser).mockReturnValue({uid: '1', token: 't', is_admin: false});
+            vi.mocked(globals.getCurrentUser).mockReturnValue(mockUser);
 
             // Mock the fetch response to fail
             (global.fetch as any).mockResolvedValueOnce({
@@ -147,7 +155,7 @@ describe('states', () => {
     describe('storeStates', () => {
         it('stores states to the backend', async () => {
             // Mock the getCurrentUser function
-            vi.mocked(globals.getCurrentUser).mockReturnValue({uid: '1', token: 't', is_admin: false});
+            vi.mocked(globals.getCurrentUser).mockReturnValue(mockUser);
 
             // Mock the fetch response
             const mockResponse = {
@@ -170,9 +178,10 @@ describe('states', () => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-API-KEY': 'key',
                     },
                     body: JSON.stringify({
-                        user: {uid: '1', token: 't', is_admin: false},
+                        user: mockUser,
                         url: window.location.href,
                         states,
                         sdk_version: '1.2.0'
@@ -201,7 +210,7 @@ describe('states', () => {
     describe('clearStates', () => {
         it('clears states on the backend', async () => {
             // Mock the getCurrentUser function
-            vi.mocked(globals.getCurrentUser).mockReturnValue({uid: '1', token: 't', is_admin: false});
+            vi.mocked(globals.getCurrentUser).mockReturnValue(mockUser);
 
             // Mock the fetch response
             const mockResponse = {
@@ -220,9 +229,10 @@ describe('states', () => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'X-API-KEY': 'key',
                     },
                     body: JSON.stringify({
-                        user: {uid: '1', token: 't', is_admin: false},
+                        user: mockUser,
                         url: window.location.href,
                         states: [
                             {name: 'test1', value: null},

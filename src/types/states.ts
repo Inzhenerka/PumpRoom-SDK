@@ -14,9 +14,13 @@
  * @category States
  */
 export enum StateDataType {
+    /** Boolean value */
     bool = 'bool',
+    /** Integer value */
     int = 'int',
+    /** String value */
     str = 'str',
+    /** Null value */
     null = 'null'
 }
 
