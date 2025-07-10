@@ -12,6 +12,7 @@ import {getVersion} from './version.ts';
 import type {SetEnvironmentMessage} from './types/messages.js';
 import {registerTaskInstance} from './instance.ts';
 import {executeOnInitCallback} from './callbacks.ts';
+import {getCurrentNormalizedUrl} from './utils.ts';
 
 // The setOnInitCallback function has been moved to callbacks.ts
 
@@ -32,8 +33,12 @@ export interface PumpRoomEnvironment {
  * @internal
  */
 function buildEnvironment(): PumpRoomEnvironment {
+    const pageURL = getCurrentNormalizedUrl();
+    if (!pageURL) {
+        throw new Error('Unable to determine current page URL');
+    }
     return {
-        pageURL: window.location.href,
+        pageURL: pageURL,
         sdkVersion: getVersion(),
     };
 }

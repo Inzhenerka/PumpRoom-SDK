@@ -21,7 +21,7 @@ PumpRoomSdk.init({
 
 PumpRoomSdk.setOnInitCallback(async (data) => {
     console.log('[CB] Instance initialized:', data);
-    console.log('[CB] All instances', PumpRoomSdk.getInstances())
+    console.log('[CB] All instances', PumpRoomSdk.getTaskInstances())
 });
 
 PumpRoomSdk.setOnTaskLoadedCallback(async (data) => {

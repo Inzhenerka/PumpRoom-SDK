@@ -8,6 +8,7 @@ import {
     GetStatesResponse,
     SetStatesResponse,
 } from './types/index.ts';
+import {getCurrentNormalizedUrl} from "./utils.js";
 import {AUTH_URL, VERIFY_URL, GET_STATES_URL, SET_STATES_URL} from './constants.ts';
 import {getVersion} from './version.ts';
 
@@ -98,7 +99,7 @@ export class ApiClient {
             lms: options.lms,
             profile: options.profile,
             realm: realm,
-            url: typeof window !== 'undefined' ? window.location.href : null,
+            url: getCurrentNormalizedUrl(),
             sdk_version: getVersion(),
         };
 
@@ -148,7 +149,7 @@ export class ApiClient {
             },
             body: JSON.stringify({
                 user: user,
-                url: typeof window !== 'undefined' ? window.location.href : null,
+                url: getCurrentNormalizedUrl(),
                 state_names: stateNames,
                 sdk_version: getVersion()
             })
@@ -194,7 +195,7 @@ export class ApiClient {
             },
             body: JSON.stringify({
                 user: user,
-                url: typeof window !== 'undefined' ? window.location.href : null,
+                url: getCurrentNormalizedUrl(),
                 states: states,
                 sdk_version: getVersion()
             })

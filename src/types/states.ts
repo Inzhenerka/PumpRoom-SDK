@@ -60,10 +60,6 @@ export interface StateOutput extends State {
  * @experimental
  */
 export interface GetStatesResponse {
-    /** Status of the operation */
-    status: 'success' | 'error';
-    /** Optional error message */
-    error?: string;
     /** Array of state objects */
     states: StateOutput[];
 }
@@ -76,8 +72,6 @@ export interface GetStatesResponse {
  * @experimental
  */
 export interface SetStatesResponse {
-    /** Status of the operation */
-    status: 'success' | 'error';
     /** Optional error message */
     error?: string;
 }

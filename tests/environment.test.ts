@@ -2,9 +2,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { sendEnvironment, setEnvironmentListener } from '../src/environment.ts';
 import { setOnInitCallback } from '../src/callbacks.ts';
 import * as version from '../src/version.ts';
+import * as utils from '../src/utils.ts';
+
+// Mock getCurrentNormalizedUrl to avoid window dependency
+vi.mock('../src/utils.ts', () => ({
+  getCurrentNormalizedUrl: vi.fn().mockReturnValue('http://localhost/test-page')
+}));
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  // Re-mock getCurrentNormalizedUrl after restoreAllMocks
+  vi.mocked(utils.getCurrentNormalizedUrl).mockReturnValue('http://localhost/test-page');
 });
 
 describe('environment helpers', () => {
@@ -16,7 +24,7 @@ describe('environment helpers', () => {
       {
         service: 'pumproom',
         type: 'setEnvironment',
-        payload: { pageURL: window.location.href, sdkVersion: '1.0.0' }
+        payload: { pageURL: 'http://localhost/test-page', sdkVersion: '1.0.0' }
       },
       'https://pumproom.tech'
     );
@@ -41,7 +49,7 @@ describe('environment helpers', () => {
       {
         service: 'pumproom',
         type: 'setEnvironment',
-        payload: { pageURL: window.location.href, sdkVersion: '2.0.0' }
+        payload: { pageURL: 'http://localhost/test-page', sdkVersion: '2.0.0' }
       },
       'https://pumproom.tech'
     );

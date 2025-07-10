@@ -61,3 +61,10 @@ export const PUMPROOM_DOMAINS = [
  * @public
  */
 export const USER_STORAGE_KEY = 'pumproomUser'
+
+/**
+ * Prefix for localStorage keys to avoid conflicts with other applications when storing states
+ * 
+ * @experimental
+ */
+export const STORAGE_PREFIX = 'pumproomState:'
