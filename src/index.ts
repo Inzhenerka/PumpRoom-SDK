@@ -51,6 +51,8 @@ export type {
     SubmissionStatus,
     SubmissionResult,
     State,
+    StateOutput,
+    StateDataType,
     GetStatesResponse,
     SetStatesResponse,
 } from './types/index.ts';

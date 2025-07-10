@@ -1,28 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { setUser } from '../src/auth.ts';
-import { setConfig, getCurrentUser, setCurrentUser } from '../src/globals.ts';
-import { initApiClient } from '../src/api-client.ts';
+import { getCurrentUser, setConfig } from '../src/globals.ts';
 import { VERIFY_URL } from '../src/constants.ts';
+import { setupSdk, mockUser } from './test-utils.ts';
 
 beforeEach(() => {
-  setConfig({ apiKey: 'key', realm: 'test' });
-  initApiClient('key');
-  localStorage.clear();
-  vi.restoreAllMocks();
-  setCurrentUser(null);
+  setupSdk();
 });
 
 describe('setUser', () => {
   it('verifies and stores user', async () => {
+    // enable caching
+    setConfig({ apiKey: 'key', realm: 'test', cacheUser: true });
     const verifyResp = { is_valid: true, is_admin: true };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
 
-    const user = { uid: '1', token: 'tok' };
-    const result = await setUser(user);
+    const result = await setUser({ uid: mockUser.uid, token: mockUser.token });
 
     expect(fetch).toHaveBeenCalledWith(VERIFY_URL, expect.any(Object));
-    expect(result).toEqual({ uid: '1', token: 'tok', is_admin: true });
-    expect(getCurrentUser()).toEqual({ uid: '1', token: 'tok', is_admin: true });
+    expect(result).toEqual({ uid: mockUser.uid, token: mockUser.token, is_admin: true });
+    expect(getCurrentUser()).toEqual({ uid: mockUser.uid, token: mockUser.token, is_admin: true });
     expect(localStorage.getItem('pumproomUser')).not.toBeNull();
   });
 
