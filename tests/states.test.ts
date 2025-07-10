@@ -38,8 +38,7 @@ import { mockUser, setupSdk } from './test-utils.ts';
 // Mock fetch
 global.fetch = vi.fn();
 
-// Mock version
-vi.spyOn(version, 'getVersion').mockReturnValue('1.2.0');
+// No need to mock version - use actual version from package.json
 
 describe('states', () => {
     beforeEach(() => {
@@ -107,7 +106,7 @@ describe('states', () => {
                         user: mockUser,
                         url: window.location.href,
                         state_names: ['test1', 'test2'],
-                        sdk_version: '1.2.0'
+                        sdk_version: version.getVersion()
                     })
                 })
             );
@@ -184,7 +183,7 @@ describe('states', () => {
                         user: mockUser,
                         url: window.location.href,
                         states,
-                        sdk_version: '1.2.0'
+                        sdk_version: version.getVersion()
                     })
                 })
             );
@@ -238,7 +237,7 @@ describe('states', () => {
                             {name: 'test1', value: null},
                             {name: 'test2', value: null}
                         ] as Array<{ name: string, value: boolean | number | string | null }>,
-                        sdk_version: '1.2.0'
+                        sdk_version: version.getVersion()
                     })
                 })
             );
