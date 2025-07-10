@@ -12,8 +12,8 @@
 
 import {getCurrentUser, registerStates, getRegisteredStates, resetRegisteredStates} from './globals.ts';
 import {getApiClient} from './api-client.ts';
-import {generateStateKey, saveStatesToLocalStorage, getStatesFromLocalStorage} from './storage.ts';
-import type {State, GetStatesResponse, SetStatesResponse, StateOutput} from './types/index.ts';
+import {saveStatesToLocalStorage, getStatesFromLocalStorage} from './storage.ts';
+import type {State, StatesResponse, StateOutput, StatesCallback} from './types/index.ts';
 import {StateDataType} from './types/index.ts';
 
 
@@ -24,7 +24,12 @@ import {StateDataType} from './types/index.ts';
  * It first checks localStorage for cached values and then fetches from the backend.
  * After fetching from the backend, it updates the localStorage cache.
  *
+ * If a callback is provided, it will be called twice:
+ * 1. First with cached states (if available)
+ * 2. Then with states fetched from the server
+ *
  * @param stateNames - Array of state names to fetch
+ * @param callback - Optional callback function that will be called with states
  * @returns Promise resolving to the fetched states
  * @throws Error if stateNames is not a non-empty array or if user is not authenticated
  *
@@ -40,13 +45,19 @@ import {StateDataType} from './types/index.ts';
  *   console.error(error);
  * }
  *
+ * // Using callback for immediate rendering with lazy loading
+ * fetchStates(['userPreferences', 'lastVisitedPage'], (states) => {
+ *   console.log('Received states:', states);
+ *   // Update UI with the states
+ * });
+ *
  * // Using Promise chain
  * fetchStates(['userPreferences', 'lastVisitedPage'])
  *   .then(states => console.log(states))
  *   .catch(error => console.error(error));
  * ```
  */
-export async function fetchStates(stateNames: string[]): Promise<GetStatesResponse> {
+export async function fetchStates(stateNames: string[], callback?: StatesCallback): Promise<StatesResponse> {
     // Validate stateNames parameter
     if (!Array.isArray(stateNames) || stateNames.length === 0) {
         throw new Error('stateNames must be non-empty array of strings');
@@ -66,9 +77,11 @@ export async function fetchStates(stateNames: string[]): Promise<GetStatesRespon
     // Check localStorage for cached states
     const cachedStates = getStatesFromLocalStorage(stateNames, currentUser.uid);
 
-    // Create a response with cached states if available
+    // If we have cached states and a callback, call the callback with the cached states
     if (cachedStates.length > 0) {
-        console.debug('Using cached states from localStorage:', cachedStates);
+        if (callback) {
+            callback(cachedStates);
+        }
     }
 
     // Get the API client
@@ -79,6 +92,11 @@ export async function fetchStates(stateNames: string[]): Promise<GetStatesRespon
 
     // Update localStorage with the fetched states
     saveStatesToLocalStorage(response.states, currentUser.uid);
+
+    // If we have a callback, call it with the fetched states
+    if (callback) {
+        callback(response.states);
+    }
 
     return response;
 }
@@ -118,7 +136,7 @@ export async function fetchStates(stateNames: string[]): Promise<GetStatesRespon
  *   .catch(error => console.error(error));
  * ```
  */
-export async function storeStates(states: State[]): Promise<SetStatesResponse> {
+export async function storeStates(states: State[]): Promise<StatesResponse> {
     // Validate states parameter
     if (!Array.isArray(states)) {
         throw new Error('states parameter must be array of objects');
@@ -184,7 +202,7 @@ export async function storeStates(states: State[]): Promise<SetStatesResponse> {
  *   .catch(error => console.error(error));
  * ```
  */
-export async function clearStates(stateNames: string[]): Promise<SetStatesResponse> {
+export async function clearStates(stateNames: string[]): Promise<StatesResponse> {
     // Validate stateNames parameter
     if (!Array.isArray(stateNames) || stateNames.length === 0) {
         throw new Error('stateNames must be non-empty array of strings');

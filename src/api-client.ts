@@ -5,8 +5,7 @@ import {
     PumpRoomUser,
     AuthenticateOptions,
     State,
-    GetStatesResponse,
-    SetStatesResponse,
+    StatesResponse,
 } from './types/index.ts';
 import {getCurrentNormalizedUrl} from "./utils.js";
 import {AUTH_URL, VERIFY_URL, GET_STATES_URL, SET_STATES_URL} from './constants.ts';
@@ -140,7 +139,7 @@ export class ApiClient {
      * }
      * ```
      */
-    async fetchStates(stateNames: string[], user: PumpRoomUser): Promise<GetStatesResponse> {
+    async fetchStates(stateNames: string[], user: PumpRoomUser): Promise<StatesResponse> {
         const response = await fetch(GET_STATES_URL, {
             method: 'POST',
             headers: {
@@ -159,7 +158,7 @@ export class ApiClient {
             throw new Error(`Request error: ${response.status} ${response.statusText}`);
         }
 
-        return await response.json() as GetStatesResponse;
+        return await response.json() as StatesResponse;
     }
 
     /**
@@ -186,7 +185,7 @@ export class ApiClient {
      * }
      * ```
      */
-    async storeStates(states: State[], user: PumpRoomUser): Promise<SetStatesResponse> {
+    async storeStates(states: State[], user: PumpRoomUser): Promise<StatesResponse> {
         const response = await fetch(SET_STATES_URL, {
             method: 'POST',
             headers: {
@@ -205,7 +204,7 @@ export class ApiClient {
             throw new Error(`Request error: ${response.status} ${response.statusText}`);
         }
 
-        return await response.json() as SetStatesResponse;
+        return await response.json() as StatesResponse;
     }
 }
 

@@ -62,8 +62,8 @@ export type {
     State,
     StateOutput,
     StateDataType,
-    GetStatesResponse,
-    SetStatesResponse,
+    StatesResponse,
+    StatesCallback,
 } from './types/index.ts';
 
 console.debug('PumpRoom SDK v' + getVersion() + ' loaded');

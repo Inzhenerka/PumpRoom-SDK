@@ -122,15 +122,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Helper function to load states
 async function loadStates() {
     try {
-        const result = await PumpRoomSdk.fetchStates(['checkbox1State', 'checkbox2State', 'textInputState']);
-        console.log('Fetched states:', result);
-
-        // Try to update UI with fetched states
-        if (Array.isArray(result.states)) {
-            updateUIFromStates(result.states);
-        } else {
-            console.error('Invalid state format received:', result);
-        }
+        // Use the callback parameter to update UI immediately with cached states
+        // and then again with states fetched from the server
+        const result = await PumpRoomSdk.fetchStates(
+            ['checkbox1State', 'checkbox2State', 'textInputState'],
+            (states) => {
+                console.log('Received states via callback:', states);
+                updateUIFromStates(states);
+            }
+        );
+        console.log('Fetched states (final result):', result);
     } catch (error) {
         console.error(`Error fetching states: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -140,7 +141,7 @@ async function loadStates() {
 function updateUIFromStates(states: Array<{
     name: string,
     value: boolean | number | string | null
-}>, retryCount = 0) {
+}>) {
     // Get UI elements
     console.log('Updating UI from states...');
     const checkbox1 = document.getElementById('checkbox1') as HTMLInputElement;

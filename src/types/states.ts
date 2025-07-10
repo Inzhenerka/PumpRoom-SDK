@@ -53,25 +53,22 @@ export interface StateOutput extends State {
 }
 
 /**
- * Response from the get_states API endpoint
+ * Response from the states API endpoints
  * 
  * @public
  * @category States
  * @experimental
  */
-export interface GetStatesResponse {
+export interface StatesResponse {
     /** Array of state objects */
     states: StateOutput[];
 }
 
 /**
- * Response from the set_states API endpoint
+ * Callback function type for receiving states
  * 
  * @public
  * @category States
  * @experimental
  */
-export interface SetStatesResponse {
-    /** Optional error message */
-    error?: string;
-}
+export type StatesCallback = (states: StateOutput[]) => void;
