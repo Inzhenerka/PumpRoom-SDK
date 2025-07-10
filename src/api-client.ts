@@ -128,6 +128,7 @@ export class ApiClient {
      * @returns Promise resolving to the fetched states
      * @throws Error if the request fails
      *
+     * @category Experimental
      * @example
      * ```typescript
      * try {
@@ -170,6 +171,7 @@ export class ApiClient {
      * @returns Promise resolving to the result of the operation
      * @throws Error if the request fails
      *
+     * @category Experimental
      * @example
      * ```typescript
      * try {

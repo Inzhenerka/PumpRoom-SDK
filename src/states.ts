@@ -5,6 +5,7 @@
  * It allows registering, fetching, storing, and clearing states.
  *
  * @module States
+ * @category Experimental
  */
 
 import {getCurrentUser, registerStates, getRegisteredStates, resetRegisteredStates} from './globals.ts';
@@ -20,6 +21,7 @@ import type {State, GetStatesResponse, SetStatesResponse} from './types/index.ts
  * @returns Promise resolving to the fetched states
  * @throws Error if stateNames is not a non-empty array or if user is not authenticated
  *
+ * @category Experimental
  * @example
  * ```typescript
  * // Using async/await
@@ -71,6 +73,7 @@ export async function fetchStates(stateNames: string[]): Promise<GetStatesRespon
  * @returns Promise resolving to the result of the operation
  * @throws Error if states is not an array or if user is not authenticated
  *
+ * @category Experimental
  * @example
  * ```typescript
  * // Using async/await
@@ -126,6 +129,7 @@ export async function storeStates(states: State[]): Promise<SetStatesResponse> {
  * @returns Promise resolving to the result of the operation
  * @throws Error if stateNames is not a non-empty array
  *
+ * @category Experimental
  * @example
  * ```typescript
  * // Using async/await

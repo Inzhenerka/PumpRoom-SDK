@@ -16,10 +16,18 @@ export const AUTH_URL = `${API_BASE_URL}/auth/authenticate`;
 /** URL for the token verification endpoint */
 export const VERIFY_URL = `${API_BASE_URL}/auth/verify_token`;
 
-/** URL to load states from backend */
+/**
+ * URL to load states from backend
+ *
+ * @category Experimental
+ */
 export const GET_STATES_URL = `${API_BASE_URL}/tracker/get_states`;
 
-/** URL to store states on backend */
+/**
+ * URL to store states on backend
+ *
+ * @category Experimental
+ */
 export const SET_STATES_URL = `${API_BASE_URL}/tracker/set_states`;
 
 /** 
