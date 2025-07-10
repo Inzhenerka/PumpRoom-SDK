@@ -4,14 +4,16 @@
  * This file contains type definitions for the States module.
  * 
  * @module Types/States
- * @category Experimental
+ * @category States
+ * @experimental
  */
 
 /**
  * Enum for state data types
  * 
  * @public
- * @category Experimental
+ * @category States
+ * @experimental
  */
 export enum StateDataType {
     /** Boolean value */
@@ -28,7 +30,8 @@ export enum StateDataType {
  * Interface representing a state input object
  * 
  * @public
- * @category Experimental
+ * @category States
+ * @experimental
  */
 export interface State {
     /** Name of the state */
@@ -41,7 +44,8 @@ export interface State {
  * Interface representing a state output object
  * 
  * @public
- * @category Experimental
+ * @category States
+ * @experimental
  */
 export interface StateOutput extends State {
     /** Data type of the state value */
@@ -52,7 +56,8 @@ export interface StateOutput extends State {
  * Response from the get_states API endpoint
  * 
  * @public
- * @category Experimental
+ * @category States
+ * @experimental
  */
 export interface GetStatesResponse {
     /** Status of the operation */
@@ -67,7 +72,8 @@ export interface GetStatesResponse {
  * Response from the set_states API endpoint
  * 
  * @public
- * @category Experimental
+ * @category States
+ * @experimental
  */
 export interface SetStatesResponse {
     /** Status of the operation */

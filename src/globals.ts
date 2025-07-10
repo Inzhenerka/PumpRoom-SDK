@@ -277,7 +277,7 @@ export function getApiClientInstance(): ApiClient {
  * @param stateNames - Array of state names to register
  * @throws Error if stateNames is not an array
  *
- * @category Experimental
+ * @experimental
  * @example
  * ```typescript
  * registerStates(['userPreferences', 'lastVisitedPage']);
@@ -300,7 +300,7 @@ export function registerStates(stateNames: string[]): void {
  * 
  * @returns Array of registered state names
  *
- * @category Experimental
+ * @experimental
  * @example
  * ```typescript
  * const states = getRegisteredStates();
@@ -316,7 +316,7 @@ export function getRegisteredStates(): string[] {
  * 
  * This function is primarily used for testing purposes.
  *
- * @category Experimental
+ * @experimental
  * @internal
  */
 export function resetRegisteredStates(): void {

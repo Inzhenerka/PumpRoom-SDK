@@ -12,8 +12,6 @@
   "name": "PumpRoom SDK",
   "includeVersion": true,
   "categorizeByGroup": true,
-  "defaultCategory": "Official",
-  "categoryOrder": ["Official", "Experimental", "*"],
   "searchInComments": true,
   "hideGenerator": true,
   "customFooterHtml": "PumpRoom SDK",
