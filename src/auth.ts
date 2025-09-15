@@ -131,6 +131,23 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
     if (!fromCache) {
         const apiClient = getApiClient();
         const normLms = normalizeLmsProfile(lms);
+
+        // Validate GetCourse placeholders if requested via init configuration
+        if (config.type === 'getcourse') {
+            const uid = normLms?.id;
+            const hasCurly = typeof uid === 'string' && uid.indexOf('{') !== -1;
+            const invalid = !uid || hasCurly;
+            if (invalid) {
+                const msg = 'Некорректный идентификатор пользователя из GetCourse. При встраивании JavaScript-кода включите галочку «Заменять переменные пользователя».';
+                if (typeof window !== 'undefined' && typeof window.alert === 'function') {
+                    try { window.alert(msg); } catch (_) { /* ignore */ }
+                } else {
+                    console.warn(msg);
+                }
+                throw new Error('GetCourse UID validation failed');
+            }
+        }
+
         currentUser = await apiClient.authenticate({lms: normLms, profile}, config.realm);
 
         if (config.cacheUser) {

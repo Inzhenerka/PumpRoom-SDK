@@ -49,6 +49,13 @@
                 </button>
             </li>
             <li class="nav-item" role="presentation">
+                <button class="nav-link" id="getcourse-tab" data-bs-toggle="tab" data-bs-target="#getcourse"
+                        type="button"
+                        role="tab">
+                    Подключение к GetCourse
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
                 <button class="nav-link" id="npm-tab" data-bs-toggle="tab" data-bs-target="#npm" type="button"
                         role="tab">
                     Интеграция в проект платформы
@@ -97,6 +104,27 @@
                 </ul>
             </div>
 
+            <div class="tab-pane fade" id="getcourse" role="tabpanel" aria-labelledby="getcourse-tab">
+                <p>
+                    На платформе GetCourse, надо на странице урока вставить в самом начале компонент Блок -> Вставка ->
+                    <b>Javascript-код</b>.
+                </p>
+                <p>
+                    В настройках компонента надо обязательно включить галочку <b>«Заменять переменные пользователя»</b>
+                    и вставить код:
+                </p>
+                <pre><code class="language-javascript border border-primary-subtle">const s = document.createElement('script');
+s.src = 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v1.umd.js';
+s.onload = function () {
+  window.PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID', type: 'getcourse' });
+  window.PumpRoomSdk.authenticate({ lms: { id: '{uid}', name: '{name}' } }).catch(console.error);
+};
+document.head.appendChild(s);</code></pre>
+                <p>
+                    Замените значения 'ВАШ_КЛЮЧ' и 'ВАШ_ID' на параметры из админки PumpRoom. Больше ничего менять не
+                    требуется.
+                </p>
+            </div>
 
             <div class="tab-pane fade" id="npm" role="tabpanel" aria-labelledby="npm-tab">
                 <p>Если вы хотите интегрировать SDK в проект своей платформы LMS, установите npm-пакет

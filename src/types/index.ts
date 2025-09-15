@@ -233,6 +233,12 @@ export interface PumpRoomConfig {
     /** Realm identifier that determines the context of operations */
     realm: string;
     /**
+     * Optional LMS type identifier applied globally for the SDK.
+     * When set to 'getcourse', the SDK will validate LMS identifiers
+     * to ensure that GetCourse template placeholders were replaced.
+     */
+    type?: 'getcourse';
+    /**
      * Flag indicating whether to cache the user in localStorage
      * @defaultValue true
      */
@@ -258,6 +264,8 @@ export interface InternalConfig {
     apiKey: string;
     /** Realm identifier that determines the context of operations */
     realm: string;
+    /** Optional LMS type identifier applied globally for the SDK. */
+    type?: 'getcourse';
     /** Flag indicating whether to cache the user in localStorage */
     cacheUser: boolean;
     /** Minimum height for PumpRoom iframes in pixels */
