@@ -36,13 +36,13 @@
     <section class="my-5">
         <h2 class="h4 mb-3">Начало работы</h2>
         <div class="alert alert-info bg-primary-subtle border-primary" role="alert">
-            Прежде чем начать, сообщите менеджеру PumpRoom ваш Email, чтобы получить доступ
-            к <a href="http://admin.pumproom.tech/" target="_blank">админке</a>.
+            Прежде чем начать, создайте пространство в
+            <a href="http://admin.pumproom.tech/" target="_blank">админке PumpRoom</a>.
             Там в разделе Интеграция вы найдете API-ключ <code>apiKey</code> и идентификатор школы <code>realm</code>.
         </div>
         <ul class="nav nav-tabs" id="setupTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="script-tab" data-bs-toggle="tab" data-bs-target="#script"
+                <button class="nav-link active" id="cdn-tab" data-bs-toggle="tab" data-bs-target="#cdn"
                         type="button"
                         role="tab">
                     Подключение к любой странице
@@ -64,7 +64,7 @@
         </ul>
 
         <div class="tab-content border border-top-0 p-4 bg-white" id="setupTabsContent">
-            <div class="tab-pane fade show active" id="script" role="tabpanel" aria-labelledby="script-tab">
+            <div class="tab-pane fade show active" id="cdn" role="tabpanel" aria-labelledby="cdn-tab">
                 <p>Этот способ подойдет вам, если вы используете любую готовую LMS, которая позволяет вставлять на
                     страницу HTML-код.</p>
 
@@ -76,6 +76,10 @@
         lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
   }).catch(console.error);
 &lt;/script&gt;</code></pre>
+
+                <p>
+                    Замените значения 'ВАШ_КЛЮЧ' и 'ВАШ_ID' на параметры из админки PumpRoom.
+                </p>
                 <p>Альтернативный способ (более современный):</p>
                 <pre><code class="language-html border border-primary-subtle">&lt;script type="module"&gt;
   import { init, authenticate } from '__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js';
@@ -113,13 +117,13 @@
                     В настройках компонента надо обязательно включить галочку <b>«Заменять переменные пользователя»</b>
                     и вставить код:
                 </p>
-                <pre><code class="language-javascript border border-primary-subtle">const s = document.createElement('script');
-s.src = 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v1.umd.js';
-s.onload = function () {
-  window.PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID', type: 'getcourse' });
-  window.PumpRoomSdk.authenticate({ lms: { id: '{uid}', name: '{name}' } }).catch(console.error);
-};
-document.head.appendChild(s);</code></pre>
+                <pre><code class="language-javascript border border-primary-subtle">document.head.appendChild(Object.assign(document.createElement('script'), {
+  src: 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v1.umd.js',
+  async: true, onload() {
+    window.PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID', 'type': 'getcourse' });
+    window.PumpRoomSdk.authenticate({ lms: { id: '{uid}', name: '{name}' } }).catch(console.error);
+  }
+}));</code></pre>
                 <p>
                     Замените значения 'ВАШ_КЛЮЧ' и 'ВАШ_ID' на параметры из админки PumpRoom. Больше ничего менять не
                     требуется.
@@ -204,6 +208,13 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
     <section class="my-5">
         <h2 class="h4 mb-3">История версий</h2>
         <ul class="list-unstyled1">
+            <li class="mt-3">
+                <div><strong>1.3.0 – Интеграция с GetCourse.</strong></div>
+                <div>
+                    Упрощена интеграция в страницы GetCourse, добавлена инструкция.
+                </div>
+            </li>
+
             <li class="mt-3">
                 <div><strong>1.2.1 – обновленная документация.</strong></div>
                 <div>
