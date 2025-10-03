@@ -248,6 +248,16 @@ export interface PumpRoomConfig {
      * @defaultValue 600
      */
     minHeight?: number;
+    /**
+     * Optional course identifier used for tracking the current course context.
+     * This value can be used to associate SDK operations with a specific course.
+     */
+    courseId?: string;
+    /**
+     * Optional lesson identifier used for tracking the current lesson context.
+     * This value can be used to associate SDK operations with a specific lesson.
+     */
+    lessonId?: string;
 }
 
 /**
@@ -270,6 +280,16 @@ export interface InternalConfig {
     cacheUser: boolean;
     /** Minimum height for PumpRoom iframes in pixels */
     minHeight?: number;
+    /**
+     * Optional course identifier used for tracking the current course context.
+     * This value can be used to associate SDK operations with a specific course.
+     */
+    courseId?: string;
+    /**
+     * Optional lesson identifier used for tracking the current lesson context.
+     * This value can be used to associate SDK operations with a specific lesson.
+     */
+    lessonId?: string;
 }
 
 /**

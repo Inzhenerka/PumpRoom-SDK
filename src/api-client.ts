@@ -9,6 +9,7 @@ import {
 } from './types/index.ts';
 import {getCurrentNormalizedUrl} from "./utils.js";
 import {AUTH_URL, VERIFY_URL, GET_STATES_URL, SET_STATES_URL} from './constants.ts';
+import {getConfig} from './globals.ts';
 import {getVersion} from './version.ts';
 
 /**
@@ -140,6 +141,7 @@ export class ApiClient {
      * ```
      */
     async fetchStates(stateNames: string[], user: PumpRoomUser): Promise<StatesResponse> {
+        const config = getConfig();
         const response = await fetch(GET_STATES_URL, {
             method: 'POST',
             headers: {
@@ -149,6 +151,8 @@ export class ApiClient {
             body: JSON.stringify({
                 user: user,
                 url: getCurrentNormalizedUrl(),
+                course_id: config?.courseId,
+                lesson_id: config?.lessonId,
                 state_names: stateNames,
                 sdk_version: getVersion()
             })
@@ -186,6 +190,7 @@ export class ApiClient {
      * ```
      */
     async storeStates(states: State[], user: PumpRoomUser): Promise<StatesResponse> {
+        const config = getConfig();
         const response = await fetch(SET_STATES_URL, {
             method: 'POST',
             headers: {
@@ -195,6 +200,8 @@ export class ApiClient {
             body: JSON.stringify({
                 user: user,
                 url: getCurrentNormalizedUrl(),
+                course_id: config?.courseId,
+                lesson_id: config?.lessonId,
                 states: states,
                 sdk_version: getVersion()
             })
