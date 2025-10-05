@@ -94,22 +94,26 @@ describe('states', () => {
 
             const result = await fetchStates(['test1', 'test2']);
             expect(result).toEqual(mockResponse);
-            expect(global.fetch).toHaveBeenCalledWith(
-                'https://pumproom-api.inzhenerka-cloud.com/tracker/get_states',
-                expect.objectContaining({
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-KEY': 'key',
-                    },
-                    body: JSON.stringify({
-                        user: mockUser,
-                        url: window.location.href,
-                        state_names: ['test1', 'test2'],
-                        sdk_version: version.getVersion()
-                    })
-                })
-            );
+            expect(global.fetch).toHaveBeenCalled();
+            const call = (global.fetch as any).mock.calls[0];
+            expect(call[0]).toBe('https://pumproom-api.inzhenerka-cloud.com/tracker/get_states');
+            const opts = call[1];
+            expect(opts).toEqual(expect.objectContaining({
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': 'key',
+                },
+            }));
+            const body = JSON.parse(opts.body);
+            expect(body.user).toEqual(mockUser);
+            expect(body.state_names).toEqual(['test1', 'test2']);
+            expect(body.url).toBe(window.location.href);
+            expect(body.sdk_version).toBe(version.getVersion());
+            expect(body.context).toEqual(expect.objectContaining({
+                url: window.location.href,
+                sdk_version: version.getVersion(),
+            }));
         });
 
         it('throws an error if stateNames is not an array', async () => {
@@ -171,22 +175,26 @@ describe('states', () => {
             ] as Array<{ name: string, value: boolean | number | string | null }>;
             const result = await storeStates(states);
             expect(result).toEqual(mockResponse);
-            expect(global.fetch).toHaveBeenCalledWith(
-                'https://pumproom-api.inzhenerka-cloud.com/tracker/set_states',
-                expect.objectContaining({
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-KEY': 'key',
-                    },
-                    body: JSON.stringify({
-                        user: mockUser,
-                        url: window.location.href,
-                        states,
-                        sdk_version: version.getVersion()
-                    })
-                })
-            );
+            expect(global.fetch).toHaveBeenCalled();
+            const call = (global.fetch as any).mock.calls[0];
+            expect(call[0]).toBe('https://pumproom-api.inzhenerka-cloud.com/tracker/set_states');
+            const opts = call[1];
+            expect(opts).toEqual(expect.objectContaining({
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': 'key',
+                },
+            }));
+            const body = JSON.parse(opts.body);
+            expect(body.user).toEqual(mockUser);
+            expect(body.states).toEqual(states);
+            expect(body.url).toBe(window.location.href);
+            expect(body.sdk_version).toBe(version.getVersion());
+            expect(body.context).toEqual(expect.objectContaining({
+                url: window.location.href,
+                sdk_version: version.getVersion(),
+            }));
         });
 
         it('throws an error if states is not an array', async () => {
@@ -222,25 +230,29 @@ describe('states', () => {
 
             const result = await clearStates(['test1', 'test2']);
             expect(result).toEqual(mockResponse);
-            expect(global.fetch).toHaveBeenCalledWith(
-                'https://pumproom-api.inzhenerka-cloud.com/tracker/set_states',
-                expect.objectContaining({
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-KEY': 'key',
-                    },
-                    body: JSON.stringify({
-                        user: mockUser,
-                        url: window.location.href,
-                        states: [
-                            {name: 'test1', value: null},
-                            {name: 'test2', value: null}
-                        ] as Array<{ name: string, value: boolean | number | string | null }>,
-                        sdk_version: version.getVersion()
-                    })
-                })
-            );
+            expect(global.fetch).toHaveBeenCalled();
+            const call = (global.fetch as any).mock.calls[0];
+            expect(call[0]).toBe('https://pumproom-api.inzhenerka-cloud.com/tracker/set_states');
+            const opts = call[1];
+            expect(opts).toEqual(expect.objectContaining({
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': 'key',
+                },
+            }));
+            const body = JSON.parse(opts.body);
+            expect(body.user).toEqual(mockUser);
+            expect(body.states).toEqual([
+                {name: 'test1', value: null},
+                {name: 'test2', value: null}
+            ]);
+            expect(body.url).toBe(window.location.href);
+            expect(body.sdk_version).toBe(version.getVersion());
+            expect(body.context).toEqual(expect.objectContaining({
+                url: window.location.href,
+                sdk_version: version.getVersion(),
+            }));
         });
 
         it('throws an error if stateNames is not an array', async () => {

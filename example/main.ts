@@ -1,9 +1,9 @@
 // Import site styles and libraries
 import '../src/styles/bootstrap.scss';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-
 // Import SDK from the built library
-import * as PumpRoomSdk from '../src/index.ts';
+import * as PumpRoomSdk from '../src/index.js';
+import {StatesResponse} from "../src/index.js";
 
 const apiKey = import.meta.env.VITE_PUMPROOM_API_KEY;
 const realm = import.meta.env.VITE_PUMPROOM_REALM;
@@ -138,10 +138,7 @@ async function loadStates() {
 }
 
 // Function to update UI from states
-function updateUIFromStates(states: Array<{
-    name: string,
-    value: boolean | number | string | null
-}>) {
+function updateUIFromStates(states: StatesResponse) {
     // Get UI elements
     console.log('Updating UI from states...');
     const checkbox1 = document.getElementById('checkbox1') as HTMLInputElement;
@@ -149,9 +146,9 @@ function updateUIFromStates(states: Array<{
     const textInput = document.getElementById('textInput') as HTMLInputElement;
 
     // Find states by name
-    const checkbox1State = states.find(state => state.name === 'checkbox1State');
-    const checkbox2State = states.find(state => state.name === 'checkbox2State');
-    const textInputState = states.find(state => state.name === 'textInputState');
+    const checkbox1State = states.states.find(state => state.name === 'checkbox1State');
+    const checkbox2State = states.states.find(state => state.name === 'checkbox2State');
+    const textInputState = states.states.find(state => state.name === 'textInputState');
 
     if (checkbox1State !== undefined) {
         checkbox1.checked = !!checkbox1State.value;

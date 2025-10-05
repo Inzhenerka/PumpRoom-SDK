@@ -148,6 +148,27 @@ export interface AuthenticateOptions {
 }
 
 /**
+ * Context information for SDK operations
+ *
+ * This interface contains context information about the execution environment
+ * where the SDK is operating, including LMS kit/lesson identifiers.
+ *
+ * @public
+ * @category States
+ * @experimental
+ */
+export interface LMSContext {
+    /** Optional LMS Kit identifier used for tracking the current course context */
+    kit_id?: string | null;
+    /** Optional lesson identifier used for tracking the current lesson context */
+    lesson_id?: string | null;
+    /** Current page URL (mirrored for compatibility) */
+    url?: string | null;
+    /** SDK version (mirrored for compatibility) */
+    sdk_version?: string;
+}
+
+/**
  * Input data for authentication call
  *
  * This interface defines the data sent to the authentication endpoint.
@@ -160,9 +181,11 @@ export interface AuthInput extends RealmPayload {
     lms?: LMSProfileInput | null;
     /** Tilda profile information, if authenticating via Tilda */
     profile?: TildaProfileInput | null;
-    /** URL of the page where authentication is being performed */
+    /** LMS context information */
+    context: LMSContext;
+    /** Current page URL */
     url?: string | null;
-    /** Version of the SDK performing the authentication */
+    /** SDK version */
     sdk_version: string;
 }
 
@@ -216,6 +239,48 @@ export interface VerifyTokenResult {
     is_valid: boolean;
     /** Flag indicating whether the user has admin privileges */
     is_admin: boolean;
+    /** LMS context information */
+    context: LMSContext;
+}
+
+/**
+ * Input data for fetching states
+ *
+ * @public
+ * @category States
+ * @experimental
+ */
+export interface FetchStatesInput {
+    /** Authenticated user */
+    user: PumpRoomUser;
+    /** Names of states to fetch */
+    state_names: string[];
+    /** LMS context information */
+    context: LMSContext;
+    /** Current page URL */
+    url?: string | null;
+    /** SDK version */
+    sdk_version: string;
+}
+
+/**
+ * Input data for storing states
+ *
+ * @public
+ * @category States
+ * @experimental
+ */
+export interface StoreStatesInput {
+    /** Authenticated user */
+    user: PumpRoomUser;
+    /** States to store */
+    states: import('./states.ts').State[];
+    /** LMS context information */
+    context: LMSContext;
+    /** Current page URL */
+    url?: string | null;
+    /** SDK version */
+    sdk_version: string;
 }
 
 /**
@@ -249,10 +314,9 @@ export interface PumpRoomConfig {
      */
     minHeight?: number;
     /**
-     * Optional course identifier used for tracking the current course context.
-     * This value can be used to associate SDK operations with a specific course.
+     * Optional LMS Kit identifier used for tracking the current course context.
      */
-    courseId?: string;
+    kitId?: string;
     /**
      * Optional lesson identifier used for tracking the current lesson context.
      * This value can be used to associate SDK operations with a specific lesson.
@@ -281,10 +345,9 @@ export interface InternalConfig {
     /** Minimum height for PumpRoom iframes in pixels */
     minHeight?: number;
     /**
-     * Optional course identifier used for tracking the current course context.
-     * This value can be used to associate SDK operations with a specific course.
+     * Optional LMS Kit identifier used for tracking the current course context.
      */
-    courseId?: string;
+    kitId?: string;
     /**
      * Optional lesson identifier used for tracking the current lesson context.
      * This value can be used to associate SDK operations with a specific lesson.

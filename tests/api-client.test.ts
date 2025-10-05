@@ -37,22 +37,29 @@ describe('ApiClient', () => {
 
             const result = await apiClient.fetchStates(['test1', 'test2'], mockUser);
             expect(result).toEqual(mockResponse);
-            expect(global.fetch).toHaveBeenCalledWith(
-                'https://pumproom-api.inzhenerka-cloud.com/tracker/get_states',
-                expect.objectContaining({
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-KEY': 'test-api-key',
-                    },
-                    body: JSON.stringify({
-                        user: mockUser,
-                        url: window.location.href,
-                        state_names: ['test1', 'test2'],
-                        sdk_version: version.getVersion()
-                    })
-                })
-            );
+            // Validate fetch was called with correct URL and options
+            expect(global.fetch).toHaveBeenCalled();
+            const call = (global.fetch as any).mock.calls[0];
+            expect(call[0]).toBe('https://pumproom-api.inzhenerka-cloud.com/tracker/get_states');
+            const opts = call[1];
+            expect(opts).toEqual(expect.objectContaining({
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': 'test-api-key',
+                },
+            }));
+            const body = JSON.parse(opts.body);
+            // Legacy flat fields preserved
+            expect(body.url).toBe(window.location.href);
+            expect(body.sdk_version).toBe(version.getVersion());
+            expect(body.state_names).toEqual(['test1', 'test2']);
+            expect(body.user).toEqual(mockUser);
+            // New context object mirrors legacy fields
+            expect(body.context).toEqual(expect.objectContaining({
+                url: window.location.href,
+                sdk_version: version.getVersion(),
+            }));
         });
 
         it('throws an error if the fetch request fails', async () => {
@@ -86,22 +93,29 @@ describe('ApiClient', () => {
             ];
             const result = await apiClient.storeStates(states, mockUser);
             expect(result).toEqual(mockResponse);
-            expect(global.fetch).toHaveBeenCalledWith(
-                'https://pumproom-api.inzhenerka-cloud.com/tracker/set_states',
-                expect.objectContaining({
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-KEY': 'test-api-key',
-                    },
-                    body: JSON.stringify({
-                        user: mockUser,
-                        url: window.location.href,
-                        states,
-                        sdk_version: version.getVersion()
-                    })
-                })
-            );
+            // Validate fetch was called with correct URL and options
+            expect(global.fetch).toHaveBeenCalled();
+            const call = (global.fetch as any).mock.calls[0];
+            expect(call[0]).toBe('https://pumproom-api.inzhenerka-cloud.com/tracker/set_states');
+            const opts = call[1];
+            expect(opts).toEqual(expect.objectContaining({
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': 'test-api-key',
+                },
+            }));
+            const body = JSON.parse(opts.body);
+            // Legacy flat fields preserved
+            expect(body.url).toBe(window.location.href);
+            expect(body.sdk_version).toBe(version.getVersion());
+            expect(body.states).toEqual(states);
+            expect(body.user).toEqual(mockUser);
+            // New context object mirrors legacy fields
+            expect(body.context).toEqual(expect.objectContaining({
+                url: window.location.href,
+                sdk_version: version.getVersion(),
+            }));
         });
 
         it('throws an error if the fetch request fails', async () => {

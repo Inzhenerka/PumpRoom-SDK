@@ -26,16 +26,16 @@
     "postversion": "git push && git push --tags"
   },
   "devDependencies": {
-    "@types/node": "^24.0.7",
+    "@types/node": "^24.6.2",
     "@vitest/coverage-istanbul": "^3.2.4",
-    "bootstrap": "^5.3.7",
+    "bootstrap": "^5.3.8",
     "highlight.js": "^11.11.1",
     "highlightjs-copy": "^1.0.6",
-    "jsdom": "^26.1.0",
-    "sass": "^1.89.2",
-    "typedoc": "^0.28.7",
-    "typescript": "^5.2.2",
-    "vite": "^6.3.5",
+    "jsdom": "^27.0.0",
+    "sass": "^1.93.2",
+    "typedoc": "^0.28.13",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.9",
     "vitest": "^3.2.4"
   },
   "type": "module",

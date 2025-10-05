@@ -7,9 +7,10 @@ import {
     State,
     StatesResponse,
 } from './types/index.ts';
+import type {LMSContext, FetchStatesInput, StoreStatesInput} from './types/index.ts';
 import {getCurrentNormalizedUrl} from "./utils.js";
 import {AUTH_URL, VERIFY_URL, GET_STATES_URL, SET_STATES_URL} from './constants.ts';
-import {getConfig} from './globals.ts';
+import {getConfig, setApiClientInstance, getApiClientInstance} from './globals.ts';
 import {getVersion} from './version.ts';
 
 /**
@@ -36,6 +37,19 @@ export class ApiClient {
     }
 
     /**
+     * Builds LMS context payload that is sent with most API requests.
+     */
+    private buildContext(): LMSContext {
+        const config = getConfig();
+        return {
+            kit_id: config?.kitId ?? null,
+            lesson_id: config?.lessonId ?? null,
+            url: getCurrentNormalizedUrl(),
+            sdk_version: getVersion(),
+        };
+    }
+
+    /**
      * Verify a cached user token.
      *
      * This call checks whether the provided user token is still valid for the
@@ -54,6 +68,7 @@ export class ApiClient {
      * ```
      */
     async verifyToken(user: PumpRoomUser, realm: string): Promise<VerifyTokenResult> {
+        const context = this.buildContext();
         const payload: VerifyTokenInput = {
             realm,
             token: user.token,
@@ -95,12 +110,14 @@ export class ApiClient {
      * ```
      */
     async authenticate(options: AuthenticateOptions, realm: string): Promise<PumpRoomUser> {
+        const context = this.buildContext();
         const body: AuthInput = {
             lms: options.lms,
             profile: options.profile,
             realm: realm,
             url: getCurrentNormalizedUrl(),
             sdk_version: getVersion(),
+            context: context,
         };
 
         const response = await fetch(AUTH_URL, {
@@ -141,21 +158,21 @@ export class ApiClient {
      * ```
      */
     async fetchStates(stateNames: string[], user: PumpRoomUser): Promise<StatesResponse> {
-        const config = getConfig();
+        const context = this.buildContext();
+        const body: FetchStatesInput = {
+            user: user,
+            state_names: stateNames,
+            url: getCurrentNormalizedUrl(),
+            sdk_version: getVersion(),
+            context: context,
+        };
         const response = await fetch(GET_STATES_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-API-KEY': this.apiKey,
             },
-            body: JSON.stringify({
-                user: user,
-                url: getCurrentNormalizedUrl(),
-                course_id: config?.courseId,
-                lesson_id: config?.lessonId,
-                state_names: stateNames,
-                sdk_version: getVersion()
-            })
+            body: JSON.stringify(body),
         });
 
         if (!response.ok) {
@@ -190,21 +207,21 @@ export class ApiClient {
      * ```
      */
     async storeStates(states: State[], user: PumpRoomUser): Promise<StatesResponse> {
-        const config = getConfig();
+        const context = this.buildContext();
+        const body: StoreStatesInput = {
+            user: user,
+            states: states,
+            url: getCurrentNormalizedUrl(),
+            sdk_version: getVersion(),
+            context: context,
+        };
         const response = await fetch(SET_STATES_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-API-KEY': this.apiKey,
             },
-            body: JSON.stringify({
-                user: user,
-                url: getCurrentNormalizedUrl(),
-                course_id: config?.courseId,
-                lesson_id: config?.lessonId,
-                states: states,
-                sdk_version: getVersion()
-            })
+            body: JSON.stringify(body),
         });
 
         if (!response.ok) {
@@ -214,8 +231,6 @@ export class ApiClient {
         return await response.json() as StatesResponse;
     }
 }
-
-import {setApiClientInstance, getApiClientInstance} from './globals.ts';
 
 /**
  * Initialize the API client with the API key.
