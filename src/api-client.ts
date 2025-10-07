@@ -6,6 +6,7 @@ import {
     AuthenticateOptions,
     State,
     StatesResponse,
+    LMSContextAPI,
 } from './types/index.ts';
 import type {LMSContext, FetchStatesInput, StoreStatesInput} from './types/index.ts';
 import {getCurrentNormalizedUrl} from "./utils.js";
@@ -39,14 +40,13 @@ export class ApiClient {
     /**
      * Builds LMS context payload that is sent with most API requests.
      */
-    private buildContext(): LMSContext {
+    private buildContext(): LMSContextAPI {
         const config = getConfig();
         return {
-            kit_id: config?.kitId ?? null,
-            lesson_id: config?.lessonId ?? null,
-            url: getCurrentNormalizedUrl(),
-            sdk_version: getVersion(),
-        };
+            kit_id: config?.context?.kitId,
+            program_id: config?.context?.programId,
+            lesson_id: config?.context?.lessonId,
+        } as LMSContextAPI;
     }
 
     /**
@@ -68,11 +68,11 @@ export class ApiClient {
      * ```
      */
     async verifyToken(user: PumpRoomUser, realm: string): Promise<VerifyTokenResult> {
-        const context = this.buildContext();
         const payload: VerifyTokenInput = {
             realm,
             token: user.token,
             uid: user.uid,
+            context: this.buildContext(),
         };
 
         const resp = await fetch(VERIFY_URL, {
@@ -110,14 +110,13 @@ export class ApiClient {
      * ```
      */
     async authenticate(options: AuthenticateOptions, realm: string): Promise<PumpRoomUser> {
-        const context = this.buildContext();
         const body: AuthInput = {
             lms: options.lms,
             profile: options.profile,
             realm: realm,
             url: getCurrentNormalizedUrl(),
             sdk_version: getVersion(),
-            context: context,
+            context: this.buildContext(),
         };
 
         const response = await fetch(AUTH_URL, {
@@ -157,14 +156,18 @@ export class ApiClient {
      * }
      * ```
      */
-    async fetchStates(stateNames: string[], user: PumpRoomUser): Promise<StatesResponse> {
+    async fetchStates(stateNames: string[], user: PumpRoomUser, options?: { includeEnvInContext?: boolean }): Promise<StatesResponse> {
         const context = this.buildContext();
+        if (options?.includeEnvInContext) {
+            (context as any).url = getCurrentNormalizedUrl();
+            (context as any).sdk_version = getVersion();
+        }
         const body: FetchStatesInput = {
             user: user,
             state_names: stateNames,
             url: getCurrentNormalizedUrl(),
             sdk_version: getVersion(),
-            context: context,
+            context,
         };
         const response = await fetch(GET_STATES_URL, {
             method: 'POST',
@@ -206,14 +209,18 @@ export class ApiClient {
      * }
      * ```
      */
-    async storeStates(states: State[], user: PumpRoomUser): Promise<StatesResponse> {
+    async storeStates(states: State[], user: PumpRoomUser, options?: { includeEnvInContext?: boolean }): Promise<StatesResponse> {
         const context = this.buildContext();
+        if (options?.includeEnvInContext) {
+            (context as any).url = getCurrentNormalizedUrl();
+            (context as any).sdk_version = getVersion();
+        }
         const body: StoreStatesInput = {
             user: user,
             states: states,
             url: getCurrentNormalizedUrl(),
             sdk_version: getVersion(),
-            context: context,
+            context,
         };
         const response = await fetch(SET_STATES_URL, {
             method: 'POST',

@@ -44,6 +44,7 @@ export {
 export type {
     PumpRoomConfig,
     PumpRoomUser,
+    LMSContext,
     AuthenticateOptions,
     LMSProfileInput,
     TildaProfileInput,

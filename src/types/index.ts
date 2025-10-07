@@ -159,13 +159,33 @@ export interface AuthenticateOptions {
  */
 export interface LMSContext {
     /** Optional LMS Kit identifier used for tracking the current course context */
+    kitId?: string | null;
+    /** Optional LMS program (course) identifier used for tracking the current course context */
+    programId?: string | null;
+    /** Optional lesson identifier used for tracking the current lesson context */
+    lessonId?: string | null;
+}
+/**
+ * Context information for API calls
+ *
+ * This interface contains context information about the execution environment
+ * where the SDK is operating, including LMS kit/lesson identifiers.
+ *
+ * @private
+ * @category States
+ * @experimental
+ */
+export interface LMSContextAPI {
+    /** Optional LMS Kit identifier used for tracking the current course context */
     kit_id?: string | null;
+    /** Optional LMS program (course) identifier used for tracking the current course context */
+    program_id?: string | null;
     /** Optional lesson identifier used for tracking the current lesson context */
     lesson_id?: string | null;
-    /** Current page URL (mirrored for compatibility) */
+    /** Current page URL (duplicated in top-level for some endpoints) */
     url?: string | null;
-    /** SDK version (mirrored for compatibility) */
-    sdk_version?: string;
+    /** SDK version (duplicated in top-level for some endpoints) */
+    sdk_version: string;
 }
 
 /**
@@ -173,7 +193,7 @@ export interface LMSContext {
  *
  * This interface defines the data sent to the authentication endpoint.
  *
- * @public
+ * @private
  * @category Authentication
  */
 export interface AuthInput extends RealmPayload {
@@ -182,7 +202,7 @@ export interface AuthInput extends RealmPayload {
     /** Tilda profile information, if authenticating via Tilda */
     profile?: TildaProfileInput | null;
     /** LMS context information */
-    context: LMSContext;
+    context?: LMSContextAPI;
     /** Current page URL */
     url?: string | null;
     /** SDK version */
@@ -224,6 +244,8 @@ export interface VerifyTokenInput extends RealmPayload {
     token: string;
     /** User ID associated with the token */
     uid: string;
+    /** LMS context information */
+    context?: LMSContextAPI;
 }
 
 /**
@@ -239,8 +261,6 @@ export interface VerifyTokenResult {
     is_valid: boolean;
     /** Flag indicating whether the user has admin privileges */
     is_admin: boolean;
-    /** LMS context information */
-    context: LMSContext;
 }
 
 /**
@@ -256,7 +276,7 @@ export interface FetchStatesInput {
     /** Names of states to fetch */
     state_names: string[];
     /** LMS context information */
-    context: LMSContext;
+    context?: LMSContextAPI;
     /** Current page URL */
     url?: string | null;
     /** SDK version */
@@ -276,7 +296,7 @@ export interface StoreStatesInput {
     /** States to store */
     states: import('./states.ts').State[];
     /** LMS context information */
-    context: LMSContext;
+    context?: LMSContextAPI;
     /** Current page URL */
     url?: string | null;
     /** SDK version */
@@ -314,14 +334,11 @@ export interface PumpRoomConfig {
      */
     minHeight?: number;
     /**
-     * Optional LMS Kit identifier used for tracking the current course context.
+     * Optional LMS context applied globally for the SDK.
+     * Contains identifiers like kit_id, program_id, and lesson_id that will be
+     * sent to the API with relevant requests.
      */
-    kitId?: string;
-    /**
-     * Optional lesson identifier used for tracking the current lesson context.
-     * This value can be used to associate SDK operations with a specific lesson.
-     */
-    lessonId?: string;
+    context?: LMSContext;
 }
 
 /**
@@ -345,14 +362,11 @@ export interface InternalConfig {
     /** Minimum height for PumpRoom iframes in pixels */
     minHeight?: number;
     /**
-     * Optional LMS Kit identifier used for tracking the current course context.
+     * Optional LMS context applied globally for the SDK.
+     * Contains identifiers like kit_id, program_id, and lesson_id that will be
+     * sent to the API with relevant requests.
      */
-    kitId?: string;
-    /**
-     * Optional lesson identifier used for tracking the current lesson context.
-     * This value can be used to associate SDK operations with a specific lesson.
-     */
-    lessonId?: string;
+    context?: LMSContext;
 }
 
 /**

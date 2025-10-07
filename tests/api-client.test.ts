@@ -55,11 +55,8 @@ describe('ApiClient', () => {
             expect(body.sdk_version).toBe(version.getVersion());
             expect(body.state_names).toEqual(['test1', 'test2']);
             expect(body.user).toEqual(mockUser);
-            // New context object mirrors legacy fields
-            expect(body.context).toEqual(expect.objectContaining({
-                url: window.location.href,
-                sdk_version: version.getVersion(),
-            }));
+            // Context is passed from SDK config only; no defaults in tests
+            expect(body.context).toEqual({});
         });
 
         it('throws an error if the fetch request fails', async () => {
@@ -111,11 +108,8 @@ describe('ApiClient', () => {
             expect(body.sdk_version).toBe(version.getVersion());
             expect(body.states).toEqual(states);
             expect(body.user).toEqual(mockUser);
-            // New context object mirrors legacy fields
-            expect(body.context).toEqual(expect.objectContaining({
-                url: window.location.href,
-                sdk_version: version.getVersion(),
-            }));
+            // Context is passed from SDK config only; no defaults in tests
+            expect(body.context).toEqual({});
         });
 
         it('throws an error if the fetch request fails', async () => {

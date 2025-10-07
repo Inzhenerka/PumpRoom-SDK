@@ -88,7 +88,7 @@ export async function fetchStates(stateNames: string[], callback?: StatesCallbac
     const apiClient = getApiClient();
 
     // Use the API client to fetch states from the backend
-    const response = await apiClient.fetchStates(stateNames, currentUser);
+    const response = await apiClient.fetchStates(stateNames, currentUser, { includeEnvInContext: true });
 
     // Update localStorage with the fetched states
     saveStatesToLocalStorage(response.states, currentUser.uid);
@@ -157,7 +157,7 @@ export async function storeStates(states: State[]): Promise<StatesResponse> {
     const apiClient = getApiClient();
 
     // Use the API client to store states
-    const response = await apiClient.storeStates(states, currentUser);
+    const response = await apiClient.storeStates(states, currentUser, { includeEnvInContext: true });
 
     // Convert State[] to StateOutput[] for localStorage
     const stateOutputs: StateOutput[] = states.map(state => ({
