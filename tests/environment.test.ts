@@ -24,7 +24,7 @@ describe('environment helpers', () => {
       {
         service: 'pumproom',
         type: 'setEnvironment',
-        payload: { pageURL: 'http://localhost/test-page', sdkVersion: '1.0.0' }
+        payload: { pageURL: 'http://localhost/test-page', sdkVersion: '1.0.0', context: null }
       },
       'https://pumproom.tech'
     );
@@ -49,7 +49,7 @@ describe('environment helpers', () => {
       {
         service: 'pumproom',
         type: 'setEnvironment',
-        payload: { pageURL: 'http://localhost/test-page', sdkVersion: '2.0.0' }
+        payload: { pageURL: 'http://localhost/test-page', sdkVersion: '2.0.0', context: null }
       },
       'https://pumproom.tech'
     );
