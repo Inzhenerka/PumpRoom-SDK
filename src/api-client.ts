@@ -46,7 +46,7 @@ export class ApiClient {
             kit_id: config?.context?.kitId,
             program_id: config?.context?.programId,
             lesson_id: config?.context?.lessonId,
-        } as LMSContextAPI;
+        };
     }
 
     /**

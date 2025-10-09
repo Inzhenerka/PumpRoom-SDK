@@ -181,10 +181,6 @@ export interface LMSContextAPI {
     program_id?: string | null;
     /** Optional lesson identifier used for tracking the current lesson context */
     lesson_id?: string | null;
-    /** Current page URL (duplicated in top-level for some endpoints) */
-    url?: string | null;
-    /** SDK version (duplicated in top-level for some endpoints) */
-    sdk_version: string;
 }
 
 /**
