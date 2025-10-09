@@ -8,7 +8,7 @@ import {
     StatesResponse,
     LMSContextAPI,
 } from './types/index.ts';
-import type {LMSContext, FetchStatesInput, StoreStatesInput} from './types/index.ts';
+import type {FetchStatesInput, StoreStatesInput} from './types/index.ts';
 import {getCurrentNormalizedUrl} from "./utils.js";
 import {AUTH_URL, VERIFY_URL, GET_STATES_URL, SET_STATES_URL} from './constants.ts';
 import {getConfig, setApiClientInstance, getApiClientInstance} from './globals.ts';

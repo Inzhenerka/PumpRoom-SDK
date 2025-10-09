@@ -154,8 +154,7 @@ export interface AuthenticateOptions {
  * where the SDK is operating, including LMS kit/lesson identifiers.
  *
  * @public
- * @category States
- * @experimental
+ * @category Environment
  */
 export interface LMSContext {
     /** Optional LMS Kit identifier used for tracking the current course context */

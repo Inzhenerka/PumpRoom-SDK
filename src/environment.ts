@@ -13,6 +13,8 @@ import type {SetEnvironmentMessage} from './types/messages.js';
 import {registerTaskInstance} from './instance.ts';
 import {executeOnInitCallback} from './callbacks.ts';
 import {getCurrentNormalizedUrl} from './utils.ts';
+import {getConfig} from './globals.ts';
+import {LMSContext} from "./types/index.js";
 
 // The setOnInitCallback function has been moved to callbacks.ts
 
@@ -24,6 +26,8 @@ export interface PumpRoomEnvironment {
     pageURL: string;
     /** The version of the SDK */
     sdkVersion: string;
+    /** LMS context information */
+    context: LMSContext | null;
 }
 
 /**
@@ -33,6 +37,7 @@ export interface PumpRoomEnvironment {
  * @internal
  */
 function buildEnvironment(): PumpRoomEnvironment {
+    const config = getConfig();
     const pageURL = getCurrentNormalizedUrl();
     if (!pageURL) {
         throw new Error('Unable to determine current page URL');
@@ -40,6 +45,7 @@ function buildEnvironment(): PumpRoomEnvironment {
     return {
         pageURL: pageURL,
         sdkVersion: getVersion(),
+        context: config?.context || null
     };
 }
 
