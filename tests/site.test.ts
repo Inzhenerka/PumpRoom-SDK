@@ -2,7 +2,9 @@ import {describe, it, expect, vi} from 'vitest';
 
 const addPlugin = vi.fn();
 const highlightAll = vi.fn();
-const pluginCtor = vi.fn().mockReturnValue({name: 'plugin'});
+const pluginCtor = vi.fn(function() {
+  return { name: 'plugin' };
+});
 
 vi.mock('highlight.js', () => ({
   default: { addPlugin, highlightAll }
