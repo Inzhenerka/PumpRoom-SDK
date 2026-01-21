@@ -11,12 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 👋 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: ⚙️ Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: 1.2.16
+        uses: oven-sh/setup-bun@v2
 
       - name: ⚙️ Install AWS CLI
         uses: unfor19/install-aws-cli-action@v1
@@ -65,7 +63,7 @@ jobs:
         uses: yc-actions/yc-cdn-cache@v2
         with:
           yc-sa-json-credentials: ${{ secrets.yc_sa_json_credentials }}
-          cdn-resource-id: asdre3dzed6dwkut637s
+          cdn-resource-id: bc8rsghmnpm27w7z5ppm
 
       - name: 🏁 Create GitHub deployment
         uses: chrnorm/deployment-action@v2
