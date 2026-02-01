@@ -21,15 +21,15 @@ import {getVersion} from './version.ts';
  *
  * This class wraps the HTTP calls performed by the SDK and is normally
  * initialized automatically when calling {@link init}. It can also be used
- * directly when custom API calls are required.
+ * directly within the SDK codebase when custom API calls are required.
  *
  * @example
  * ```typescript
- * import { ApiClient } from 'pumproom-sdk';
+ * import { ApiClient } from './api-client';
  *
  * const client = new ApiClient('api-key');
  * const user = await client.authenticate({ lms: { id: '42', name: 'Alice' } }, 'realm');
- * console.log(user?.uid);
+ * console.log(user.uid);
  * ```
  */
 export class ApiClient {
@@ -101,14 +101,13 @@ export class ApiClient {
      *
      * @param options - Authentication options
      * @param realm - Realm identifier
-     * @returns Authenticated user or `null` if authentication failed
+     * @returns Authenticated user
+     * @throws Error if the authentication request fails
      *
      * @example
      * ```typescript
      * const user = await client.authenticate({ profile: { login: 'bob', name: 'Bob', istutor: false, lang: 'en', projectid: '1' } }, 'academy');
-     * if (user) {
-     *   console.log('Authenticated as', user.uid);
-     * }
+     * console.log('Authenticated as', user.uid);
      * ```
      */
     async authenticate(options: AuthenticateOptions, realm: string): Promise<PumpRoomUser> {

@@ -91,7 +91,8 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
  * If caching is enabled, it will first try to use a cached user.
  *
  * @param options - Authentication options containing LMS and/or profile data
- * @returns Promise resolving to the authenticated user or null if authentication failed
+ * @returns Promise resolving to the authenticated user
+ * @throws Error if the SDK is not initialized or authentication fails
  * @category Authentication
  * @public
  * @example
@@ -177,6 +178,7 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
  *
  * @param user - The user object containing uid and token
  * @returns Promise resolving to the verified user or null if verification failed
+ * @throws Error if the SDK is not initialized
  * @category Authentication
  * @public
  * @example
