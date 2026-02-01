@@ -1,6 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { retrieveData, storeData, generateStateKey, saveStatesToLocalStorage, getStatesFromLocalStorage } from '../src/storage.ts';
-import { USER_STORAGE_KEY, STORAGE_PREFIX } from "../src/constants.ts";
+import {
+  retrieveData,
+  storeData,
+  generateStateKey,
+  saveStatesToLocalStorage,
+  getStatesFromLocalStorage,
+  generateCourseKey,
+  saveCourseToLocalStorage,
+  getCourseFromLocalStorage
+} from '../src/storage.ts';
+import { USER_STORAGE_KEY, STORAGE_PREFIX, COURSE_STORAGE_PREFIX } from "../src/constants.ts";
 import * as utils from '../src/utils.ts';
 
 // Mock getCurrentNormalizedUrl to avoid window dependency
@@ -137,6 +146,37 @@ describe('storage', () => {
       expect(retrievedStates).toEqual([]);
 
       global.localStorage = orig;
+    });
+  });
+
+  describe('course storage operations', () => {
+    it('generates correct course key', () => {
+      const key = generateCourseKey();
+      expect(key).toBe(`${COURSE_STORAGE_PREFIX}:http://localhost/test-page`);
+      expect(utils.getCurrentNormalizedUrl).toHaveBeenCalled();
+    });
+
+    it('saves and retrieves course data', () => {
+      const data = {
+        course: {
+          uid: 'course-1',
+          visible_name: 'Course One',
+          url: 'https://example.com/course',
+          is_paid: true,
+          student_chat_url: null,
+          helper_task: null,
+          vote_task: null
+        }
+      };
+
+      saveCourseToLocalStorage(data);
+      const cached = getCourseFromLocalStorage();
+      expect(cached).toEqual(data);
+    });
+
+    it('returns null when course cache is missing', () => {
+      const cached = getCourseFromLocalStorage();
+      expect(cached).toBeNull();
     });
   });
 });

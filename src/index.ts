@@ -13,6 +13,8 @@
  *  Functions for working with task instances and retrieving task-related information.
  * @categoryDescription States
  *  [Experimental] Functions for managing persistent state data, including storing, retrieving, and clearing application states.
+ * @categoryDescription Courses
+ *  [Experimental] Functions for loading course information with local caching.
  * @module PumpRoomSDK
  */
 
@@ -41,10 +43,12 @@ export {
     clearStates,
     getRegisteredStates
 } from './states.ts';
+export {loadCourseData} from './course.ts';
 export type {
     PumpRoomConfig,
     PumpRoomUser,
     LMSContext,
+    LMSContextAPI,
     AuthenticateOptions,
     LMSProfileInput,
     TildaProfileInput,
@@ -56,10 +60,15 @@ export type {
     OnResultReadyCallback,
     EnvironmentData,
     TaskDetails,
+    TaskDataOutput,
+    CourseDataOutput,
     LoadedTaskData,
     ResultData,
     SubmissionStatus,
     SubmissionResult,
+    LoadCourseDataInput,
+    LoadCourseDataOutput,
+    CourseDataCallback,
     State,
     StateOutput,
     StateDataType,

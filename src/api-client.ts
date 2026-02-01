@@ -7,10 +7,12 @@ import {
     State,
     StatesResponse,
     LMSContextAPI,
+    LoadCourseDataInput,
+    LoadCourseDataOutput,
 } from './types/index.ts';
 import type {FetchStatesInput, StoreStatesInput} from './types/index.ts';
 import {getCurrentNormalizedUrl} from "./utils.js";
-import {AUTH_URL, VERIFY_URL, GET_STATES_URL, SET_STATES_URL} from './constants.ts';
+import {AUTH_URL, VERIFY_URL, GET_STATES_URL, SET_STATES_URL, LOAD_COURSE_URL} from './constants.ts';
 import {getConfig, setApiClientInstance, getApiClientInstance} from './globals.ts';
 import {getVersion} from './version.ts';
 
@@ -133,6 +135,52 @@ export class ApiClient {
         } else {
             throw new Error(`Authentication error: ${response.status} ${response.statusText}`);
         }
+    }
+
+    /**
+     * Loads course data for the current URL.
+     *
+     * This method retrieves course details and related tasks using the current page URL
+     * and LMS context.
+     *
+     * @param realm - Realm identifier
+     * @returns Promise resolving to course data output
+     * @throws Error if the request fails or the current URL is unavailable
+     *
+     * @category Courses
+     * @experimental
+     * @example
+     * ```typescript
+     * const result = await client.loadCourseData('academy');
+     * console.log(result.course?.visible_name);
+     * ```
+     */
+    async loadCourseData(realm: string): Promise<LoadCourseDataOutput> {
+        const url = getCurrentNormalizedUrl();
+        if (!url) {
+            throw new Error('Current URL is not available');
+        }
+        const body: LoadCourseDataInput = {
+            realm,
+            url,
+            context: this.buildContext(),
+            sdk_version: getVersion(),
+        };
+
+        const response = await fetch(LOAD_COURSE_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-API-KEY': this.apiKey,
+            },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Request error: ${response.status} ${response.statusText}`);
+        }
+
+        return await response.json() as LoadCourseDataOutput;
     }
 
     /**

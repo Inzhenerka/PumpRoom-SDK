@@ -9,8 +9,8 @@
  */
 
 import {getCurrentNormalizedUrl} from "./utils.js";
-import {STORAGE_PREFIX} from './constants.ts';
-import type {StateOutput} from './types/index.ts';
+import {COURSE_STORAGE_PREFIX, STORAGE_PREFIX} from './constants.ts';
+import type {LoadCourseDataOutput, StateOutput} from './types/index.ts';
 
 /**
  * Retrieves data from localStorage
@@ -78,6 +78,23 @@ export function generateStateKey(stateName: string, userId: string): string {
 }
 
 /**
+ * Generates a unique key for course data in localStorage
+ *
+ * @param realm - Realm identifier
+ * @returns Unique key for the course data
+ * @returns Unique key for the course data
+ *
+ * @experimental
+ */
+export function generateCourseKey(): string {
+    const pageUrl = getCurrentNormalizedUrl();
+    if (!pageUrl) {
+        throw new Error('Unable to determine current page URL');
+    }
+    return `${COURSE_STORAGE_PREFIX}:${pageUrl}`;
+}
+
+/**
  * Saves states to localStorage
  *
  * @param states - Array of states to save
@@ -123,4 +140,38 @@ export function getStatesFromLocalStorage(stateNames: string[], userId: string):
     }
 
     return states;
+}
+
+/**
+ * Saves course data to localStorage
+ *
+ * @param data - Course data to store
+ *
+ * @experimental
+ */
+export function saveCourseToLocalStorage(data: LoadCourseDataOutput): void {
+    try {
+        const key = generateCourseKey();
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+        console.warn('Failed to save course data to localStorage:', error);
+    }
+}
+
+/**
+ * Retrieves course data from localStorage
+ *
+ * @returns Cached course data or null if not found
+ *
+ * @experimental
+ */
+export function getCourseFromLocalStorage(): LoadCourseDataOutput | null {
+    try {
+        const key = generateCourseKey();
+        const cached = localStorage.getItem(key);
+        return cached ? (JSON.parse(cached) as LoadCourseDataOutput) : null;
+    } catch (error) {
+        console.warn('Failed to retrieve course data from localStorage:', error);
+        return null;
+    }
 }

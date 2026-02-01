@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ApiClient } from '../src/api-client.ts';
 import * as version from '../src/version.ts';
+import * as utils from '../src/utils.ts';
 
 // Mock fetch
 global.fetch = vi.fn();
@@ -122,6 +123,72 @@ describe('ApiClient', () => {
 
             await expect(async () => {
                 await apiClient.storeStates([{ name: 'test1', value: 'value1' }], mockUser);
+            }).rejects.toThrow('Request error: 500 Internal Server Error');
+        });
+    });
+
+    describe('loadCourseData', () => {
+        it('loads course data from the backend', async () => {
+            const mockResponse = {
+                course: {
+                    uid: 'course-1',
+                    visible_name: 'Course One',
+                    url: 'https://example.com/course',
+                    is_paid: true,
+                    student_chat_url: null,
+                    helper_task: null,
+                    vote_task: {
+                        uid: 'task-1',
+                        task_name: 'Vote',
+                        repo_name: 'repo',
+                        realm: 'academy'
+                    }
+                }
+            };
+            (global.fetch as any).mockResolvedValueOnce({
+                ok: true,
+                json: async () => mockResponse
+            });
+
+            const result = await apiClient.loadCourseData('academy');
+            expect(result).toEqual(mockResponse);
+            expect(global.fetch).toHaveBeenCalled();
+            const call = (global.fetch as any).mock.calls[0];
+            expect(call[0]).toBe('https://pumproom-api.inzhenerka-cloud.com/course/load');
+            const opts = call[1];
+            expect(opts).toEqual(expect.objectContaining({
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': 'test-api-key',
+                },
+            }));
+            const body = JSON.parse(opts.body);
+            expect(body.realm).toBe('academy');
+            expect(body.url).toBe(window.location.href);
+            expect(body.sdk_version).toBe(version.getVersion());
+            expect(body.context).toEqual({});
+        });
+
+        it('throws an error if the current URL is unavailable', async () => {
+            const urlSpy = vi.spyOn(utils, 'getCurrentNormalizedUrl').mockReturnValue(null);
+
+            await expect(async () => {
+                await apiClient.loadCourseData('academy');
+            }).rejects.toThrow('Current URL is not available');
+
+            urlSpy.mockRestore();
+        });
+
+        it('throws an error if the fetch request fails', async () => {
+            (global.fetch as any).mockResolvedValueOnce({
+                ok: false,
+                status: 500,
+                statusText: 'Internal Server Error'
+            });
+
+            await expect(async () => {
+                await apiClient.loadCourseData('academy');
             }).rejects.toThrow('Request error: 500 Internal Server Error');
         });
     });

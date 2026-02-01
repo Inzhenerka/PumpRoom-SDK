@@ -170,7 +170,7 @@ export interface LMSContext {
  * This interface contains context information about the execution environment
  * where the SDK is operating, including LMS kit/lesson identifiers.
  *
- * @private
+ * @public
  * @category States
  * @experimental
  */
@@ -297,6 +297,85 @@ export interface StoreStatesInput {
     /** SDK version */
     sdk_version: string;
 }
+
+/**
+ * Task data returned for course-related tasks
+ *
+ * @public
+ * @category Courses
+ * @experimental
+ */
+export interface TaskDataOutput {
+    /** Unique identifier of the task */
+    uid: string;
+    /** Display name of the task */
+    task_name: string;
+    /** Repository name used by the task */
+    repo_name: string;
+    /** Realm identifier for the task */
+    realm: string;
+}
+
+/**
+ * Course data returned by the course loading endpoint
+ *
+ * @public
+ * @category Courses
+ * @experimental
+ */
+export interface CourseDataOutput {
+    /** Unique identifier of the course */
+    uid: string;
+    /** Display name of the course */
+    visible_name: string;
+    /** Course URL */
+    url: string;
+    /** Flag indicating whether the course is paid */
+    is_paid: boolean;
+    /** Optional student chat URL */
+    student_chat_url: string | null;
+    /** Optional helper task */
+    helper_task: TaskDataOutput | null;
+    /** Optional vote task */
+    vote_task: TaskDataOutput | null;
+}
+
+/**
+ * Input data for loading course data
+ *
+ * @public
+ * @category Courses
+ * @experimental
+ */
+export interface LoadCourseDataInput extends RealmPayload {
+    /** Current page URL */
+    url: string;
+    /** LMS context information */
+    context: LMSContextAPI;
+    /** SDK version */
+    sdk_version: string;
+}
+
+/**
+ * Result returned by the course loading endpoint
+ *
+ * @public
+ * @category Courses
+ * @experimental
+ */
+export interface LoadCourseDataOutput {
+    /** Loaded course data or null if not found */
+    course: CourseDataOutput | null;
+}
+
+/**
+ * Callback function type for receiving course data
+ *
+ * @public
+ * @category Courses
+ * @experimental
+ */
+export type CourseDataCallback = (data: LoadCourseDataOutput) => void;
 
 /**
  * Configuration for initializing the SDK
