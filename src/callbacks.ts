@@ -6,24 +6,24 @@
  *
  * @module Callbacks
  */
-import {getPumpRoomEventMessage} from './messaging.ts';
 import {
-    setOnInitCallback as setOnInitCallbackGlobal,
-    getOnInitCallback,
-    setOnTaskLoadedCallback as setOnTaskLoadedCallbackGlobal,
-    getOnTaskLoadedCallback,
-    setOnTaskSubmittedCallback as setOnTaskSubmittedCallbackGlobal,
-    getOnTaskSubmittedCallback,
-    setOnResultReadyCallback as setOnResultReadyCallbackGlobal,
-    getOnResultReadyCallback
-} from './globals.ts';
+  getOnInitCallback,
+  getOnResultReadyCallback,
+  getOnTaskLoadedCallback,
+  getOnTaskSubmittedCallback,
+  setOnInitCallback as setOnInitCallbackGlobal,
+  setOnResultReadyCallback as setOnResultReadyCallbackGlobal,
+  setOnTaskLoadedCallback as setOnTaskLoadedCallbackGlobal,
+  setOnTaskSubmittedCallback as setOnTaskSubmittedCallbackGlobal,
+} from "./globals.ts";
+import { getPumpRoomEventMessage } from "./messaging.ts";
 import type {
-    OnInitCallback, 
-    OnTaskLoadedCallback, 
-    OnTaskSubmittedCallback,
-    OnResultReadyCallback,
-    EnvironmentData
-} from './types/index.ts';
+  EnvironmentData,
+  OnInitCallback,
+  OnResultReadyCallback,
+  OnTaskLoadedCallback,
+  OnTaskSubmittedCallback,
+} from "./types/index.ts";
 
 /**
  * Sets a callback function to be executed on initialization
@@ -56,7 +56,7 @@ import type {
  * ```
  */
 export function setOnInitCallback(callback: OnInitCallback): void {
-    setOnInitCallbackGlobal(callback);
+  setOnInitCallbackGlobal(callback);
 }
 
 /**
@@ -90,7 +90,7 @@ export function setOnInitCallback(callback: OnInitCallback): void {
  * ```
  */
 export function setOnTaskLoadedCallback(callback: OnTaskLoadedCallback): void {
-    setOnTaskLoadedCallbackGlobal(callback);
+  setOnTaskLoadedCallbackGlobal(callback);
 }
 
 /**
@@ -124,7 +124,7 @@ export function setOnTaskLoadedCallback(callback: OnTaskLoadedCallback): void {
  * ```
  */
 export function setOnTaskSubmittedCallback(callback: OnTaskSubmittedCallback): void {
-    setOnTaskSubmittedCallbackGlobal(callback);
+  setOnTaskSubmittedCallbackGlobal(callback);
 }
 
 /**
@@ -159,7 +159,7 @@ export function setOnTaskSubmittedCallback(callback: OnTaskSubmittedCallback): v
  * ```
  */
 export function setOnResultReadyCallback(callback: OnResultReadyCallback): void {
-    setOnResultReadyCallbackGlobal(callback);
+  setOnResultReadyCallbackGlobal(callback);
 }
 
 /**
@@ -169,12 +169,12 @@ export function setOnResultReadyCallback(callback: OnResultReadyCallback): void 
  * @internal
  */
 export function executeOnInitCallback(data: EnvironmentData): void {
-    const callback = getOnInitCallback();
-    if (callback) {
-        // Call the callback, which may return a Promise
-        callback(data);
-        // No need to await the Promise as we're not using the result
-    }
+  const callback = getOnInitCallback();
+  if (callback) {
+    // Call the callback, which may return a Promise
+    callback(data);
+    // No need to await the Promise as we're not using the result
+  }
 }
 
 /**
@@ -184,16 +184,16 @@ export function executeOnInitCallback(data: EnvironmentData): void {
  * @internal
  */
 export function handleTaskLoadedMessage(event: MessageEvent): void {
-    const data = getPumpRoomEventMessage(event, 'onTaskLoaded');
-    if (!data) return;
+  const data = getPumpRoomEventMessage(event, "onTaskLoaded");
+  if (!data) return;
 
-    // Execute the onTaskLoaded callback if it's set
-    const callback = getOnTaskLoadedCallback();
-    if (callback) {
-        // Call the callback, which may return a Promise
-        const result = callback(data.payload);
-        // No need to await the Promise as we're not using the result
-    }
+  // Execute the onTaskLoaded callback if it's set
+  const callback = getOnTaskLoadedCallback();
+  if (callback) {
+    // Call the callback, which may return a Promise
+    callback(data.payload);
+    // No need to await the Promise as we're not using the result
+  }
 }
 
 /**
@@ -203,16 +203,16 @@ export function handleTaskLoadedMessage(event: MessageEvent): void {
  * @internal
  */
 export function handleTaskSubmittedMessage(event: MessageEvent): void {
-    const data = getPumpRoomEventMessage(event, 'onTaskSubmitted');
-    if (!data) return;
+  const data = getPumpRoomEventMessage(event, "onTaskSubmitted");
+  if (!data) return;
 
-    // Execute the onTaskSubmitted callback if it's set
-    const callback = getOnTaskSubmittedCallback();
-    if (callback) {
-        // Call the callback, which may return a Promise
-        const result = callback(data.payload);
-        // No need to await the Promise as we're not using the result
-    }
+  // Execute the onTaskSubmitted callback if it's set
+  const callback = getOnTaskSubmittedCallback();
+  if (callback) {
+    // Call the callback, which may return a Promise
+    callback(data.payload);
+    // No need to await the Promise as we're not using the result
+  }
 }
 
 /**
@@ -222,16 +222,16 @@ export function handleTaskSubmittedMessage(event: MessageEvent): void {
  * @internal
  */
 export function handleResultReadyMessage(event: MessageEvent): void {
-    const data = getPumpRoomEventMessage(event, 'onResultReady');
-    if (!data) return;
+  const data = getPumpRoomEventMessage(event, "onResultReady");
+  if (!data) return;
 
-    // Execute the onResultReady callback if it's set
-    const callback = getOnResultReadyCallback();
-    if (callback) {
-        // Call the callback, which may return a Promise
-        const result = callback(data.payload);
-        // No need to await the Promise as we're not using the result
-    }
+  // Execute the onResultReady callback if it's set
+  const callback = getOnResultReadyCallback();
+  if (callback) {
+    // Call the callback, which may return a Promise
+    callback(data.payload);
+    // No need to await the Promise as we're not using the result
+  }
 }
 
 /**
@@ -241,7 +241,7 @@ export function handleResultReadyMessage(event: MessageEvent): void {
  * messages related to tasks and results from PumpRoom iframes.
  */
 export function setTaskListener(): void {
-    window.addEventListener('message', handleTaskLoadedMessage);
-    window.addEventListener('message', handleTaskSubmittedMessage);
-    window.addEventListener('message', handleResultReadyMessage);
+  window.addEventListener("message", handleTaskLoadedMessage);
+  window.addEventListener("message", handleTaskSubmittedMessage);
+  window.addEventListener("message", handleResultReadyMessage);
 }

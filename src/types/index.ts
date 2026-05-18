@@ -8,7 +8,7 @@
  * @category Core
  */
 
-export * from './states.ts';
+export * from "./states.ts";
 
 /**
  * Identity provider names used by PumpRoom
@@ -18,7 +18,7 @@ export * from './states.ts';
  * @public
  * @category Authentication
  */
-export type IdentityProviderType = 'tilda' | 'telegram';
+export type IdentityProviderType = "tilda" | "telegram";
 
 /**
  * Status of a task submission
@@ -26,7 +26,7 @@ export type IdentityProviderType = 'tilda' | 'telegram';
  * @public
  * @category Callbacks
  */
-export type SubmissionStatus = 'success' | 'fail' | 'internal_error';
+export type SubmissionStatus = "success" | "fail" | "internal_error";
 
 /**
  * Information about an authenticated user
@@ -37,12 +37,12 @@ export type SubmissionStatus = 'success' | 'fail' | 'internal_error';
  * @category Authentication
  */
 export interface PumpRoomUser {
-    /** Unique identifier of the user */
-    uid: string;
-    /** Authentication token for the user */
-    token: string;
-    /** Flag indicating whether the user has admin privileges */
-    is_admin: boolean;
+  /** Unique identifier of the user */
+  uid: string;
+  /** Authentication token for the user */
+  token: string;
+  /** Flag indicating whether the user has admin privileges */
+  is_admin: boolean;
 }
 
 /**
@@ -55,12 +55,12 @@ export interface PumpRoomUser {
  * @category Authentication
  */
 export interface CourseInput {
-    /** Unique identifier of the course */
-    alias: string;
-    /** Display name of the course */
-    name: string;
-    /** Date when the course was created or when the user enrolled */
-    created: Date;
+  /** Unique identifier of the course */
+  alias: string;
+  /** Display name of the course */
+  name: string;
+  /** Date when the course was created or when the user enrolled */
+  created: Date;
 }
 
 /**
@@ -73,20 +73,20 @@ export interface CourseInput {
  * @category Authentication
  */
 export interface TildaProfileInput {
-    /** User's login identifier in Tilda */
-    login: string;
-    /** User's display name */
-    name: string;
-    /** Flag indicating whether the user is a tutor */
-    istutor: boolean;
-    /** User's preferred language */
-    lang: string;
-    /** Tilda project identifier */
-    projectid: string;
-    /** Optional list of courses the user is enrolled in */
-    courses?: CourseInput[] | null;
-    /** Optional URL to the user's profile picture */
-    memberlogo?: string | null;
+  /** User's login identifier in Tilda */
+  login: string;
+  /** User's display name */
+  name: string;
+  /** Flag indicating whether the user is a tutor */
+  istutor: boolean;
+  /** User's preferred language */
+  lang: string;
+  /** Tilda project identifier */
+  projectid: string;
+  /** Optional list of courses the user is enrolled in */
+  courses?: CourseInput[] | null;
+  /** Optional URL to the user's profile picture */
+  memberlogo?: string | null;
 }
 
 /**
@@ -99,23 +99,23 @@ export interface TildaProfileInput {
  * @category Authentication
  */
 export interface LMSProfileInput {
-    /**
-     * Unique identifier of the user within LMS.
-     * Can be any string. When not provided and a valid email is passed via
-     * `email`, it will be used as the identifier.
-     */
-    id?: string;
+  /**
+   * Unique identifier of the user within LMS.
+   * Can be any string. When not provided and a valid email is passed via
+   * `email`, it will be used as the identifier.
+   */
+  id?: string;
 
-    /**
-     * Optional email that can also act as identifier if `id` is missing.
-     */
-    email?: string;
+  /**
+   * Optional email that can also act as identifier if `id` is missing.
+   */
+  email?: string;
 
-    /** Display name of the user */
-    name: string;
+  /** Display name of the user */
+  name: string;
 
-    /** Optional link to avatar */
-    photo_url?: string | null;
+  /** Optional link to avatar */
+  photo_url?: string | null;
 }
 
 /**
@@ -127,8 +127,8 @@ export interface LMSProfileInput {
  * @category Core
  */
 export interface RealmPayload {
-    /** Realm identifier that determines the context of the operation */
-    realm: string;
+  /** Realm identifier that determines the context of the operation */
+  realm: string;
 }
 
 /**
@@ -141,10 +141,10 @@ export interface RealmPayload {
  * @category Authentication
  */
 export interface AuthenticateOptions {
-    /** LMS profile information, if authenticating via an LMS */
-    lms?: LMSProfileInput | null;
-    /** Tilda profile information, if authenticating via Tilda */
-    profile?: TildaProfileInput | null;
+  /** LMS profile information, if authenticating via an LMS */
+  lms?: LMSProfileInput | null;
+  /** Tilda profile information, if authenticating via Tilda */
+  profile?: TildaProfileInput | null;
 }
 
 /**
@@ -157,12 +157,12 @@ export interface AuthenticateOptions {
  * @category Environment
  */
 export interface LMSContext {
-    /** Optional LMS Kit identifier used for tracking the current course context */
-    kitId?: string | null;
-    /** Optional LMS program (course) identifier used for tracking the current course context */
-    programId?: string | null;
-    /** Optional lesson identifier used for tracking the current lesson context */
-    lessonId?: string | null;
+  /** Optional LMS Kit identifier used for tracking the current course context */
+  kitId?: string | null;
+  /** Optional LMS program (course) identifier used for tracking the current course context */
+  programId?: string | null;
+  /** Optional lesson identifier used for tracking the current lesson context */
+  lessonId?: string | null;
 }
 /**
  * Context information for API calls
@@ -175,12 +175,12 @@ export interface LMSContext {
  * @experimental
  */
 export interface LMSContextAPI {
-    /** Optional LMS Kit identifier used for tracking the current course context */
-    kit_id?: string | null;
-    /** Optional LMS program (course) identifier used for tracking the current course context */
-    program_id?: string | null;
-    /** Optional lesson identifier used for tracking the current lesson context */
-    lesson_id?: string | null;
+  /** Optional LMS Kit identifier used for tracking the current course context */
+  kit_id?: string | null;
+  /** Optional LMS program (course) identifier used for tracking the current course context */
+  program_id?: string | null;
+  /** Optional lesson identifier used for tracking the current lesson context */
+  lesson_id?: string | null;
 }
 
 /**
@@ -192,16 +192,16 @@ export interface LMSContextAPI {
  * @category Authentication
  */
 export interface AuthInput extends RealmPayload {
-    /** LMS profile information, if authenticating via an LMS */
-    lms?: LMSProfileInput | null;
-    /** Tilda profile information, if authenticating via Tilda */
-    profile?: TildaProfileInput | null;
-    /** LMS context information */
-    context?: LMSContextAPI;
-    /** Current page URL */
-    url?: string | null;
-    /** SDK version */
-    sdk_version: string;
+  /** LMS profile information, if authenticating via an LMS */
+  lms?: LMSProfileInput | null;
+  /** Tilda profile information, if authenticating via Tilda */
+  profile?: TildaProfileInput | null;
+  /** LMS context information */
+  context?: LMSContextAPI;
+  /** Current page URL */
+  url?: string | null;
+  /** SDK version */
+  sdk_version: string;
 }
 
 /**
@@ -214,16 +214,16 @@ export interface AuthInput extends RealmPayload {
  * @category Authentication
  */
 export interface AuthResult {
-    /** Unique identifier of the authenticated user */
-    uid: string;
-    /** Authentication token for the user */
-    token: string;
-    /** Flag indicating whether the user has admin privileges */
-    is_admin: boolean;
-    /** Identity provider used for authentication */
-    provider: IdentityProviderType;
-    /** List of identity providers available for this user */
-    available_providers: IdentityProviderType[];
+  /** Unique identifier of the authenticated user */
+  uid: string;
+  /** Authentication token for the user */
+  token: string;
+  /** Flag indicating whether the user has admin privileges */
+  is_admin: boolean;
+  /** Identity provider used for authentication */
+  provider: IdentityProviderType;
+  /** List of identity providers available for this user */
+  available_providers: IdentityProviderType[];
 }
 
 /**
@@ -235,12 +235,12 @@ export interface AuthResult {
  * @category Authentication
  */
 export interface VerifyTokenInput extends RealmPayload {
-    /** Authentication token to verify */
-    token: string;
-    /** User ID associated with the token */
-    uid: string;
-    /** LMS context information */
-    context?: LMSContextAPI;
+  /** Authentication token to verify */
+  token: string;
+  /** User ID associated with the token */
+  uid: string;
+  /** LMS context information */
+  context?: LMSContextAPI;
 }
 
 /**
@@ -252,10 +252,10 @@ export interface VerifyTokenInput extends RealmPayload {
  * @category Authentication
  */
 export interface VerifyTokenResult {
-    /** Flag indicating whether the token is valid */
-    is_valid: boolean;
-    /** Flag indicating whether the user has admin privileges */
-    is_admin: boolean;
+  /** Flag indicating whether the token is valid */
+  is_valid: boolean;
+  /** Flag indicating whether the user has admin privileges */
+  is_admin: boolean;
 }
 
 /**
@@ -266,16 +266,16 @@ export interface VerifyTokenResult {
  * @experimental
  */
 export interface FetchStatesInput {
-    /** Authenticated user */
-    user: PumpRoomUser;
-    /** Names of states to fetch */
-    state_names: string[];
-    /** LMS context information */
-    context?: LMSContextAPI;
-    /** Current page URL */
-    url?: string | null;
-    /** SDK version */
-    sdk_version: string;
+  /** Authenticated user */
+  user: PumpRoomUser;
+  /** Names of states to fetch */
+  state_names: string[];
+  /** LMS context information */
+  context?: LMSContextAPI;
+  /** Current page URL */
+  url?: string | null;
+  /** SDK version */
+  sdk_version: string;
 }
 
 /**
@@ -286,16 +286,16 @@ export interface FetchStatesInput {
  * @experimental
  */
 export interface StoreStatesInput {
-    /** Authenticated user */
-    user: PumpRoomUser;
-    /** States to store */
-    states: import('./states.ts').State[];
-    /** LMS context information */
-    context?: LMSContextAPI;
-    /** Current page URL */
-    url?: string | null;
-    /** SDK version */
-    sdk_version: string;
+  /** Authenticated user */
+  user: PumpRoomUser;
+  /** States to store */
+  states: import("./states.ts").State[];
+  /** LMS context information */
+  context?: LMSContextAPI;
+  /** Current page URL */
+  url?: string | null;
+  /** SDK version */
+  sdk_version: string;
 }
 
 /**
@@ -306,14 +306,14 @@ export interface StoreStatesInput {
  * @experimental
  */
 export interface TaskDataOutput {
-    /** Unique identifier of the task */
-    uid: string;
-    /** Display name of the task */
-    task_name: string;
-    /** Repository name used by the task */
-    repo_name: string;
-    /** Realm identifier for the task */
-    realm: string;
+  /** Unique identifier of the task */
+  uid: string;
+  /** Display name of the task */
+  task_name: string;
+  /** Repository name used by the task */
+  repo_name: string;
+  /** Realm identifier for the task */
+  realm: string;
 }
 
 /**
@@ -324,20 +324,20 @@ export interface TaskDataOutput {
  * @experimental
  */
 export interface CourseDataOutput {
-    /** Unique identifier of the course */
-    uid: string;
-    /** Display name of the course */
-    visible_name: string;
-    /** Course URL */
-    url: string;
-    /** Flag indicating whether the course is paid */
-    is_paid: boolean;
-    /** Optional student chat URL */
-    student_chat_url: string | null;
-    /** Optional helper task */
-    helper_task: TaskDataOutput | null;
-    /** Optional vote task */
-    vote_task: TaskDataOutput | null;
+  /** Unique identifier of the course */
+  uid: string;
+  /** Display name of the course */
+  visible_name: string;
+  /** Course URL */
+  url: string;
+  /** Flag indicating whether the course is paid */
+  is_paid: boolean;
+  /** Optional student chat URL */
+  student_chat_url: string | null;
+  /** Optional helper task */
+  helper_task: TaskDataOutput | null;
+  /** Optional vote task */
+  vote_task: TaskDataOutput | null;
 }
 
 /**
@@ -348,12 +348,12 @@ export interface CourseDataOutput {
  * @experimental
  */
 export interface LoadCourseDataInput extends RealmPayload {
-    /** Current page URL */
-    url: string;
-    /** LMS context information */
-    context: LMSContextAPI;
-    /** SDK version */
-    sdk_version: string;
+  /** Current page URL */
+  url: string;
+  /** LMS context information */
+  context: LMSContextAPI;
+  /** SDK version */
+  sdk_version: string;
 }
 
 /**
@@ -364,8 +364,8 @@ export interface LoadCourseDataInput extends RealmPayload {
  * @experimental
  */
 export interface LoadCourseDataOutput {
-    /** Loaded course data or null if not found */
-    course: CourseDataOutput | null;
+  /** Loaded course data or null if not found */
+  course: CourseDataOutput | null;
 }
 
 /**
@@ -387,32 +387,32 @@ export type CourseDataCallback = (data: LoadCourseDataOutput) => void;
  * @category Initialization
  */
 export interface PumpRoomConfig {
-    /** API key for authenticating with the PumpRoom API */
-    apiKey: string;
-    /** Realm identifier that determines the context of operations */
-    realm: string;
-    /**
-     * Optional LMS type identifier applied globally for the SDK.
-     * When set to 'getcourse', the SDK will validate LMS identifiers
-     * to ensure that GetCourse template placeholders were replaced.
-     */
-    type?: 'getcourse';
-    /**
-     * Flag indicating whether to cache the user in localStorage
-     * @defaultValue true
-     */
-    cacheUser?: boolean;
-    /**
-     * Minimum height for PumpRoom iframes in pixels
-     * @defaultValue 600
-     */
-    minHeight?: number;
-    /**
-     * Optional LMS context applied globally for the SDK.
-     * Contains identifiers like kit_id, program_id, and lesson_id that will be
-     * sent to the API with relevant requests.
-     */
-    context?: LMSContext;
+  /** API key for authenticating with the PumpRoom API */
+  apiKey: string;
+  /** Realm identifier that determines the context of operations */
+  realm: string;
+  /**
+   * Optional LMS type identifier applied globally for the SDK.
+   * When set to 'getcourse', the SDK will validate LMS identifiers
+   * to ensure that GetCourse template placeholders were replaced.
+   */
+  type?: "getcourse";
+  /**
+   * Flag indicating whether to cache the user in localStorage
+   * @defaultValue true
+   */
+  cacheUser?: boolean;
+  /**
+   * Minimum height for PumpRoom iframes in pixels
+   * @defaultValue 600
+   */
+  minHeight?: number;
+  /**
+   * Optional LMS context applied globally for the SDK.
+   * Contains identifiers like kit_id, program_id, and lesson_id that will be
+   * sent to the API with relevant requests.
+   */
+  context?: LMSContext;
 }
 
 /**
@@ -425,22 +425,22 @@ export interface PumpRoomConfig {
  * @category Configuration
  */
 export interface InternalConfig {
-    /** API key for authenticating with the PumpRoom API */
-    apiKey: string;
-    /** Realm identifier that determines the context of operations */
-    realm: string;
-    /** Optional LMS type identifier applied globally for the SDK. */
-    type?: 'getcourse';
-    /** Flag indicating whether to cache the user in localStorage */
-    cacheUser: boolean;
-    /** Minimum height for PumpRoom iframes in pixels */
-    minHeight?: number;
-    /**
-     * Optional LMS context applied globally for the SDK.
-     * Contains identifiers like kit_id, program_id, and lesson_id that will be
-     * sent to the API with relevant requests.
-     */
-    context?: LMSContext;
+  /** API key for authenticating with the PumpRoom API */
+  apiKey: string;
+  /** Realm identifier that determines the context of operations */
+  realm: string;
+  /** Optional LMS type identifier applied globally for the SDK. */
+  type?: "getcourse";
+  /** Flag indicating whether to cache the user in localStorage */
+  cacheUser: boolean;
+  /** Minimum height for PumpRoom iframes in pixels */
+  minHeight?: number;
+  /**
+   * Optional LMS context applied globally for the SDK.
+   * Contains identifiers like kit_id, program_id, and lesson_id that will be
+   * sent to the API with relevant requests.
+   */
+  context?: LMSContext;
 }
 
 /**
@@ -453,16 +453,16 @@ export interface InternalConfig {
  * @category Callbacks
  */
 export interface InstanceContext {
-    /** Unique identifier for the instance */
-    instanceUid: string;
-    /** Name of the repository associated with the instance */
-    repoName: string;
-    /** Name of the task associated with the instance */
-    taskName: string;
-    /** Realm identifier that determines the context of operations */
-    realm: string;
-    /** Optional tags associated with the instance */
-    tags: string | undefined;
+  /** Unique identifier for the instance */
+  instanceUid: string;
+  /** Name of the repository associated with the instance */
+  repoName: string;
+  /** Name of the task associated with the instance */
+  taskName: string;
+  /** Realm identifier that determines the context of operations */
+  realm: string;
+  /** Optional tags associated with the instance */
+  tags: string | undefined;
 }
 
 /**
@@ -507,8 +507,8 @@ export type OnResultReadyCallback = (data: ResultData) => void | Promise<void>;
  * @category UI
  */
 export interface FullscreenParameters {
-    /** Flag indicating whether fullscreen mode is active */
-    fullscreenState: boolean;
+  /** Flag indicating whether fullscreen mode is active */
+  fullscreenState: boolean;
 }
 
 /**
@@ -517,7 +517,7 @@ export interface FullscreenParameters {
  * @public
  * @category Callbacks
  */
-export type TaskStatus = 'loading' | 'ready' | 'error';
+export type TaskStatus = "loading" | "ready" | "error";
 
 /**
  * Detailed information about a task
@@ -526,10 +526,10 @@ export type TaskStatus = 'loading' | 'ready' | 'error';
  * @category Callbacks
  */
 export interface TaskDetails {
-    /** Unique identifier of the task */
-    uid: string;
-    /** Optional description of the task */
-    description: string | null;
+  /** Unique identifier of the task */
+  uid: string;
+  /** Optional description of the task */
+  description: string | null;
 }
 
 /**
@@ -539,16 +539,16 @@ export interface TaskDetails {
  * @category Callbacks
  */
 export interface SubmissionResult {
-    /** Unique identifier of the task */
-    taskUid: string;
-    /** Unique identifier of the submission */
-    submissionUid: string;
-    /** Status of the submission */
-    status: SubmissionStatus;
-    /** Optional message about the submission */
-    message: string | null;
-    /** Optional standard output from the submission */
-    stdout: string | null;
+  /** Unique identifier of the task */
+  taskUid: string;
+  /** Unique identifier of the submission */
+  submissionUid: string;
+  /** Status of the submission */
+  status: SubmissionStatus;
+  /** Optional message about the submission */
+  message: string | null;
+  /** Optional standard output from the submission */
+  stdout: string | null;
 }
 
 /**
@@ -558,8 +558,8 @@ export interface SubmissionResult {
  * @category Callbacks
  */
 export interface EnvironmentData {
-    /** Context information about the current instance */
-    instanceContext: InstanceContext;
+  /** Context information about the current instance */
+  instanceContext: InstanceContext;
 }
 
 /**
@@ -569,10 +569,10 @@ export interface EnvironmentData {
  * @category Callbacks
  */
 export interface LoadedTaskData {
-    /** Context information about the current instance */
-    instanceContext: InstanceContext;
-    /** Details about the loaded task */
-    task: TaskDetails;
+  /** Context information about the current instance */
+  instanceContext: InstanceContext;
+  /** Details about the loaded task */
+  task: TaskDetails;
 }
 
 /**
@@ -582,8 +582,8 @@ export interface LoadedTaskData {
  * @category Callbacks
  */
 export interface ResultData {
-    /** Context information about the current instance */
-    instanceContext: InstanceContext;
-    /** Result of the submission */
-    result: SubmissionResult;
+  /** Context information about the current instance */
+  instanceContext: InstanceContext;
+  /** Result of the submission */
+  result: SubmissionResult;
 }

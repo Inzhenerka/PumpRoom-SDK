@@ -6,8 +6,11 @@
  *
  * @module Instance
  */
-import {registerTaskInstance as registerInstanceGlobal, getTaskInstances as getInstancesGlobal} from './globals.ts';
-import type {InstanceContext} from './types/index.ts';
+import {
+  getTaskInstances as getInstancesGlobal,
+  registerTaskInstance as registerInstanceGlobal,
+} from "./globals.ts";
+import type { InstanceContext } from "./types/index.ts";
 
 /**
  * Registers an instance context
@@ -21,7 +24,7 @@ import type {InstanceContext} from './types/index.ts';
  * ```
  */
 export function registerTaskInstance(instanceContext: InstanceContext): void {
-    registerInstanceGlobal(instanceContext);
+  registerInstanceGlobal(instanceContext);
 }
 
 /**
@@ -37,5 +40,5 @@ export function registerTaskInstance(instanceContext: InstanceContext): void {
  * ```
  */
 export function getTaskInstances(): Record<string, InstanceContext> {
-    return getInstancesGlobal();
+  return getInstancesGlobal();
 }

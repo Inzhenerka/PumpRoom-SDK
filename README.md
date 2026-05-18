@@ -13,6 +13,7 @@ Lightweight library for integrating LMS with PumpRoom. Provides methods for API 
 ## Installing Dependencies
 
 Requirements:
+
 - Node.js >=20
 - Bun
 

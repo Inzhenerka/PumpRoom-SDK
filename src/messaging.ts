@@ -6,10 +6,7 @@
  *
  * @module Messaging
  */
-import type {
-    PumpRoomMessageType,
-    MessageReturnType,
-} from './types/messages.js';
+import type { MessageReturnType, PumpRoomMessageType } from "./types/messages.js";
 
 /**
  * Extracts and validates a PumpRoom message from a MessageEvent
@@ -34,15 +31,15 @@ import type {
  * ```
  */
 export function getPumpRoomEventMessage<T extends PumpRoomMessageType>(
-    event: MessageEvent,
-    target_type: T
+  event: MessageEvent,
+  target_type: T,
 ): MessageReturnType<T> | null {
-    // Basic validation of the message
-    if (!event.data || typeof event.data !== 'object') return null;
-    if (event.data.service !== 'pumproom') return null;
-    if (!event.data.type || typeof event.data.type !== 'string') return null;
-    // If target_type is specified, only return messages of that type
-    if (target_type && event.data.type !== target_type) return null;
-    // Return the message with the appropriate type
-    return event.data as any;
+  // Basic validation of the message
+  if (!event.data || typeof event.data !== "object") return null;
+  if (event.data.service !== "pumproom") return null;
+  if (!event.data.type || typeof event.data.type !== "string") return null;
+  // If target_type is specified, only return messages of that type
+  if (target_type && event.data.type !== target_type) return null;
+  // Return the message with the appropriate type
+  return event.data as MessageReturnType<T>;
 }

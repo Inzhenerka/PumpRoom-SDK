@@ -7,19 +7,19 @@
  * @module Authentication
  * @category Authentication
  */
-import type {PumpRoomUser, AuthenticateOptions, LMSProfileInput} from './types/index.ts';
-import type {SetPumpRoomUserMessage} from './types/messages.ts';
-import {USER_STORAGE_KEY} from './constants.ts';
-import {retrieveData, storeData} from './storage.ts';
+import { getApiClient } from "./api-client.ts";
+import { USER_STORAGE_KEY } from "./constants.ts";
 import {
-    getConfig,
-    setCurrentUser,
-    getCurrentUser,
-    registerAutoListener,
-    isAutoListenerRegistered,
-} from './globals.ts';
-import {getPumpRoomEventMessage} from './messaging.ts';
-import {getApiClient} from './api-client.ts';
+  getConfig,
+  getCurrentUser,
+  isAutoListenerRegistered,
+  registerAutoListener,
+  setCurrentUser,
+} from "./globals.ts";
+import { getPumpRoomEventMessage } from "./messaging.ts";
+import { retrieveData, storeData } from "./storage.ts";
+import type { AuthenticateOptions, LMSProfileInput, PumpRoomUser } from "./types/index.ts";
+import type { SetPumpRoomUserMessage } from "./types/messages.ts";
 
 /**
  * Validates an email address format
@@ -29,7 +29,7 @@ import {getApiClient} from './api-client.ts';
  * @internal
  */
 function isValidEmail(email: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 /**
@@ -43,19 +43,19 @@ function isValidEmail(email: string): boolean {
  * @internal
  */
 function normalizeLmsProfile(lms?: LMSProfileInput | null): LMSProfileInput | null | undefined {
-    if (!lms) return lms;
+  if (!lms) return lms;
 
-    if (lms.id && lms.email) {
-        console.warn('LMS email provided along with id; email will be ignored');
-    } else if (!lms.id && lms.email) {
-        if (isValidEmail(lms.email)) {
-            lms.id = lms.email;
-        } else {
-            console.warn('Invalid email supplied to LMS profile');
-        }
+  if (lms.id && lms.email) {
+    console.warn("LMS email provided along with id; email will be ignored");
+  } else if (!lms.id && lms.email) {
+    if (isValidEmail(lms.email)) {
+      lms.id = lms.email;
+    } else {
+      console.warn("Invalid email supplied to LMS profile");
     }
+  }
 
-    return lms;
+  return lms;
 }
 
 /**
@@ -66,22 +66,22 @@ function normalizeLmsProfile(lms?: LMSProfileInput | null): LMSProfileInput | nu
  * @internal
  */
 async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
-    const config = getConfig();
-    if (!config) return false;
+  const config = getConfig();
+  if (!config) return false;
 
-    try {
-        const apiClient = getApiClient();
-        const result = await apiClient.verifyToken(user, config.realm);
+  try {
+    const apiClient = getApiClient();
+    const result = await apiClient.verifyToken(user, config.realm);
 
-        if (result.is_valid) {
-            user.is_admin = result.is_admin;
-            storeData(USER_STORAGE_KEY, user);
-        }
-        return result.is_valid;
-    } catch (err) {
-        console.error('Verification error', err);
-        return false;
+    if (result.is_valid) {
+      user.is_admin = result.is_admin;
+      storeData(USER_STORAGE_KEY, user);
     }
+    return result.is_valid;
+  } catch (err) {
+    console.error("Verification error", err);
+    return false;
+  }
 }
 
 /**
@@ -111,63 +111,71 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
  * }
  * ```
  */
-export async function authenticate({lms, profile}: AuthenticateOptions = {}): Promise<PumpRoomUser> {
-    const config = getConfig();
-    if (!config) {
-        throw new Error('SDK is not initialized');
+export async function authenticate({
+  lms,
+  profile,
+}: AuthenticateOptions = {}): Promise<PumpRoomUser> {
+  const config = getConfig();
+  if (!config) {
+    throw new Error("SDK is not initialized");
+  }
+
+  let currentUser = getCurrentUser();
+  let fromCache = false;
+  if (config.cacheUser) {
+    const cachedUser = retrieveData(USER_STORAGE_KEY) as PumpRoomUser;
+    if (cachedUser && (await verifyCachedUser(cachedUser))) {
+      currentUser = cachedUser;
+      fromCache = true;
+    } else if (cachedUser && typeof localStorage !== "undefined") {
+      localStorage.removeItem(USER_STORAGE_KEY);
+    }
+  }
+
+  if (!fromCache) {
+    const apiClient = getApiClient();
+    const normLms = normalizeLmsProfile(lms);
+
+    // Validate GetCourse placeholders if requested via init configuration
+    if (config.type === "getcourse") {
+      const uid = normLms?.id;
+      const hasCurly = typeof uid === "string" && uid.indexOf("{") !== -1;
+      const invalid = !uid || hasCurly;
+      if (invalid) {
+        const msg =
+          "Некорректный идентификатор пользователя из GetCourse. При встраивании JavaScript-кода включите галочку «Заменять переменные пользователя».";
+        if (typeof window !== "undefined" && typeof window.alert === "function") {
+          try {
+            window.alert(msg);
+          } catch {
+            /* ignore */
+          }
+        } else {
+          console.warn(msg);
+        }
+        throw new Error("GetCourse UID validation failed");
+      }
     }
 
-    let currentUser = getCurrentUser();
-    let fromCache = false;
+    currentUser = await apiClient.authenticate({ lms: normLms, profile }, config.realm);
+
     if (config.cacheUser) {
-        const cachedUser = retrieveData(USER_STORAGE_KEY) as PumpRoomUser;
-        if (cachedUser && (await verifyCachedUser(cachedUser))) {
-            currentUser = cachedUser;
-            fromCache = true;
-        } else if (cachedUser && typeof localStorage !== 'undefined') {
-            localStorage.removeItem(USER_STORAGE_KEY);
-        }
+      storeData(USER_STORAGE_KEY, currentUser);
     }
+  }
 
-    if (!fromCache) {
-        const apiClient = getApiClient();
-        const normLms = normalizeLmsProfile(lms);
+  if (!currentUser) {
+    throw new Error("Authentication failed");
+  }
 
-        // Validate GetCourse placeholders if requested via init configuration
-        if (config.type === 'getcourse') {
-            const uid = normLms?.id;
-            const hasCurly = typeof uid === 'string' && uid.indexOf('{') !== -1;
-            const invalid = !uid || hasCurly;
-            if (invalid) {
-                const msg = 'Некорректный идентификатор пользователя из GetCourse. При встраивании JavaScript-кода включите галочку «Заменять переменные пользователя».';
-                if (typeof window !== 'undefined' && typeof window.alert === 'function') {
-                    try { window.alert(msg); } catch (_) { /* ignore */ }
-                } else {
-                    console.warn(msg);
-                }
-                throw new Error('GetCourse UID validation failed');
-            }
-        }
+  if (!isAutoListenerRegistered()) {
+    window.addEventListener("message", defaultUserListener);
+    registerAutoListener();
+  }
 
-        currentUser = await apiClient.authenticate({lms: normLms, profile}, config.realm);
+  setCurrentUser(currentUser);
 
-        if (config.cacheUser) {
-            storeData(USER_STORAGE_KEY, currentUser);
-        }
-    }
-
-    if (!currentUser) {
-        throw new Error('Authentication failed');
-    }
-
-    if (!isAutoListenerRegistered()) {
-        window.addEventListener('message', defaultUserListener);
-        registerAutoListener();
-    }
-
-    setCurrentUser(currentUser);
-
-    return currentUser;
+  return currentUser;
 }
 
 /**
@@ -195,40 +203,40 @@ export async function authenticate({lms, profile}: AuthenticateOptions = {}): Pr
  * }
  * ```
  */
-export async function setUser(user: Omit<PumpRoomUser, 'is_admin'>): Promise<PumpRoomUser | null> {
-    const config = getConfig();
-    if (!config) {
-        throw new Error('SDK is not initialized');
+export async function setUser(user: Omit<PumpRoomUser, "is_admin">): Promise<PumpRoomUser | null> {
+  const config = getConfig();
+  if (!config) {
+    throw new Error("SDK is not initialized");
+  }
+
+  let verified: PumpRoomUser;
+
+  try {
+    const apiClient = getApiClient();
+    const result = await apiClient.verifyToken({ ...user, is_admin: false }, config.realm);
+
+    if (!result.is_valid) {
+      console.error("Invalid user passed to setUser");
+      return null;
     }
 
-    let verified: PumpRoomUser;
+    verified = { ...user, is_admin: result.is_admin };
+  } catch (err) {
+    console.error("Verification error", err);
+    return null;
+  }
 
-    try {
-        const apiClient = getApiClient();
-        const result = await apiClient.verifyToken({...user, is_admin: false}, config.realm);
+  if (config.cacheUser) {
+    storeData(USER_STORAGE_KEY, verified);
+  }
+  setCurrentUser(verified);
 
-        if (!result.is_valid) {
-            console.error('Invalid user passed to setUser');
-            return null;
-        }
+  if (!isAutoListenerRegistered()) {
+    window.addEventListener("message", defaultUserListener);
+    registerAutoListener();
+  }
 
-        verified = {...user, is_admin: result.is_admin};
-    } catch (err) {
-        console.error('Verification error', err);
-        return null;
-    }
-
-    if (config.cacheUser) {
-        storeData(USER_STORAGE_KEY, verified);
-    }
-    setCurrentUser(verified);
-
-    if (!isAutoListenerRegistered()) {
-        window.addEventListener('message', defaultUserListener);
-        registerAutoListener();
-    }
-
-    return verified;
+  return verified;
 }
 
 /**
@@ -238,16 +246,16 @@ export async function setUser(user: Omit<PumpRoomUser, 'is_admin'>): Promise<Pum
  * @internal
  */
 function defaultUserListener(event: MessageEvent): void {
-    const data = getPumpRoomEventMessage(event, 'getPumpRoomUser');
-    if (!data) return;
-    const user = getCurrentUser();
-    if (!user) return;
-    if (event.source) {
-        const message: SetPumpRoomUserMessage = {
-            service: 'pumproom',
-            type: 'setPumpRoomUser',
-            payload: user,
-        };
-        (event.source as Window).postMessage(message, event.origin);
-    }
+  const data = getPumpRoomEventMessage(event, "getPumpRoomUser");
+  if (!data) return;
+  const user = getCurrentUser();
+  if (!user) return;
+  if (event.source) {
+    const message: SetPumpRoomUserMessage = {
+      service: "pumproom",
+      type: "setPumpRoomUser",
+      payload: user,
+    };
+    (event.source as Window).postMessage(message, event.origin);
+  }
 }

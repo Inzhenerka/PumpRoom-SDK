@@ -1,9 +1,9 @@
 /**
  * Constants module for PumpRoom SDK
- * 
+ *
  * This module defines various constants used throughout the SDK,
  * including API URLs, PumpRoom domains, and storage keys.
- * 
+ *
  * @module Constants
  */
 
@@ -12,7 +12,7 @@
  *
  * @public
  */
-export const API_BASE_URL = 'https://pumproom-api.inzhenerka-cloud.com';
+export const API_BASE_URL = "https://pumproom-api.inzhenerka-cloud.com";
 
 /**
  * URL for the authentication endpoint
@@ -56,10 +56,10 @@ export const LOAD_COURSE_URL = `${API_BASE_URL}/course/load`;
  * @public
  */
 export const PUMPROOM_DOMAINS = [
-    'https://pumproom.',
-    'https://pump-room.',
-    'https://dev.pumproom.',
-    'https://ide.code.winbd.ru'
+  "https://pumproom.",
+  "https://pump-room.",
+  "https://dev.pumproom.",
+  "https://ide.code.winbd.ru",
 ] as const;
 
 /**
@@ -67,18 +67,18 @@ export const PUMPROOM_DOMAINS = [
  *
  * @public
  */
-export const USER_STORAGE_KEY = 'pumproomUser'
+export const USER_STORAGE_KEY = "pumproomUser";
 
 /**
  * Prefix for localStorage keys to avoid conflicts with other applications when storing states
- * 
+ *
  * @experimental
  */
-export const STORAGE_PREFIX = 'pumproomState:'
+export const STORAGE_PREFIX = "pumproomState:";
 
 /**
  * Prefix for localStorage keys to avoid conflicts when storing course data
  *
  * @experimental
  */
-export const COURSE_STORAGE_PREFIX = 'pumproomCourse:'
+export const COURSE_STORAGE_PREFIX = "pumproomCourse:";

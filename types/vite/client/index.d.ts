@@ -1,14 +1,13 @@
 /// <reference types="vite/client" />
-declare module 'vite/client' {
-    interface ImportMetaEnv {
-        readonly VITE_PUMPROOM_API_KEY: string;
-        readonly VITE_PUMPROOM_REALM: string;
-    }
 
-    interface ImportMeta {
-        readonly env: ImportMetaEnv;
-    }
+interface ImportMetaEnv {
+  readonly VITE_PUMPROOM_API_KEY: string;
+  readonly VITE_PUMPROOM_REALM: string;
 }
 
-declare module '*.css';
-declare module '*.scss';
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
+declare module "*.css";
+declare module "*.scss";

@@ -1,79 +1,84 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PumpRoom Demo</title>
-    <link rel="icon"
-          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🟣</text></svg>">
-</head>
-<body>
-<div class="container">
-    <div class="row">
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🟣</text></svg>"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
         <div class="col-12">
-            <header class="py-3 mb-4 border-bottom">
-                <h1 class="h-4 text-center text-primary">PumpRoom Demo</h1>
-            </header>
+          <header class="py-3 mb-4 border-bottom">
+            <h1 class="h-4 text-center text-primary">PumpRoom Demo</h1>
+          </header>
         </div>
-    </div>
+      </div>
 
-    <div class="row mb-4">
+      <div class="row mb-4">
         <div class="col">
-            Это пример использования PumpRoom на странице LMS, где он работает в связке с SDK.
+          Это пример использования PumpRoom на странице LMS, где он работает в связке с SDK.
         </div>
-    </div>
+      </div>
 
-    <div class="row mb-4">
+      <div class="row mb-4">
         <div class="col col-lg-6">
-            <h2 class="h5 text-primary mb-4">Тестирование состояний</h2>
-            <div class="card">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="checkbox1">
-                            <label class="form-check-label" for="checkbox1">
-                                Пример состояния 1
-                            </label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="checkbox2">
-                            <label class="form-check-label" for="checkbox2">
-                                Пример состояния 2
-                            </label>
-                        </div>
-                        <div class="mb-3">
-                            <label for="textInput" class="form-label">Пример состояния 3 - текстовый ввод:</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="textInput" placeholder="Введите текст...">
-                                <button class="btn btn-primary" type="button" id="sendBtn">Отправить</button>
-                            </div>
-                        </div>
-                        <button class="btn btn-danger" id="clearStatesBtn">Очистить состояния</button>
-                    </div>
+          <h2 class="h5 text-primary mb-4">Тестирование состояний</h2>
+          <div class="card">
+            <div class="card-body">
+              <div class="mb-3">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="checkbox1" />
+                  <label class="form-check-label" for="checkbox1"> Пример состояния 1 </label>
                 </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="checkbox2" />
+                  <label class="form-check-label" for="checkbox2"> Пример состояния 2 </label>
+                </div>
+                <div class="mb-3">
+                  <label for="textInput" class="form-label"
+                    >Пример состояния 3 - текстовый ввод:</label
+                  >
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="textInput"
+                      placeholder="Введите текст..."
+                    />
+                    <button class="btn btn-primary" type="button" id="sendBtn">Отправить</button>
+                  </div>
+                </div>
+                <button class="btn btn-danger" id="clearStatesBtn">Очистить состояния</button>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <div class="row mb-5">
+      <div class="row mb-5">
         <div class="col">
-            <h2 class="h5 text-primary">Пример задания</h2>
+          <h2 class="h5 text-primary">Пример задания</h2>
         </div>
-    </div>
+      </div>
 
-    <div class="row">
+      <div class="row">
         <div class="col col-lg-8 offset-lg-2">
-            <iframe
-                    src="http://pumproom.inzhenerka-cloud.com/?repo_name=Base-Pumping&task_name=language_example"
-                    height="600px"
-                    width="100%"
-                    allow="clipboard-write; fullscreen;"
-                    class="border-0 rounded"
-            ></iframe>
+          <iframe
+            src="http://pumproom.inzhenerka-cloud.com/?repo_name=Base-Pumping&task_name=language_example"
+            height="600px"
+            width="100%"
+            allow="clipboard-write; fullscreen"
+            class="border-0 rounded"
+          ></iframe>
         </div>
+      </div>
     </div>
-</div>
 
-<script type="module" src="./main.ts"></script>
-</body>
+    <script type="module" src="./main.ts"></script>
+  </body>
 </html>

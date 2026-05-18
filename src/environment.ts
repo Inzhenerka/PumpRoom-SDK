@@ -7,14 +7,14 @@
  *
  * @module Environment
  */
-import {getPumpRoomEventMessage} from './messaging.ts';
-import {getVersion} from './version.ts';
-import type {SetEnvironmentMessage} from './types/messages.js';
-import {registerTaskInstance} from './instance.ts';
-import {executeOnInitCallback} from './callbacks.ts';
-import {getCurrentNormalizedUrl} from './utils.ts';
-import {getConfig} from './globals.ts';
-import {LMSContext} from "./types/index.js";
+import { executeOnInitCallback } from "./callbacks.ts";
+import { getConfig } from "./globals.ts";
+import { registerTaskInstance } from "./instance.ts";
+import { getPumpRoomEventMessage } from "./messaging.ts";
+import { LMSContext } from "./types/index.js";
+import type { SetEnvironmentMessage } from "./types/messages.js";
+import { getCurrentNormalizedUrl } from "./utils.ts";
+import { getVersion } from "./version.ts";
 
 // The setOnInitCallback function has been moved to callbacks.ts
 
@@ -22,12 +22,12 @@ import {LMSContext} from "./types/index.js";
  * Environment information sent to PumpRoom iframes
  */
 export interface PumpRoomEnvironment {
-    /** The URL of the page containing the SDK */
-    pageURL: string;
-    /** The version of the SDK */
-    sdkVersion: string;
-    /** LMS context information */
-    context: LMSContext | null;
+  /** The URL of the page containing the SDK */
+  pageURL: string;
+  /** The version of the SDK */
+  sdkVersion: string;
+  /** LMS context information */
+  context: LMSContext | null;
 }
 
 /**
@@ -37,16 +37,16 @@ export interface PumpRoomEnvironment {
  * @internal
  */
 function buildEnvironment(): PumpRoomEnvironment {
-    const config = getConfig();
-    const pageURL = getCurrentNormalizedUrl();
-    if (!pageURL) {
-        throw new Error('Unable to determine current page URL');
-    }
-    return {
-        pageURL: pageURL,
-        sdkVersion: getVersion(),
-        context: config?.context || null
-    };
+  const config = getConfig();
+  const pageURL = getCurrentNormalizedUrl();
+  if (!pageURL) {
+    throw new Error("Unable to determine current page URL");
+  }
+  return {
+    pageURL: pageURL,
+    sdkVersion: getVersion(),
+    context: config?.context || null,
+  };
 }
 
 /**
@@ -66,12 +66,12 @@ function buildEnvironment(): PumpRoomEnvironment {
  * ```
  */
 export function sendEnvironment(target: Window, origin: string): void {
-    const message: SetEnvironmentMessage = {
-        service: 'pumproom',
-        type: 'setEnvironment',
-        payload: buildEnvironment(),
-    }
-    target.postMessage(message, origin);
+  const message: SetEnvironmentMessage = {
+    service: "pumproom",
+    type: "setEnvironment",
+    payload: buildEnvironment(),
+  };
+  target.postMessage(message, origin);
 }
 
 /**
@@ -81,17 +81,17 @@ export function sendEnvironment(target: Window, origin: string): void {
  * @internal
  */
 function handleEnvironmentMessage(event: MessageEvent): void {
-    const data = getPumpRoomEventMessage(event, 'getEnvironment');
-    if (!data) return
-    // Register the instance using the instance module
-    registerTaskInstance(data.payload.instanceContext);
+  const data = getPumpRoomEventMessage(event, "getEnvironment");
+  if (!data) return;
+  // Register the instance using the instance module
+  registerTaskInstance(data.payload.instanceContext);
 
-    if (event.source) {
-        sendEnvironment(event.source as Window, event.origin);
-    }
+  if (event.source) {
+    sendEnvironment(event.source as Window, event.origin);
+  }
 
-    // Execute the on init callback if it's set (using the callbacks module)
-    executeOnInitCallback(data.payload);
+  // Execute the on init callback if it's set (using the callbacks module)
+  executeOnInitCallback(data.payload);
 }
 
 /**
@@ -106,5 +106,5 @@ function handleEnvironmentMessage(event: MessageEvent): void {
  * ```
  */
 export function setEnvironmentListener(): void {
-    window.addEventListener('message', handleEnvironmentMessage);
+  window.addEventListener("message", handleEnvironmentMessage);
 }

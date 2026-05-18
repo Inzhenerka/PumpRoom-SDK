@@ -1,20 +1,31 @@
 import {
-    AuthInput,
-    VerifyTokenInput,
-    VerifyTokenResult,
-    PumpRoomUser,
-    AuthenticateOptions,
-    State,
-    StatesResponse,
-    LMSContextAPI,
-    LoadCourseDataInput,
-    LoadCourseDataOutput,
-} from './types/index.ts';
-import type {FetchStatesInput, StoreStatesInput} from './types/index.ts';
-import {getCurrentNormalizedUrl} from "./utils.js";
-import {AUTH_URL, VERIFY_URL, GET_STATES_URL, SET_STATES_URL, LOAD_COURSE_URL} from './constants.ts';
-import {getConfig, setApiClientInstance, getApiClientInstance} from './globals.ts';
-import {getVersion} from './version.ts';
+  AUTH_URL,
+  GET_STATES_URL,
+  LOAD_COURSE_URL,
+  SET_STATES_URL,
+  VERIFY_URL,
+} from "./constants.ts";
+import { getApiClientInstance, getConfig, setApiClientInstance } from "./globals.ts";
+import type { FetchStatesInput, StoreStatesInput } from "./types/index.ts";
+import {
+  AuthenticateOptions,
+  AuthInput,
+  LMSContextAPI,
+  LoadCourseDataInput,
+  LoadCourseDataOutput,
+  PumpRoomUser,
+  State,
+  StatesResponse,
+  VerifyTokenInput,
+  VerifyTokenResult,
+} from "./types/index.ts";
+import { getCurrentNormalizedUrl } from "./utils.js";
+import { getVersion } from "./version.ts";
+
+type RequestContext = LMSContextAPI & {
+  url?: string | null;
+  sdk_version?: string;
+};
 
 /**
  * API client for PumpRoom SDK.
@@ -33,257 +44,262 @@ import {getVersion} from './version.ts';
  * ```
  */
 export class ApiClient {
-    private readonly apiKey: string;
+  private readonly apiKey: string;
 
-    constructor(apiKey: string) {
-        this.apiKey = apiKey;
+  constructor(apiKey: string) {
+    this.apiKey = apiKey;
+  }
+
+  /**
+   * Builds LMS context payload that is sent with most API requests.
+   */
+  private buildContext(includeEnvironment = false): RequestContext {
+    const config = getConfig();
+    const context: RequestContext = {
+      kit_id: config?.context?.kitId,
+      program_id: config?.context?.programId,
+      lesson_id: config?.context?.lessonId,
+    };
+    if (includeEnvironment) {
+      context.url = getCurrentNormalizedUrl();
+      context.sdk_version = getVersion();
+    }
+    return context;
+  }
+
+  /**
+   * Verify a cached user token.
+   *
+   * This call checks whether the provided user token is still valid for the
+   * specified realm.
+   *
+   * @param user - User to verify
+   * @param realm - Realm identifier
+   * @returns Result with validity and admin flag
+   *
+   * @example
+   * ```typescript
+   * const result = await client.verifyToken(user, 'academy');
+   * if (result.is_valid) {
+   *   console.log('Token is still valid');
+   * }
+   * ```
+   */
+  async verifyToken(user: PumpRoomUser, realm: string): Promise<VerifyTokenResult> {
+    const payload: VerifyTokenInput = {
+      realm,
+      token: user.token,
+      uid: user.uid,
+      context: this.buildContext(),
+    };
+
+    const resp = await fetch(VERIFY_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": this.apiKey,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!resp.ok) {
+      throw new Error(`User verification error: ${resp.status} ${resp.statusText}`);
     }
 
-    /**
-     * Builds LMS context payload that is sent with most API requests.
-     */
-    private buildContext(): LMSContextAPI {
-        const config = getConfig();
-        return {
-            kit_id: config?.context?.kitId,
-            program_id: config?.context?.programId,
-            lesson_id: config?.context?.lessonId,
-        };
+    return (await resp.json()) as VerifyTokenResult;
+  }
+
+  /**
+   * Authenticate a user.
+   *
+   * Performs a call to the PumpRoom authentication endpoint using the
+   * provided profile information.
+   *
+   * @param options - Authentication options
+   * @param realm - Realm identifier
+   * @returns Authenticated user
+   * @throws Error if the authentication request fails
+   *
+   * @example
+   * ```typescript
+   * const user = await client.authenticate({ profile: { login: 'bob', name: 'Bob', istutor: false, lang: 'en', projectid: '1' } }, 'academy');
+   * console.log('Authenticated as', user.uid);
+   * ```
+   */
+  async authenticate(options: AuthenticateOptions, realm: string): Promise<PumpRoomUser> {
+    const body: AuthInput = {
+      lms: options.lms,
+      profile: options.profile,
+      realm: realm,
+      url: getCurrentNormalizedUrl(),
+      sdk_version: getVersion(),
+      context: this.buildContext(),
+    };
+
+    const response = await fetch(AUTH_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": this.apiKey,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) {
+      return (await response.json()) as PumpRoomUser;
+    } else {
+      throw new Error(`Authentication error: ${response.status} ${response.statusText}`);
+    }
+  }
+
+  /**
+   * Loads course data for the current URL.
+   *
+   * This method retrieves course details and related tasks using the current page URL
+   * and LMS context.
+   *
+   * @param realm - Realm identifier
+   * @returns Promise resolving to course data output
+   * @throws Error if the request fails or the current URL is unavailable
+   *
+   * @category Courses
+   * @experimental
+   * @example
+   * ```typescript
+   * const result = await client.loadCourseData('academy');
+   * console.log(result.course?.visible_name);
+   * ```
+   */
+  async loadCourseData(realm: string): Promise<LoadCourseDataOutput> {
+    const url = getCurrentNormalizedUrl();
+    if (!url) {
+      throw new Error("Current URL is not available");
+    }
+    const body: LoadCourseDataInput = {
+      realm,
+      url,
+      context: this.buildContext(),
+      sdk_version: getVersion(),
+    };
+
+    const response = await fetch(LOAD_COURSE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": this.apiKey,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Request error: ${response.status} ${response.statusText}`);
     }
 
-    /**
-     * Verify a cached user token.
-     *
-     * This call checks whether the provided user token is still valid for the
-     * specified realm.
-     *
-     * @param user - User to verify
-     * @param realm - Realm identifier
-     * @returns Result with validity and admin flag
-     *
-     * @example
-     * ```typescript
-     * const result = await client.verifyToken(user, 'academy');
-     * if (result.is_valid) {
-     *   console.log('Token is still valid');
-     * }
-     * ```
-     */
-    async verifyToken(user: PumpRoomUser, realm: string): Promise<VerifyTokenResult> {
-        const payload: VerifyTokenInput = {
-            realm,
-            token: user.token,
-            uid: user.uid,
-            context: this.buildContext(),
-        };
+    return (await response.json()) as LoadCourseDataOutput;
+  }
 
-        const resp = await fetch(VERIFY_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-KEY': this.apiKey,
-            },
-            body: JSON.stringify(payload),
-        });
+  /**
+   * Fetches states from the backend
+   *
+   * This method retrieves the values of the specified states from the backend.
+   *
+   * @param stateNames - Array of state names to fetch
+   * @param user - The authenticated user
+   * @returns Promise resolving to the fetched states
+   * @throws Error if the request fails
+   *
+   * @experimental
+   * @example
+   * ```typescript
+   * try {
+   *   const states = await client.fetchStates(['userPreferences', 'lastVisitedPage'], user);
+   *   console.log(states);
+   * } catch (error) {
+   *   console.error(error);
+   * }
+   * ```
+   */
+  async fetchStates(
+    stateNames: string[],
+    user: PumpRoomUser,
+    options?: { includeEnvInContext?: boolean },
+  ): Promise<StatesResponse> {
+    const context = this.buildContext(options?.includeEnvInContext);
+    const body: FetchStatesInput = {
+      user: user,
+      state_names: stateNames,
+      url: getCurrentNormalizedUrl(),
+      sdk_version: getVersion(),
+      context,
+    };
+    const response = await fetch(GET_STATES_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": this.apiKey,
+      },
+      body: JSON.stringify(body),
+    });
 
-        if (!resp.ok) {
-            throw new Error(`User verification error: ${resp.status} ${resp.statusText}`);
-        }
-
-        return await resp.json() as VerifyTokenResult;
+    if (!response.ok) {
+      throw new Error(`Request error: ${response.status} ${response.statusText}`);
     }
 
-    /**
-     * Authenticate a user.
-     *
-     * Performs a call to the PumpRoom authentication endpoint using the
-     * provided profile information.
-     *
-     * @param options - Authentication options
-     * @param realm - Realm identifier
-     * @returns Authenticated user
-     * @throws Error if the authentication request fails
-     *
-     * @example
-     * ```typescript
-     * const user = await client.authenticate({ profile: { login: 'bob', name: 'Bob', istutor: false, lang: 'en', projectid: '1' } }, 'academy');
-     * console.log('Authenticated as', user.uid);
-     * ```
-     */
-    async authenticate(options: AuthenticateOptions, realm: string): Promise<PumpRoomUser> {
-        const body: AuthInput = {
-            lms: options.lms,
-            profile: options.profile,
-            realm: realm,
-            url: getCurrentNormalizedUrl(),
-            sdk_version: getVersion(),
-            context: this.buildContext(),
-        };
+    return (await response.json()) as StatesResponse;
+  }
 
-        const response = await fetch(AUTH_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-KEY': this.apiKey,
-            },
-            body: JSON.stringify(body),
-        });
+  /**
+   * Stores states to the backend
+   *
+   * This method saves the provided states to the backend.
+   *
+   * @param states - Array of state objects to store
+   * @param user - The authenticated user
+   * @returns Promise resolving to the result of the operation
+   * @throws Error if the request fails
+   *
+   * @experimental
+   * @example
+   * ```typescript
+   * try {
+   *   const result = await client.storeStates([
+   *     { name: 'userPreferences', value: 'dark' },
+   *     { name: 'lastVisitedPage', value: '/dashboard' }
+   *   ], user);
+   *   console.log(result);
+   * } catch (error) {
+   *   console.error(error);
+   * }
+   * ```
+   */
+  async storeStates(
+    states: State[],
+    user: PumpRoomUser,
+    options?: { includeEnvInContext?: boolean },
+  ): Promise<StatesResponse> {
+    const context = this.buildContext(options?.includeEnvInContext);
+    const body: StoreStatesInput = {
+      user: user,
+      states: states,
+      url: getCurrentNormalizedUrl(),
+      sdk_version: getVersion(),
+      context,
+    };
+    const response = await fetch(SET_STATES_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": this.apiKey,
+      },
+      body: JSON.stringify(body),
+    });
 
-        if (response.ok) {
-            return await response.json() as PumpRoomUser;
-        } else {
-            throw new Error(`Authentication error: ${response.status} ${response.statusText}`);
-        }
+    if (!response.ok) {
+      throw new Error(`Request error: ${response.status} ${response.statusText}`);
     }
 
-    /**
-     * Loads course data for the current URL.
-     *
-     * This method retrieves course details and related tasks using the current page URL
-     * and LMS context.
-     *
-     * @param realm - Realm identifier
-     * @returns Promise resolving to course data output
-     * @throws Error if the request fails or the current URL is unavailable
-     *
-     * @category Courses
-     * @experimental
-     * @example
-     * ```typescript
-     * const result = await client.loadCourseData('academy');
-     * console.log(result.course?.visible_name);
-     * ```
-     */
-    async loadCourseData(realm: string): Promise<LoadCourseDataOutput> {
-        const url = getCurrentNormalizedUrl();
-        if (!url) {
-            throw new Error('Current URL is not available');
-        }
-        const body: LoadCourseDataInput = {
-            realm,
-            url,
-            context: this.buildContext(),
-            sdk_version: getVersion(),
-        };
-
-        const response = await fetch(LOAD_COURSE_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-KEY': this.apiKey,
-            },
-            body: JSON.stringify(body),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Request error: ${response.status} ${response.statusText}`);
-        }
-
-        return await response.json() as LoadCourseDataOutput;
-    }
-
-    /**
-     * Fetches states from the backend
-     *
-     * This method retrieves the values of the specified states from the backend.
-     *
-     * @param stateNames - Array of state names to fetch
-     * @param user - The authenticated user
-     * @returns Promise resolving to the fetched states
-     * @throws Error if the request fails
-     *
-     * @experimental
-     * @example
-     * ```typescript
-     * try {
-     *   const states = await client.fetchStates(['userPreferences', 'lastVisitedPage'], user);
-     *   console.log(states);
-     * } catch (error) {
-     *   console.error(error);
-     * }
-     * ```
-     */
-    async fetchStates(stateNames: string[], user: PumpRoomUser, options?: { includeEnvInContext?: boolean }): Promise<StatesResponse> {
-        const context = this.buildContext();
-        if (options?.includeEnvInContext) {
-            (context as any).url = getCurrentNormalizedUrl();
-            (context as any).sdk_version = getVersion();
-        }
-        const body: FetchStatesInput = {
-            user: user,
-            state_names: stateNames,
-            url: getCurrentNormalizedUrl(),
-            sdk_version: getVersion(),
-            context,
-        };
-        const response = await fetch(GET_STATES_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-KEY': this.apiKey,
-            },
-            body: JSON.stringify(body),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Request error: ${response.status} ${response.statusText}`);
-        }
-
-        return await response.json() as StatesResponse;
-    }
-
-    /**
-     * Stores states to the backend
-     *
-     * This method saves the provided states to the backend.
-     *
-     * @param states - Array of state objects to store
-     * @param user - The authenticated user
-     * @returns Promise resolving to the result of the operation
-     * @throws Error if the request fails
-     *
-     * @experimental
-     * @example
-     * ```typescript
-     * try {
-     *   const result = await client.storeStates([
-     *     { name: 'userPreferences', value: 'dark' },
-     *     { name: 'lastVisitedPage', value: '/dashboard' }
-     *   ], user);
-     *   console.log(result);
-     * } catch (error) {
-     *   console.error(error);
-     * }
-     * ```
-     */
-    async storeStates(states: State[], user: PumpRoomUser, options?: { includeEnvInContext?: boolean }): Promise<StatesResponse> {
-        const context = this.buildContext();
-        if (options?.includeEnvInContext) {
-            (context as any).url = getCurrentNormalizedUrl();
-            (context as any).sdk_version = getVersion();
-        }
-        const body: StoreStatesInput = {
-            user: user,
-            states: states,
-            url: getCurrentNormalizedUrl(),
-            sdk_version: getVersion(),
-            context,
-        };
-        const response = await fetch(SET_STATES_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-API-KEY': this.apiKey,
-            },
-            body: JSON.stringify(body),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Request error: ${response.status} ${response.statusText}`);
-        }
-
-        return await response.json() as StatesResponse;
-    }
+    return (await response.json()) as StatesResponse;
+  }
 }
 
 /**
@@ -301,7 +317,7 @@ export class ApiClient {
  * ```
  */
 export function initApiClient(apiKey: string): void {
-    setApiClientInstance(new ApiClient(apiKey));
+  setApiClientInstance(new ApiClient(apiKey));
 }
 
 /**
@@ -317,5 +333,5 @@ export function initApiClient(apiKey: string): void {
  * ```
  */
 export function getApiClient(): ApiClient {
-    return getApiClientInstance();
+  return getApiClientInstance();
 }

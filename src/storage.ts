@@ -8,9 +8,9 @@
  * @module Storage
  */
 
-import {getCurrentNormalizedUrl} from "./utils.js";
-import {COURSE_STORAGE_PREFIX, STORAGE_PREFIX} from './constants.ts';
-import type {LoadCourseDataOutput, StateOutput} from './types/index.ts';
+import { COURSE_STORAGE_PREFIX, STORAGE_PREFIX } from "./constants.ts";
+import type { LoadCourseDataOutput, StateOutput } from "./types/index.ts";
+import { getCurrentNormalizedUrl } from "./utils.js";
 
 /**
  * Retrieves data from localStorage
@@ -26,15 +26,15 @@ import type {LoadCourseDataOutput, StateOutput} from './types/index.ts';
  * const user = retrieveData('user');
  * ```
  */
-export function retrieveData(key: string): Record<any, any> | null {
-    if (typeof localStorage === 'undefined') return null;
-    try {
-        const raw = localStorage.getItem(key);
-        return raw ? (JSON.parse(raw) as Record<any, any>) : null;
-    } catch (err) {
-        console.error('Cache read error', err);
-        return null;
-    }
+export function retrieveData(key: string): unknown | null {
+  if (typeof localStorage === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch (err) {
+    console.error("Cache read error", err);
+    return null;
+  }
 }
 
 /**
@@ -51,13 +51,13 @@ export function retrieveData(key: string): Record<any, any> | null {
  * storeData('user', { id: 1 });
  * ```
  */
-export function storeData(key: string, data: Record<any, any>): void {
-    if (typeof localStorage === 'undefined') return;
-    try {
-        localStorage.setItem(key, JSON.stringify(data));
-    } catch (err) {
-        console.error('Cache save error', err);
-    }
+export function storeData(key: string, data: unknown): void {
+  if (typeof localStorage === "undefined") return;
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (err) {
+    console.error("Cache save error", err);
+  }
 }
 
 /**
@@ -70,11 +70,11 @@ export function storeData(key: string, data: Record<any, any>): void {
  * @experimental
  */
 export function generateStateKey(stateName: string, userId: string): string {
-    const pageUrl = getCurrentNormalizedUrl();
-    if (!pageUrl) {
-        throw new Error('Unable to determine current page URL');
-    }
-    return `${STORAGE_PREFIX}:${pageUrl}:${stateName}:${userId}`;
+  const pageUrl = getCurrentNormalizedUrl();
+  if (!pageUrl) {
+    throw new Error("Unable to determine current page URL");
+  }
+  return `${STORAGE_PREFIX}:${pageUrl}:${stateName}:${userId}`;
 }
 
 /**
@@ -87,11 +87,11 @@ export function generateStateKey(stateName: string, userId: string): string {
  * @experimental
  */
 export function generateCourseKey(): string {
-    const pageUrl = getCurrentNormalizedUrl();
-    if (!pageUrl) {
-        throw new Error('Unable to determine current page URL');
-    }
-    return `${COURSE_STORAGE_PREFIX}:${pageUrl}`;
+  const pageUrl = getCurrentNormalizedUrl();
+  if (!pageUrl) {
+    throw new Error("Unable to determine current page URL");
+  }
+  return `${COURSE_STORAGE_PREFIX}:${pageUrl}`;
 }
 
 /**
@@ -103,14 +103,14 @@ export function generateCourseKey(): string {
  * @experimental
  */
 export function saveStatesToLocalStorage(states: StateOutput[], userId: string): void {
-    try {
-        states.forEach(state => {
-            const key = generateStateKey(state.name, userId);
-            localStorage.setItem(key, JSON.stringify(state));
-        });
-    } catch (error) {
-        console.warn('Failed to save states to localStorage:', error);
-    }
+  try {
+    states.forEach((state) => {
+      const key = generateStateKey(state.name, userId);
+      localStorage.setItem(key, JSON.stringify(state));
+    });
+  } catch (error) {
+    console.warn("Failed to save states to localStorage:", error);
+  }
 }
 
 /**
@@ -123,23 +123,23 @@ export function saveStatesToLocalStorage(states: StateOutput[], userId: string):
  * @experimental
  */
 export function getStatesFromLocalStorage(stateNames: string[], userId: string): StateOutput[] {
-    const states: StateOutput[] = [];
+  const states: StateOutput[] = [];
 
-    try {
-        stateNames.forEach(stateName => {
-            const key = generateStateKey(stateName, userId);
-            const stateJson = localStorage.getItem(key);
+  try {
+    stateNames.forEach((stateName) => {
+      const key = generateStateKey(stateName, userId);
+      const stateJson = localStorage.getItem(key);
 
-            if (stateJson) {
-                const state = JSON.parse(stateJson) as StateOutput;
-                states.push(state);
-            }
-        });
-    } catch (error) {
-        console.warn('Failed to retrieve states from localStorage:', error);
-    }
+      if (stateJson) {
+        const state = JSON.parse(stateJson) as StateOutput;
+        states.push(state);
+      }
+    });
+  } catch (error) {
+    console.warn("Failed to retrieve states from localStorage:", error);
+  }
 
-    return states;
+  return states;
 }
 
 /**
@@ -150,12 +150,12 @@ export function getStatesFromLocalStorage(stateNames: string[], userId: string):
  * @experimental
  */
 export function saveCourseToLocalStorage(data: LoadCourseDataOutput): void {
-    try {
-        const key = generateCourseKey();
-        localStorage.setItem(key, JSON.stringify(data));
-    } catch (error) {
-        console.warn('Failed to save course data to localStorage:', error);
-    }
+  try {
+    const key = generateCourseKey();
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    console.warn("Failed to save course data to localStorage:", error);
+  }
 }
 
 /**
@@ -166,12 +166,12 @@ export function saveCourseToLocalStorage(data: LoadCourseDataOutput): void {
  * @experimental
  */
 export function getCourseFromLocalStorage(): LoadCourseDataOutput | null {
-    try {
-        const key = generateCourseKey();
-        const cached = localStorage.getItem(key);
-        return cached ? (JSON.parse(cached) as LoadCourseDataOutput) : null;
-    } catch (error) {
-        console.warn('Failed to retrieve course data from localStorage:', error);
-        return null;
-    }
+  try {
+    const key = generateCourseKey();
+    const cached = localStorage.getItem(key);
+    return cached ? (JSON.parse(cached) as LoadCourseDataOutput) : null;
+  } catch (error) {
+    console.warn("Failed to retrieve course data from localStorage:", error);
+    return null;
+  }
 }

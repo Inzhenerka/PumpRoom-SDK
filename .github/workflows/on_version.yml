@@ -3,7 +3,7 @@ name: Publish to npm on version
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   publish:
@@ -68,7 +68,7 @@ jobs:
       - name: 🏁 Create GitHub deployment
         uses: chrnorm/deployment-action@v2
         with:
-          token: '${{ github.token }}'
+          token: "${{ github.token }}"
           initial-status: success
           environment-url: https://pumproom-sdk.inzhenerka-cloud.com
           environment: prod

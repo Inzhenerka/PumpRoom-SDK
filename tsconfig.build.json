@@ -13,12 +13,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
-    "lib": [
-      "dom",
-      "es2015"
-    ]
+    "lib": ["dom", "es2015"]
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }

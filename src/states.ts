@@ -10,12 +10,16 @@
  * @experimental
  */
 
-import {getCurrentUser, registerStates, getRegisteredStates, resetRegisteredStates} from './globals.ts';
-import {getApiClient} from './api-client.ts';
-import {saveStatesToLocalStorage, getStatesFromLocalStorage} from './storage.ts';
-import type {State, StatesResponse, StateOutput, StatesCallback} from './types/index.ts';
-import {StateDataType} from './types/index.ts';
-
+import { getApiClient } from "./api-client.ts";
+import {
+  getCurrentUser,
+  getRegisteredStates,
+  registerStates,
+  resetRegisteredStates,
+} from "./globals.ts";
+import { getStatesFromLocalStorage, saveStatesToLocalStorage } from "./storage.ts";
+import type { State, StateOutput, StatesCallback, StatesResponse } from "./types/index.ts";
+import { StateDataType } from "./types/index.ts";
 
 /**
  * Fetches states from the backend
@@ -57,48 +61,53 @@ import {StateDataType} from './types/index.ts';
  *   .catch(error => console.error(error));
  * ```
  */
-export async function fetchStates(stateNames: string[], callback?: StatesCallback): Promise<StatesResponse> {
-    // Validate stateNames parameter
-    if (!Array.isArray(stateNames) || stateNames.length === 0) {
-        throw new Error('stateNames must be non-empty array of strings');
-    }
+export async function fetchStates(
+  stateNames: string[],
+  callback?: StatesCallback,
+): Promise<StatesResponse> {
+  // Validate stateNames parameter
+  if (!Array.isArray(stateNames) || stateNames.length === 0) {
+    throw new Error("stateNames must be non-empty array of strings");
+  }
 
-    // Register the state names globally
-    registerStates(stateNames);
+  // Register the state names globally
+  registerStates(stateNames);
 
-    // Get the current user
-    const currentUser = getCurrentUser();
+  // Get the current user
+  const currentUser = getCurrentUser();
 
-    // Check if user is authenticated
-    if (!currentUser) {
-        throw new Error('User is not authenticated');
-    }
+  // Check if user is authenticated
+  if (!currentUser) {
+    throw new Error("User is not authenticated");
+  }
 
-    // Check localStorage for cached states
-    const cachedStates = getStatesFromLocalStorage(stateNames, currentUser.uid);
+  // Check localStorage for cached states
+  const cachedStates = getStatesFromLocalStorage(stateNames, currentUser.uid);
 
-    // If we have cached states and a callback, call the callback with the cached states
-    if (cachedStates.length > 0) {
-        if (callback) {
-            callback({states: cachedStates});
-        }
-    }
-
-    // Get the API client
-    const apiClient = getApiClient();
-
-    // Use the API client to fetch states from the backend
-    const response = await apiClient.fetchStates(stateNames, currentUser, { includeEnvInContext: true });
-
-    // Update localStorage with the fetched states
-    saveStatesToLocalStorage(response.states, currentUser.uid);
-
-    // If we have a callback, call it with the fetched states
+  // If we have cached states and a callback, call the callback with the cached states
+  if (cachedStates.length > 0) {
     if (callback) {
-        callback(response);
+      callback({ states: cachedStates });
     }
+  }
 
-    return response;
+  // Get the API client
+  const apiClient = getApiClient();
+
+  // Use the API client to fetch states from the backend
+  const response = await apiClient.fetchStates(stateNames, currentUser, {
+    includeEnvInContext: true,
+  });
+
+  // Update localStorage with the fetched states
+  saveStatesToLocalStorage(response.states, currentUser.uid);
+
+  // If we have a callback, call it with the fetched states
+  if (callback) {
+    callback(response);
+  }
+
+  return response;
 }
 
 // State interface is now imported from types/index.ts
@@ -137,41 +146,46 @@ export async function fetchStates(stateNames: string[], callback?: StatesCallbac
  * ```
  */
 export async function storeStates(states: State[]): Promise<StatesResponse> {
-    // Validate states parameter
-    if (!Array.isArray(states)) {
-        throw new Error('states parameter must be array of objects');
-    }
+  // Validate states parameter
+  if (!Array.isArray(states)) {
+    throw new Error("states parameter must be array of objects");
+  }
 
-    // Register the state names globally
-    registerStates(states.map(state => state.name));
+  // Register the state names globally
+  registerStates(states.map((state) => state.name));
 
-    // Get the current user
-    const currentUser = getCurrentUser();
+  // Get the current user
+  const currentUser = getCurrentUser();
 
-    // Check if user is authenticated
-    if (!currentUser) {
-        throw new Error('User is not authenticated');
-    }
+  // Check if user is authenticated
+  if (!currentUser) {
+    throw new Error("User is not authenticated");
+  }
 
-    // Get the API client
-    const apiClient = getApiClient();
+  // Get the API client
+  const apiClient = getApiClient();
 
-    // Use the API client to store states
-    const response = await apiClient.storeStates(states, currentUser, { includeEnvInContext: true });
+  // Use the API client to store states
+  const response = await apiClient.storeStates(states, currentUser, { includeEnvInContext: true });
 
-    // Convert State[] to StateOutput[] for localStorage
-    const stateOutputs: StateOutput[] = states.map(state => ({
-        name: state.name,
-        value: state.value,
-        // Determine data_type based on value type
-        data_type: state.value === null ? StateDataType.null :
-            typeof state.value === 'boolean' ? StateDataType.bool :
-                typeof state.value === 'number' ? StateDataType.int : StateDataType.str
-    }));
+  // Convert State[] to StateOutput[] for localStorage
+  const stateOutputs: StateOutput[] = states.map((state) => ({
+    name: state.name,
+    value: state.value,
+    // Determine data_type based on value type
+    data_type:
+      state.value === null
+        ? StateDataType.null
+        : typeof state.value === "boolean"
+          ? StateDataType.bool
+          : typeof state.value === "number"
+            ? StateDataType.int
+            : StateDataType.str,
+  }));
 
-    saveStatesToLocalStorage(stateOutputs, currentUser.uid);
+  saveStatesToLocalStorage(stateOutputs, currentUser.uid);
 
-    return response;
+  return response;
 }
 
 /**
@@ -203,20 +217,20 @@ export async function storeStates(states: State[]): Promise<StatesResponse> {
  * ```
  */
 export async function clearStates(stateNames: string[]): Promise<StatesResponse> {
-    // Validate stateNames parameter
-    if (!Array.isArray(stateNames) || stateNames.length === 0) {
-        throw new Error('stateNames must be non-empty array of strings');
-    }
+  // Validate stateNames parameter
+  if (!Array.isArray(stateNames) || stateNames.length === 0) {
+    throw new Error("stateNames must be non-empty array of strings");
+  }
 
-    // Create an array of state objects with null values
-    const emptyStates: State[] = stateNames.map(stateName => ({
-        name: stateName,
-        value: null
-    }));
+  // Create an array of state objects with null values
+  const emptyStates: State[] = stateNames.map((stateName) => ({
+    name: stateName,
+    value: null,
+  }));
 
-    // Use the existing storeStates function to save the empty states
-    // This will also update the localStorage cache
-    return storeStates(emptyStates);
+  // Use the existing storeStates function to save the empty states
+  // This will also update the localStorage cache
+  return storeStates(emptyStates);
 }
 
 /**
@@ -232,7 +246,7 @@ export async function clearStates(stateNames: string[]): Promise<StatesResponse>
  * console.log(states); // ['userPreferences', 'lastVisitedPage']
  * ```
  */
-export {getRegisteredStates}
+export { getRegisteredStates };
 
 /**
  * Resets the list of registered state names
@@ -241,4 +255,4 @@ export {getRegisteredStates}
  *
  * @internal
  */
-export {resetRegisteredStates}
+export { resetRegisteredStates };

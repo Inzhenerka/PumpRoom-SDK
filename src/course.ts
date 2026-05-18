@@ -9,10 +9,10 @@
  * @experimental
  */
 
-import {getApiClient} from './api-client.ts';
-import {getConfig} from './globals.ts';
-import {getCourseFromLocalStorage, saveCourseToLocalStorage} from './storage.ts';
-import type {CourseDataCallback, LoadCourseDataOutput} from './types/index.ts';
+import { getApiClient } from "./api-client.ts";
+import { getConfig } from "./globals.ts";
+import { getCourseFromLocalStorage, saveCourseToLocalStorage } from "./storage.ts";
+import type { CourseDataCallback, LoadCourseDataOutput } from "./types/index.ts";
 
 /**
  * Loads course data for the current page
@@ -36,24 +36,24 @@ import type {CourseDataCallback, LoadCourseDataOutput} from './types/index.ts';
  * ```
  */
 export async function loadCourseData(callback?: CourseDataCallback): Promise<LoadCourseDataOutput> {
-    const config = getConfig();
-    if (!config) {
-        throw new Error('SDK is not initialized');
-    }
+  const config = getConfig();
+  if (!config) {
+    throw new Error("SDK is not initialized");
+  }
 
-    const cached = getCourseFromLocalStorage();
-    if (cached && callback) {
-        callback(cached);
-    }
+  const cached = getCourseFromLocalStorage();
+  if (cached && callback) {
+    callback(cached);
+  }
 
-    const apiClient = getApiClient();
-    const response = await apiClient.loadCourseData(config.realm);
+  const apiClient = getApiClient();
+  const response = await apiClient.loadCourseData(config.realm);
 
-    saveCourseToLocalStorage(response);
+  saveCourseToLocalStorage(response);
 
-    if (callback) {
-        callback(response);
-    }
+  if (callback) {
+    callback(response);
+  }
 
-    return response;
+  return response;
 }

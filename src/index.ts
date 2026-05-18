@@ -18,65 +18,60 @@
  * @module PumpRoomSDK
  */
 
-import {setConfig} from './globals.ts';
-import {setFullscreenListener} from './fullscreen.ts';
-import {enforceIframeHeight} from './iframe.ts';
-import {setEnvironmentListener} from './environment.ts';
-import {setTaskListener} from './callbacks.ts';
-import {getVersion} from './version.ts';
-import {PumpRoomConfig} from './types/index.ts';
-import {initApiClient} from './api-client.ts';
+import { initApiClient } from "./api-client.ts";
+import { setTaskListener } from "./callbacks.ts";
+import { setEnvironmentListener } from "./environment.ts";
+import { setFullscreenListener } from "./fullscreen.ts";
+import { setConfig } from "./globals.ts";
+import { enforceIframeHeight } from "./iframe.ts";
+import { PumpRoomConfig } from "./types/index.ts";
+import { getVersion } from "./version.ts";
 
-export {getCurrentUser} from './globals.ts';
-export {authenticate, setUser} from './auth.ts';
-export {getVersion} from './version.ts';
-export {getTaskInstances} from './instance.ts';
+export { authenticate, setUser } from "./auth.ts";
 export {
-    setOnInitCallback, 
-    setOnTaskLoadedCallback, 
-    setOnTaskSubmittedCallback, 
-    setOnResultReadyCallback
-} from './callbacks.ts';
-export {
-    fetchStates,
-    storeStates,
-    clearStates,
-    getRegisteredStates
-} from './states.ts';
-export {loadCourseData} from './course.ts';
+  setOnInitCallback,
+  setOnResultReadyCallback,
+  setOnTaskLoadedCallback,
+  setOnTaskSubmittedCallback,
+} from "./callbacks.ts";
+export { loadCourseData } from "./course.ts";
+export { getCurrentUser } from "./globals.ts";
+export { getTaskInstances } from "./instance.ts";
+export { clearStates, fetchStates, getRegisteredStates, storeStates } from "./states.ts";
 export type {
-    PumpRoomConfig,
-    PumpRoomUser,
-    LMSContext,
-    LMSContextAPI,
-    AuthenticateOptions,
-    LMSProfileInput,
-    TildaProfileInput,
-    CourseInput,
-    InstanceContext,
-    OnInitCallback,
-    OnTaskLoadedCallback,
-    OnTaskSubmittedCallback,
-    OnResultReadyCallback,
-    EnvironmentData,
-    TaskDetails,
-    TaskDataOutput,
-    CourseDataOutput,
-    LoadedTaskData,
-    ResultData,
-    SubmissionStatus,
-    SubmissionResult,
-    LoadCourseDataInput,
-    LoadCourseDataOutput,
-    CourseDataCallback,
-    State,
-    StateOutput,
-    StateDataType,
-    StatesResponse,
-    StatesCallback,
-} from './types/index.ts';
+  AuthenticateOptions,
+  CourseDataCallback,
+  CourseDataOutput,
+  CourseInput,
+  EnvironmentData,
+  InstanceContext,
+  LMSContext,
+  LMSContextAPI,
+  LMSProfileInput,
+  LoadCourseDataInput,
+  LoadCourseDataOutput,
+  LoadedTaskData,
+  OnInitCallback,
+  OnResultReadyCallback,
+  OnTaskLoadedCallback,
+  OnTaskSubmittedCallback,
+  PumpRoomConfig,
+  PumpRoomUser,
+  ResultData,
+  State,
+  StateDataType,
+  StateOutput,
+  StatesCallback,
+  StatesResponse,
+  SubmissionResult,
+  SubmissionStatus,
+  TaskDataOutput,
+  TaskDetails,
+  TildaProfileInput,
+} from "./types/index.ts";
+export { getVersion } from "./version.ts";
 
-console.debug('PumpRoom SDK v' + getVersion() + ' loaded');
+console.debug("PumpRoom SDK v" + getVersion() + " loaded");
 
 /**
  * Initializes the PumpRoom SDK with the provided configuration.
@@ -100,12 +95,12 @@ console.debug('PumpRoom SDK v' + getVersion() + ' loaded');
  * ```
  */
 export function init(cfg: PumpRoomConfig): void {
-    setConfig(cfg);
-    initApiClient(cfg.apiKey);
-    setFullscreenListener();
-    setEnvironmentListener();
-    setTaskListener();
-    if (cfg.minHeight) {
-        enforceIframeHeight(cfg.minHeight);
-    }
+  setConfig(cfg);
+  initApiClient(cfg.apiKey);
+  setFullscreenListener();
+  setEnvironmentListener();
+  setTaskListener();
+  if (cfg.minHeight) {
+    enforceIframeHeight(cfg.minHeight);
+  }
 }
