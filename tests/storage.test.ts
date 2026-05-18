@@ -10,6 +10,7 @@ import {
   getCourseFromLocalStorage
 } from '../src/storage.ts';
 import { USER_STORAGE_KEY, STORAGE_PREFIX, COURSE_STORAGE_PREFIX } from "../src/constants.ts";
+import { StateDataType, type StateOutput } from '../src/types/index.ts';
 import * as utils from '../src/utils.ts';
 
 // Mock getCurrentNormalizedUrl to avoid window dependency
@@ -70,9 +71,9 @@ describe('storage', () => {
 
     it('saves states to localStorage', () => {
       const userId = 'user123';
-      const states = [
-        { name: 'state1', value: 'value1', data_type: 'str' },
-        { name: 'state2', value: 42, data_type: 'int' }
+      const states: StateOutput[] = [
+        { name: 'state1', value: 'value1', data_type: StateDataType.str },
+        { name: 'state2', value: 42, data_type: StateDataType.int }
       ];
 
       saveStatesToLocalStorage(states, userId);
@@ -90,9 +91,9 @@ describe('storage', () => {
 
     it('retrieves states from localStorage', () => {
       const userId = 'user123';
-      const states = [
-        { name: 'state1', value: 'value1', data_type: 'str' },
-        { name: 'state2', value: 42, data_type: 'int' }
+      const states: StateOutput[] = [
+        { name: 'state1', value: 'value1', data_type: StateDataType.str },
+        { name: 'state2', value: 42, data_type: StateDataType.int }
       ];
 
       // Save states directly
@@ -122,7 +123,7 @@ describe('storage', () => {
       } as any;
 
       const userId = 'user123';
-      const states = [{ name: 'state1', value: 'value1', data_type: 'str' }];
+      const states: StateOutput[] = [{ name: 'state1', value: 'value1', data_type: StateDataType.str }];
 
       // Should not throw
       expect(() => saveStatesToLocalStorage(states, userId)).not.toThrow();

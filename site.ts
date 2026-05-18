@@ -1,9 +1,17 @@
 import './src/styles/bootstrap.scss';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'highlight.js/styles/github.css';
-import hljs from 'highlight.js';
+import hljs from 'highlight.js/lib/core';
+import bash from 'highlight.js/lib/languages/bash';
+import javascript from 'highlight.js/lib/languages/javascript';
+import xml from 'highlight.js/lib/languages/xml';
 import 'highlightjs-copy/dist/highlightjs-copy.min.css';
 import CopyButtonPlugin from 'highlightjs-copy'
+
+hljs.registerLanguage('bash', bash);
+hljs.registerLanguage('html', xml);
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('xml', xml);
 
 // Initialize Highlight.js and add the Copy Button Plugin
 document.addEventListener('DOMContentLoaded', () => {

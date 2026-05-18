@@ -32,7 +32,10 @@ export default defineConfig(({command, mode}) => {
             outDir: resolve(__dirname, 'dist'),
             target: 'es2015',
             emptyOutDir: false,
-            rollupOptions: {
+            rolldownOptions: {
+                checks: {
+                    pluginTimings: false,
+                },
                 input: {
                     main: resolve(__dirname, 'index.html'),
                     site: resolve(__dirname, 'site.ts'),
@@ -54,9 +57,9 @@ export default defineConfig(({command, mode}) => {
         css: {
             preprocessorOptions: {
                 scss: {
+                    quietDeps: true,
                     silenceDeprecations: [
                         'import',
-                        'mixed-decls',
                         'color-functions',
                         'global-builtin',
                     ],

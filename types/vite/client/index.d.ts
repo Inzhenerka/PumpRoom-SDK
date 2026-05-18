@@ -9,3 +9,6 @@ declare module 'vite/client' {
         readonly env: ImportMetaEnv;
     }
 }
+
+declare module '*.css';
+declare module '*.scss';

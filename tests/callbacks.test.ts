@@ -31,11 +31,13 @@ describe('callbacks module', () => {
     // Set the callback
     setOnInitCallback(mockCallback);
 
+    const mockEnvironmentData = { instanceContext: mockInstanceContext };
+
     // Directly execute the callback using the internal helper
-    executeOnInitCallback(mockInstanceContext);
+    executeOnInitCallback(mockEnvironmentData);
 
     // Verify the callback was called with the correct instance context
-    expect(mockCallback).toHaveBeenCalledWith(mockInstanceContext);
+    expect(mockCallback).toHaveBeenCalledWith(mockEnvironmentData);
   });
 
   it('executes asynchronous onInitCallback when getEnvironment message is received', async () => {
@@ -58,11 +60,13 @@ describe('callbacks module', () => {
     // Set the async callback
     setOnInitCallback(mockAsyncCallback);
 
+    const mockEnvironmentData = { instanceContext: mockInstanceContext };
+
     // Simulate the execution of the callback
-    executeOnInitCallback(mockInstanceContext);
+    executeOnInitCallback(mockEnvironmentData);
 
     // Verify the callback was called with the correct instance context
-    expect(mockAsyncCallback).toHaveBeenCalledWith(mockInstanceContext);
+    expect(mockAsyncCallback).toHaveBeenCalledWith(mockEnvironmentData);
 
     // Wait for any pending promises to resolve
     await new Promise(resolve => setTimeout(resolve, 20));

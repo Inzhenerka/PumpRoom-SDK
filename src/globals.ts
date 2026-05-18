@@ -291,7 +291,7 @@ export function registerStates(stateNames: string[]): void {
     }
 
     stateNames.forEach(state => {
-        if (!registeredStates.includes(state)) {
+        if (registeredStates.indexOf(state) === -1) {
             registeredStates.push(state);
         }
     });

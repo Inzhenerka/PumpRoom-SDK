@@ -22,7 +22,7 @@ export default defineConfig(({command, mode}) => {
                 entry: resolve(__dirname, 'src/index.ts'),
                 name: 'PumpRoomSdk',
             },
-            rollupOptions: {
+            rolldownOptions: {
                 output: [
                     {
                         entryFileNames: `bundle/pumproom-sdk-v${version}.umd.js`,

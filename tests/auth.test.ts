@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { authenticate, setUser } from '../src/auth.ts';
 import { setConfig, getCurrentUser, isAutoListenerRegistered, registerAutoListener, setCurrentUser } from '../src/globals.ts';
 import { AUTH_URL, VERIFY_URL } from '../src/constants.ts';
@@ -15,7 +15,7 @@ describe('authenticate', () => {
     const response = { uid: '1', token: 'tok', is_admin: false };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
 
-    const user = await authenticate({ login: 'l', name: 'n', istutor: false, lang: 'en', projectid: '1' });
+    const user = await authenticate({ profile: { login: 'l', name: 'n', istutor: false, lang: 'en', projectid: '1' } });
 
     expect(fetch).toHaveBeenCalledWith(AUTH_URL, expect.any(Object));
     expect(user).toEqual(response);
@@ -30,7 +30,7 @@ describe('authenticate', () => {
     const verifyResp = { is_valid: true, is_admin: true };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
 
-    const user = await authenticate({ login: 'l', name: 'n', istutor: false, lang: 'en', projectid: '1' });
+    const user = await authenticate({ profile: { login: 'l', name: 'n', istutor: false, lang: 'en', projectid: '1' } });
 
     expect(fetch).toHaveBeenCalledWith(VERIFY_URL, expect.any(Object));
     expect(user).toEqual(cached);
@@ -48,7 +48,7 @@ describe('authenticate', () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(verifyResp) })
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(authResp) });
 
-    const user = await authenticate({ login: 'l', name: 'n', istutor: false, lang: 'en', projectid: '1' });
+    const user = await authenticate({ profile: { login: 'l', name: 'n', istutor: false, lang: 'en', projectid: '1' } });
 
     expect(localStorage.getItem('pumproomUser')).not.toContain('bad');
     expect(fetch).toHaveBeenCalledWith(VERIFY_URL, expect.any(Object));
@@ -61,7 +61,7 @@ describe('authenticate', () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500, statusText: 'fail' });
 
     await expect(
-      authenticate({ login: 'l', name: 'n', istutor: false, lang: 'en', projectid: '1' })
+      authenticate({ profile: { login: 'l', name: 'n', istutor: false, lang: 'en', projectid: '1' } })
     ).rejects.toThrow('Authentication error');
     expect(getCurrentUser()).toBeNull();
   });
@@ -72,7 +72,7 @@ describe('authenticate', () => {
 
     await authenticate({ lms: { email: 'test@example.com', name: 'User' } });
 
-    const call = (fetch as unknown as vi.Mock).mock.calls[0][1];
+    const call = (fetch as unknown as Mock).mock.calls[0][1];
     expect(call.body).toContain('"id":"test@example.com"');
   });
 
@@ -84,7 +84,7 @@ describe('authenticate', () => {
     await authenticate({ lms: { id: '10', email: 'foo@bar.com', name: 'U' } });
 
     expect(warn).toHaveBeenCalled();
-    const call = (fetch as unknown as vi.Mock).mock.calls[0][1];
+    const call = (fetch as unknown as Mock).mock.calls[0][1];
     expect(call.body).toContain('"id":"10"');
   });
 });
@@ -144,7 +144,7 @@ describe('email validation', () => {
 
     await authenticate({ lms: { email: 'user@example.com', name: 'User' } });
 
-    const call = (fetch as unknown as vi.Mock).mock.calls[0][1];
+    const call = (fetch as unknown as Mock).mock.calls[0][1];
     expect(call.body).toContain('"id":"user@example.com"');
   });
 
@@ -156,7 +156,7 @@ describe('email validation', () => {
     await authenticate({ lms: { email: 'invalid-email', name: 'User' } });
 
     expect(warn).toHaveBeenCalled();
-    const call = (fetch as unknown as vi.Mock).mock.calls[0][1];
+    const call = (fetch as unknown as Mock).mock.calls[0][1];
     expect(call.body).not.toContain('"id":"invalid-email"');
   });
 });
