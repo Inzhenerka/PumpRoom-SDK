@@ -18,45 +18,8 @@ import {
 } from "./globals.ts";
 import { getPumpRoomEventMessage } from "./messaging.ts";
 import { retrieveData, storeData } from "./storage.ts";
-import type { AuthenticateOptions, LMSProfileInput, PumpRoomUser } from "./types/index.ts";
+import type { AuthenticateOptions, PumpRoomUser } from "./types/index.ts";
 import type { SetPumpRoomUserMessage } from "./types/messages.ts";
-
-/**
- * Validates an email address format
- *
- * @param email - The email address to validate
- * @returns True if the email is valid, false otherwise
- * @internal
- */
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-/**
- * Normalizes the LMS profile data
- *
- * If an email is provided without an ID, and the email is valid,
- * it will be used as the ID.
- *
- * @param lms - The LMS profile data to normalize
- * @returns The normalized LMS profile data
- * @internal
- */
-function normalizeLmsProfile(lms?: LMSProfileInput | null): LMSProfileInput | null | undefined {
-  if (!lms) return lms;
-
-  if (lms.id && lms.email) {
-    console.warn("LMS email provided along with id; email will be ignored");
-  } else if (!lms.id && lms.email) {
-    if (isValidEmail(lms.email)) {
-      lms.id = lms.email;
-    } else {
-      console.warn("Invalid email supplied to LMS profile");
-    }
-  }
-
-  return lms;
-}
 
 /**
  * Verifies a cached user token with the API
@@ -134,11 +97,10 @@ export async function authenticate({
 
   if (!fromCache) {
     const apiClient = getApiClient();
-    const normLms = normalizeLmsProfile(lms);
 
     // Validate GetCourse placeholders if requested via init configuration
     if (config.type === "getcourse") {
-      const uid = normLms?.id;
+      const uid = lms?.id;
       const hasCurly = typeof uid === "string" && uid.indexOf("{") !== -1;
       const invalid = !uid || hasCurly;
       if (invalid) {
@@ -157,7 +119,7 @@ export async function authenticate({
       }
     }
 
-    currentUser = await apiClient.authenticate({ lms: normLms, profile }, config.realm);
+    currentUser = await apiClient.authenticate({ lms, profile }, config.realm);
 
     if (config.cacheUser) {
       storeData(USER_STORAGE_KEY, currentUser);

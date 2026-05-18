@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, type Mock, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { authenticate, setUser } from "../src/auth.ts";
 import { AUTH_URL, VERIFY_URL } from "../src/constants.ts";
@@ -73,26 +73,14 @@ describe("authenticate", () => {
     expect(getCurrentUser()).toBeNull();
   });
 
-  it("uses email as id when id is missing", async () => {
+  it("sends LMS id to auth endpoint", async () => {
     const response = { uid: "4", token: "tok", is_admin: false };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
 
-    await authenticate({ lms: { email: "test@example.com", name: "User" } });
+    await authenticate({ lms: { id: "lms-user-4", name: "User" } });
 
-    const call = (fetch as unknown as Mock).mock.calls[0][1];
-    expect(call.body).toContain('"id":"test@example.com"');
-  });
-
-  it("warns when both id and email provided", async () => {
-    const response = { uid: "5", token: "tok", is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-
-    await authenticate({ lms: { id: "10", email: "foo@bar.com", name: "U" } });
-
-    expect(warn).toHaveBeenCalled();
-    const call = (fetch as unknown as Mock).mock.calls[0][1];
-    expect(call.body).toContain('"id":"10"');
+    const call = vi.mocked(fetch).mock.calls[0][1];
+    expect(call?.body).toContain('"id":"lms-user-4"');
   });
 });
 
@@ -141,30 +129,6 @@ describe("setUser", () => {
 
     const cachedUser = JSON.parse(localStorage.getItem("pumproomUser") || "{}");
     expect(cachedUser).toEqual({ ...userInput, is_admin: false });
-  });
-});
-
-describe("email validation", () => {
-  it("accepts valid email formats", async () => {
-    const response = { uid: "6", token: "tok", is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
-
-    await authenticate({ lms: { email: "user@example.com", name: "User" } });
-
-    const call = (fetch as unknown as Mock).mock.calls[0][1];
-    expect(call.body).toContain('"id":"user@example.com"');
-  });
-
-  it("warns about invalid email format", async () => {
-    const response = { uid: "7", token: "tok", is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-
-    await authenticate({ lms: { email: "invalid-email", name: "User" } });
-
-    expect(warn).toHaveBeenCalled();
-    const call = (fetch as unknown as Mock).mock.calls[0][1];
-    expect(call.body).not.toContain('"id":"invalid-email"');
   });
 });
 
