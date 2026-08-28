@@ -5,9 +5,12 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: read
+
 jobs:
-  publish:
-    name: 🚀 Publish
+  build:
+    name: 🔧 Build and test
     runs-on: ubuntu-latest
     steps:
       - name: 👋 Checkout
@@ -16,15 +19,22 @@ jobs:
       - name: ⚙️ Setup Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: ⚙️ Install AWS CLI
-        uses: unfor19/install-aws-cli-action@v1
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          version: 2
-          verbose: false
-          arch: amd64
+          node-version: "24"
 
       - name: 💪 Install deps
-        run: bun install
+        run: bun install --frozen-lockfile
+
+      - name: 🏷️ Verify package version
+        shell: bash
+        run: |
+          package_version=$(node -p "require('./package.json').version")
+          if [ "${GITHUB_REF_NAME}" != "v${package_version}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package version ${package_version}" >&2
+            exit 1
+          fi
 
       - name: 🧪 Test
         run: bun run test
@@ -38,6 +48,82 @@ jobs:
           tar -czf ../dist-${{ github.ref_name }}.tar.gz .
           cd ..
 
+      - name: 📦 Pack npm package
+        run: |
+          mkdir -p npm-package
+          npm pack --ignore-scripts --pack-destination npm-package
+
+      - name: 📤 Upload site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-dist
+          path: dist/
+          if-no-files-found: error
+
+      - name: 📤 Upload release archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-archive
+          path: dist-${{ github.ref_name }}.tar.gz
+          if-no-files-found: error
+
+      - name: 📤 Upload npm package
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-package
+          path: npm-package/*.tgz
+          if-no-files-found: error
+
+  publish-npm:
+    name: 📦 Publish to npm
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: 📥 Download npm package
+        uses: actions/download-artifact@v4
+        with:
+          name: npm-package
+          path: npm-package
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+
+      - name: 📦 Publish package
+        run: npm publish npm-package/*.tgz --ignore-scripts
+
+  release:
+    name: 🚀 Release
+    needs: [build, publish-npm]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      deployments: write
+    steps:
+      - name: 📥 Download site artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site-dist
+          path: dist
+
+      - name: 📥 Download release archive
+        uses: actions/download-artifact@v4
+        with:
+          name: release-archive
+
+      - name: ⚙️ Install AWS CLI
+        uses: unfor19/install-aws-cli-action@v1
+        with:
+          version: 2
+          verbose: false
+          arch: amd64
+
       - name: 🏷️ Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -45,11 +131,6 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 📦 Publish package
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
 
       - name: 🔼 Upload site
         run: |
