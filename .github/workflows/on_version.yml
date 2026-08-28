@@ -96,7 +96,7 @@ jobs:
           package-manager-cache: false
 
       - name: 📦 Publish package
-        run: npm publish npm-package/*.tgz --ignore-scripts
+        run: npm publish ./npm-package/*.tgz --ignore-scripts
 
   release:
     name: 🚀 Release
