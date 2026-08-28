@@ -15,7 +15,7 @@ describe("authenticate", () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
 
     const user = await authenticate({
-      profile: { login: "l", name: "n", istutor: false, lang: "en", projectid: "1" },
+      identity: { provider: "lms", id: "lms-user-1" },
     });
 
     expect(fetch).toHaveBeenCalledWith(AUTH_URL, expect.any(Object));
@@ -32,7 +32,7 @@ describe("authenticate", () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
 
     const user = await authenticate({
-      profile: { login: "l", name: "n", istutor: false, lang: "en", projectid: "1" },
+      identity: { provider: "lms", id: "lms-user-2" },
     });
 
     expect(fetch).toHaveBeenCalledWith(VERIFY_URL, expect.any(Object));
@@ -52,7 +52,7 @@ describe("authenticate", () => {
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(authResp) });
 
     const user = await authenticate({
-      profile: { login: "l", name: "n", istutor: false, lang: "en", projectid: "1" },
+      identity: { provider: "lms", id: "lms-user-3" },
     });
 
     expect(localStorage.getItem("pumproomUser")).not.toContain("bad");
@@ -67,20 +67,30 @@ describe("authenticate", () => {
 
     await expect(
       authenticate({
-        profile: { login: "l", name: "n", istutor: false, lang: "en", projectid: "1" },
+        identity: { provider: "lms", id: "lms-user-error" },
       }),
     ).rejects.toThrow("Authentication error");
     expect(getCurrentUser()).toBeNull();
   });
 
-  it("sends LMS id to auth endpoint", async () => {
+  it("sends LMS identity fields to auth endpoint", async () => {
     const response = { uid: "4", token: "tok", is_admin: false };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
 
-    await authenticate({ lms: { id: "lms-user-4", name: "User" } });
+    await authenticate({
+      identity: {
+        provider: "lms",
+        id: "lms-user-4",
+        language: "en",
+        provider_extra: { group: "advanced" },
+      },
+    });
 
     const call = vi.mocked(fetch).mock.calls[0][1];
+    expect(call?.body).toContain('"provider":"lms"');
     expect(call?.body).toContain('"id":"lms-user-4"');
+    expect(call?.body).toContain('"language":"en"');
+    expect(call?.body).toContain('"provider_extra":{"group":"advanced"}');
   });
 });
 
@@ -137,7 +147,7 @@ describe("default user listener", () => {
     const response = { uid: "9", token: "tok", is_admin: false };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
 
-    await authenticate({ lms: { id: "u", name: "User" } });
+    await authenticate({ identity: { provider: "lms", id: "u" } });
 
     const postSpy = vi.spyOn(window, "postMessage");
     const event = new MessageEvent("message", {
@@ -182,16 +192,32 @@ describe("default user listener", () => {
 // These tests are simplified to avoid mocking issues
 
 describe("error handling in authentication", () => {
-  it("handles API errors during verification", async () => {
+  it("keeps cached credentials when verification is unavailable", async () => {
     setConfig({ apiKey: "key", realm: "test", cacheUser: true });
     const user = { uid: "11", token: "token", is_admin: false };
     localStorage.setItem("pumproomUser", JSON.stringify(user));
 
-    // Mock fetch to throw an error
     global.fetch = vi.fn().mockRejectedValue(new Error("API error"));
-    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    await expect(authenticate()).rejects.toThrow("API error");
-    expect(errorSpy).toHaveBeenCalled();
+    await expect(authenticate({ identity: { provider: "lms", id: "u" } })).rejects.toThrow(
+      "API error",
+    );
+    expect(JSON.parse(localStorage.getItem("pumproomUser") || "null")).toEqual(user);
+  });
+
+  it("clears malformed cached credentials before authenticating", async () => {
+    setConfig({ apiKey: "key", realm: "test", cacheUser: true });
+    const response = { uid: "12", token: "new-token", is_admin: false };
+    localStorage.setItem("pumproomUser", JSON.stringify({ uid: "12" }));
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(response),
+    });
+
+    const result = await authenticate({ identity: { provider: "lms", id: "u" } });
+
+    expect(fetch).toHaveBeenCalledWith(AUTH_URL, expect.any(Object));
+    expect(result).toEqual(response);
+    expect(JSON.parse(localStorage.getItem("pumproomUser") || "null")).toEqual(response);
   });
 });

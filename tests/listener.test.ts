@@ -43,7 +43,7 @@ describe("message listener registration", () => {
     const addEventListenerSpy = vi.spyOn(window, "addEventListener");
 
     // Authenticate to set the current user
-    await authenticate({ lms: { id: "user1", name: "Test User" } });
+    await authenticate({ identity: { provider: "lms", id: "user1" } });
 
     // Verify that addEventListener was called with 'message'
     expect(addEventListenerSpy).toHaveBeenCalledWith("message", expect.any(Function));

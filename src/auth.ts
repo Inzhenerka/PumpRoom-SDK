@@ -22,6 +22,22 @@ import type { AuthenticateOptions, PumpRoomUser } from "./types/index.ts";
 import type { SetPumpRoomUserMessage } from "./types/messages.ts";
 
 /**
+ * Checks whether an unknown cached value has the credentials required for verification.
+ */
+function isPumpRoomUser(value: unknown): value is PumpRoomUser {
+  if (typeof value !== "object" || value === null) return false;
+
+  const user = value as Partial<PumpRoomUser>;
+  return (
+    typeof user.uid === "string" &&
+    user.uid.length > 0 &&
+    typeof user.token === "string" &&
+    user.token.length > 0 &&
+    typeof user.is_admin === "boolean"
+  );
+}
+
+/**
  * Verifies a cached user token with the API
  *
  * @param user - The user to verify
@@ -32,19 +48,14 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
   const config = getConfig();
   if (!config) return false;
 
-  try {
-    const apiClient = getApiClient();
-    const result = await apiClient.verifyToken(user, config.realm);
+  const apiClient = getApiClient();
+  const result = await apiClient.verifyToken(user, config.realm);
 
-    if (result.is_valid) {
-      user.is_admin = result.is_admin;
-      storeData(USER_STORAGE_KEY, user);
-    }
-    return result.is_valid;
-  } catch (err) {
-    console.error("Verification error", err);
-    return false;
+  if (result.is_valid) {
+    user.is_admin = result.is_admin;
+    storeData(USER_STORAGE_KEY, user);
   }
+  return result.is_valid;
 }
 
 /**
@@ -53,7 +64,7 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
  * This function attempts to authenticate a user using the provided options.
  * If caching is enabled, it will first try to use a cached user.
  *
- * @param options - Authentication options containing LMS and/or profile data
+ * @param options - Authentication options containing student identity data
  * @returns Promise resolving to the authenticated user
  * @throws Error if the SDK is not initialized or authentication fails
  * @category Authentication
@@ -63,9 +74,9 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
  * import { authenticate } from 'pumproom-sdk';
  *
  * const user = await authenticate({
- *   lms: {
- *     id: 'user123',
- *     name: 'John Doe'
+ *   identity: {
+ *     provider: 'lms',
+ *     id: 'user123'
  *   }
  * });
  *
@@ -74,10 +85,7 @@ async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
  * }
  * ```
  */
-export async function authenticate({
-  lms,
-  profile,
-}: AuthenticateOptions = {}): Promise<PumpRoomUser> {
+export async function authenticate({ identity }: AuthenticateOptions): Promise<PumpRoomUser> {
   const config = getConfig();
   if (!config) {
     throw new Error("SDK is not initialized");
@@ -86,8 +94,11 @@ export async function authenticate({
   let currentUser = getCurrentUser();
   let fromCache = false;
   if (config.cacheUser) {
-    const cachedUser = retrieveData(USER_STORAGE_KEY) as PumpRoomUser;
-    if (cachedUser && (await verifyCachedUser(cachedUser))) {
+    const cachedValue = retrieveData(USER_STORAGE_KEY);
+    const cachedUser = isPumpRoomUser(cachedValue) ? cachedValue : null;
+    if (cachedValue !== null && !cachedUser && typeof localStorage !== "undefined") {
+      localStorage.removeItem(USER_STORAGE_KEY);
+    } else if (cachedUser && (await verifyCachedUser(cachedUser))) {
       currentUser = cachedUser;
       fromCache = true;
     } else if (cachedUser && typeof localStorage !== "undefined") {
@@ -100,7 +111,7 @@ export async function authenticate({
 
     // Validate GetCourse placeholders if requested via init configuration
     if (config.type === "getcourse") {
-      const uid = lms?.id;
+      const uid = identity.id;
       const hasCurly = typeof uid === "string" && uid.indexOf("{") !== -1;
       const invalid = !uid || hasCurly;
       if (invalid) {
@@ -119,7 +130,7 @@ export async function authenticate({
       }
     }
 
-    currentUser = await apiClient.authenticate({ lms, profile }, config.realm);
+    currentUser = await apiClient.authenticate({ identity }, config.realm);
 
     if (config.cacheUser) {
       storeData(USER_STORAGE_KEY, currentUser);

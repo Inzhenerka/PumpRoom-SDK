@@ -39,7 +39,7 @@ type RequestContext = LMSContextAPI & {
  * import { ApiClient } from './api-client';
  *
  * const client = new ApiClient('api-key');
- * const user = await client.authenticate({ lms: { id: '42', name: 'Alice' } }, 'realm');
+ * const user = await client.authenticate({ identity: { provider: 'lms', id: '42' } }, 'realm');
  * console.log(user.uid);
  * ```
  */
@@ -113,7 +113,7 @@ export class ApiClient {
    * Authenticate a user.
    *
    * Performs a call to the PumpRoom authentication endpoint using the
-   * provided profile information.
+   * provided identity information.
    *
    * @param options - Authentication options
    * @param realm - Realm identifier
@@ -122,14 +122,13 @@ export class ApiClient {
    *
    * @example
    * ```typescript
-   * const user = await client.authenticate({ profile: { login: 'bob', name: 'Bob', istutor: false, lang: 'en', projectid: '1' } }, 'academy');
+   * const user = await client.authenticate({ identity: { provider: 'lms', id: '42' } }, 'academy');
    * console.log('Authenticated as', user.uid);
    * ```
    */
   async authenticate(options: AuthenticateOptions, realm: string): Promise<PumpRoomUser> {
     const body: AuthInput = {
-      lms: options.lms,
-      profile: options.profile,
+      identity: options.identity,
       realm: realm,
       url: getCurrentNormalizedUrl(),
       sdk_version: getVersion(),

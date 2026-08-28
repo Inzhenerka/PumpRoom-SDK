@@ -19,14 +19,14 @@ export const API_BASE_URL = "https://pumproom-api.inzhenerka-cloud.com";
  *
  * @public
  */
-export const AUTH_URL = `${API_BASE_URL}/auth/authenticate`;
+export const AUTH_URL = `${API_BASE_URL}/integration/authenticate`;
 
 /**
  * URL for the token verification endpoint
  *
  * @public
  */
-export const VERIFY_URL = `${API_BASE_URL}/auth/verify_token`;
+export const VERIFY_URL = `${API_BASE_URL}/integration/verify_token`;
 
 /**
  * URL to load states from backend

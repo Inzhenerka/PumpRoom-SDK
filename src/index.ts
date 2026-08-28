@@ -42,12 +42,12 @@ export type {
   AuthenticateOptions,
   CourseDataCallback,
   CourseDataOutput,
-  CourseInput,
   EnvironmentData,
+  IdentityProviderType,
   InstanceContext,
   LMSContext,
   LMSContextAPI,
-  LMSProfileInput,
+  LMSIdentityInput,
   LoadCourseDataInput,
   LoadCourseDataOutput,
   LoadedTaskData,
@@ -67,7 +67,6 @@ export type {
   SubmissionStatus,
   TaskDataOutput,
   TaskDetails,
-  TildaProfileInput,
 } from "./types/index.ts";
 export { getVersion } from "./version.ts";
 

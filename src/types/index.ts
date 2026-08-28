@@ -18,7 +18,7 @@ export * from "./states.ts";
  * @public
  * @category Authentication
  */
-export type IdentityProviderType = "tilda" | "telegram";
+export type IdentityProviderType = "lms" | "telegram";
 
 /**
  * Status of a task submission
@@ -46,64 +46,29 @@ export interface PumpRoomUser {
 }
 
 /**
- * Course information within Tilda profile
+ * Student identity from a Learning Management System (LMS)
  *
- * This interface represents a course that a user is enrolled in
- * when authenticating via Tilda.
- *
- * @public
- * @category Authentication
- */
-export interface CourseInput {
-  /** Unique identifier of the course */
-  alias: string;
-  /** Display name of the course */
-  name: string;
-  /** Date when the course was created or when the user enrolled */
-  created: Date;
-}
-
-/**
- * User profile representation expected by PumpRoom authentication API
- *
- * This interface represents a user profile from Tilda that is used
+ * This interface represents a user identity from an LMS that is used
  * for authentication with the PumpRoom service.
  *
  * @public
  * @category Authentication
  */
-export interface TildaProfileInput {
-  /** User's login identifier in Tilda */
-  login: string;
-  /** User's display name */
-  name: string;
-  /** Flag indicating whether the user is a tutor */
-  istutor: boolean;
-  /** User's preferred language */
-  lang: string;
-  /** Tilda project identifier */
-  projectid: string;
-  /** Optional list of courses the user is enrolled in */
-  courses?: CourseInput[] | null;
-  /** Optional URL to the user's profile picture */
-  memberlogo?: string | null;
-}
+export interface LMSIdentityInput {
+  /** Identity provider used for authentication. */
+  provider: IdentityProviderType;
 
-/**
- * User profile from a Learning Management System (LMS)
- *
- * This interface represents a user profile from an LMS that is used
- * for authentication with the PumpRoom service.
- *
- * @public
- * @category Authentication
- */
-export interface LMSProfileInput {
+  /** Additional provider-specific data. */
+  provider_extra?: Record<string, unknown> | null;
+
   /** Unique identifier of the user within LMS. Can be any string. */
   id: string;
 
-  /** Display name of the user */
-  name: string;
+  /** Optional display name of the user */
+  name?: string | null;
+
+  /** Student language. */
+  language?: string | null;
 
   /** Optional link to avatar */
   photo_url?: string | null;
@@ -132,10 +97,8 @@ export interface RealmPayload {
  * @category Authentication
  */
 export interface AuthenticateOptions {
-  /** LMS profile information, if authenticating via an LMS */
-  lms?: LMSProfileInput | null;
-  /** Tilda profile information, if authenticating via Tilda */
-  profile?: TildaProfileInput | null;
+  /** Student identity. */
+  identity: LMSIdentityInput;
 }
 
 /**
@@ -183,10 +146,8 @@ export interface LMSContextAPI {
  * @category Authentication
  */
 export interface AuthInput extends RealmPayload {
-  /** LMS profile information, if authenticating via an LMS */
-  lms?: LMSProfileInput | null;
-  /** Tilda profile information, if authenticating via Tilda */
-  profile?: TildaProfileInput | null;
+  /** Student identity. */
+  identity: LMSIdentityInput;
   /** LMS context information */
   context?: LMSContextAPI;
   /** Current page URL */

@@ -18,7 +18,7 @@ describe("GetCourse UID validation", () => {
     // Ensure no network call happens
     global.fetch = vi.fn();
 
-    await expect(authenticate({ lms: { id: "{user_id}", name: "User" } })).rejects.toThrow(
+    await expect(authenticate({ identity: { provider: "lms", id: "{user_id}" } })).rejects.toThrow(
       "GetCourse UID validation failed",
     );
 
@@ -32,7 +32,7 @@ describe("GetCourse UID validation", () => {
 
     await expect(
       // id omitted entirely
-      authenticate({ lms: { name: "User" } as any }),
+      authenticate({ identity: { provider: "lms" } as any }),
     ).rejects.toThrow("GetCourse UID validation failed");
 
     expect(alertSpy).toHaveBeenCalledWith(ALERT_MSG);
@@ -44,7 +44,7 @@ describe("GetCourse UID validation", () => {
     const response = { uid: "ok", token: "tok", is_admin: false };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
 
-    const user = await authenticate({ lms: { id: "12345", name: "User" } });
+    const user = await authenticate({ identity: { provider: "lms", id: "12345" } });
 
     expect(alertSpy).not.toHaveBeenCalled();
     expect(fetch).toHaveBeenCalledWith(AUTH_URL, expect.any(Object));

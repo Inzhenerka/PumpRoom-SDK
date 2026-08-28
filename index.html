@@ -98,7 +98,7 @@
 &lt;script&gt;
   PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   PumpRoomSdk.authenticate({
-        lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+        identity: { provider: 'lms', id: 'ID_СТУДЕНТА' },
   }).catch(console.error);
 &lt;/script&gt;</code></pre>
 
@@ -109,7 +109,7 @@
 
   init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   authenticate({
-        lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+        identity: { provider: 'lms', id: 'ID_СТУДЕНТА' },
   }).catch(console.error);
 &lt;/script&gt;</code></pre>
 
@@ -123,7 +123,7 @@
                 <code>__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js</code>
               </li>
               <li>
-                <strong>latest</strong> - всегда последняя версия:<br />
+                <strong>latest</strong> - последняя версия (сейчас v2):<br />
                 <code>__BASE_URL__/bundle/pumproom-sdk-latest.umd.js</code><br />
                 <code>__BASE_URL__/bundle/pumproom-sdk-latest.esm.js</code>
               </li>
@@ -145,13 +145,13 @@
   src: 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v2.umd.js',
   async: true, onload() {
     window.PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID', 'type': 'getcourse' });
-    window.PumpRoomSdk.authenticate({ lms: { id: '{uid}', name: '{name}' } }).catch(console.error);
+    window.PumpRoomSdk.authenticate({ identity: { provider: 'lms', id: '{uid}' } }).catch(console.error);
   }
 }));</code></pre>
             <p>
               Замените значения 'ВАШ_КЛЮЧ' и 'ВАШ_ID' на параметры из админки PumpRoom. При
               встраивании JavaScript-кода включите галочку «Заменять переменные пользователя», чтобы
-              значения {uid}/{name} подставлялись корректно.
+              значение {uid} подставлялось корректно.
             </p>
           </div>
 
@@ -173,7 +173,7 @@
 
 init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
 authenticate({
-    lms: { id: 'ID_СТУДЕНТА', name: 'ИМЯ_СТУДЕНТА' },
+    identity: { provider: 'lms', id: 'ID_СТУДЕНТА' },
 }).catch(console.error);</code></pre>
             <p>Если у вас уже есть сохранённый пользователь, его можно передать напрямую:</p>
             <pre><code class="language-javascript border border-primary-subtle">import { init, setUser } from 'pumproom-sdk';
@@ -190,7 +190,7 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
                 <code>npm install pumproom-sdk@__MAJOR_VERSION__</code>
               </li>
               <li>
-                <strong>latest</strong> - всегда последняя версия:<br />
+                <strong>latest</strong> - последняя версия (сейчас v2):<br />
                 <code>npm install pumproom-sdk@latest</code>
               </li>
               <li>
@@ -239,66 +239,96 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
         </div>
       </section>
 
-      <section class="my-5">
+      <section class="my-5" id="versions">
         <h2 class="h4 mb-3">История версий</h2>
+        <div class="bg-white border-start border-3 border-secondary px-3 py-2 mb-4">
+          <p class="fw-semibold mb-1">Миграция на v2</p>
+          <p class="small text-body-secondary mb-2">
+            Версия v1 больше не получает обновлений и исправлений. Существующие интеграции с
+            закреплённой ссылкой на v1 пока продолжат работать, но для новых подключений и
+            дальнейших обновлений используйте SDK v2. Псевдоним <code>latest</code> теперь указывает
+            на v2.
+          </p>
+          <p class="small mb-0">
+            При переходе замените <code>authenticate({ lms: { id } })</code> или
+            <code>authenticate({ profile })</code> на
+            <code>authenticate({ identity: { provider: 'lms', id } })</code>.
+          </p>
+        </div>
         <ul class="list-unstyled1">
           <li class="mt-3">
             <div><strong>2.0.0 – Обновление контракта авторизации LMS.</strong></div>
             <div>
-              Поле <code>LMSProfileInput.email</code> удалено. Для авторизации через LMS теперь
-              всегда передавайте идентификатор студента в <code>lms.id</code>.
-            </div>
-          </li>
-
-          <li class="mt-3">
-            <div><strong>1.4.2 – Экспериментальная поддержка курсов.</strong></div>
-            <div>Загрузка данных о курсах из админки PumpRoom.</div>
-          </li>
-
-          <li class="mt-3">
-            <div><strong>1.4.0 – Передача идентификаторов при работе с заданиями.</strong></div>
-            <div>Позволяет привязывать задания к идентификаторам уроков.</div>
-          </li>
-
-          <li class="mt-3">
-            <div><strong>1.3.1 – Интеграция с GetCourse.</strong></div>
-            <div>Упрощена интеграция в страницы GetCourse, добавлена инструкция.</div>
-          </li>
-
-          <li class="mt-3">
-            <div><strong>1.2.1 – обновленная документация.</strong></div>
-            <div>Техническая документация обновлена и разбита на категории.</div>
-            <div>
-              Экспериментальная поддержка работы с серверными состояниями для Inzhenerka LMS.
-            </div>
-          </li>
-
-          <li class="mt-3">
-            <div><strong>1.2.0 – колбэки жизненного цикла.</strong></div>
-            <div>
-              Добавлены методы <code>setOnInitCallback</code>, <code>setOnTaskLoadedCallback</code>,
-              <code>setOnTaskSubmittedCallback</code>, <code>setOnResultReadyCallback</code>
-              для задания колбэков, которые SDK вызовет при изменении статуса задания.
-            </div>
-          </li>
-
-          <li class="mt-3">
-            <div><strong>1.1.0 – новые возможности авторизации.</strong></div>
-            <div>
-              <code>authenticate</code> теперь принимает <code>id</code> студента в произвольном
-              формате.
+              Поля <code>lms</code> и <code>profile</code> в запросе авторизации заменены на единое
+              поле <code>identity</code>. Поле <code>LMSIdentityInput.email</code> удалено,
+              идентификатор студента передается в <code>identity.id</code>.
             </div>
             <div>
-              Метод <code>setUser</code> позволяет вместо авторизации передать заранее сохраненные
-              параметры пользователя, полученные после авторизации.
+              В <code>LMSIdentityInput</code> добавлено обязательное поле <code>provider</code>. Для
+              обычной LMS-интеграции используйте <code>lms</code>.
             </div>
-          </li>
-
-          <li class="mt-3">
-            <div><strong>1.0.0 – первый релиз со стабильным API.</strong></div>
-            <div>Авторизация пользователя для заданий PumpRoom, встроенных через iframe.</div>
+            <div>
+              В <code>LMSIdentityInput</code> добавлены необязательные поля <code>name</code> для
+              отображаемого имени и <code>language</code> для передачи языка студента. Также
+              добавлено поле <code>provider_extra</code> для дополнительных данных провайдера.
+            </div>
           </li>
         </ul>
+
+        <details class="mt-3">
+          <summary class="fw-semibold">История v1</summary>
+          <ul class="list-unstyled1 mb-0">
+            <li class="mt-3">
+              <div><strong>1.4.2 – Экспериментальная поддержка курсов.</strong></div>
+              <div>Загрузка данных о курсах из админки PumpRoom.</div>
+            </li>
+
+            <li class="mt-3">
+              <div><strong>1.4.0 – Передача идентификаторов при работе с заданиями.</strong></div>
+              <div>Позволяет привязывать задания к идентификаторам уроков.</div>
+            </li>
+
+            <li class="mt-3">
+              <div><strong>1.3.1 – Интеграция с GetCourse.</strong></div>
+              <div>Упрощена интеграция в страницы GetCourse, добавлена инструкция.</div>
+            </li>
+
+            <li class="mt-3">
+              <div><strong>1.2.1 – обновленная документация.</strong></div>
+              <div>Техническая документация обновлена и разбита на категории.</div>
+              <div>
+                Экспериментальная поддержка работы с серверными состояниями для Inzhenerka LMS.
+              </div>
+            </li>
+
+            <li class="mt-3">
+              <div><strong>1.2.0 – колбэки жизненного цикла.</strong></div>
+              <div>
+                Добавлены методы <code>setOnInitCallback</code>,
+                <code>setOnTaskLoadedCallback</code>, <code>setOnTaskSubmittedCallback</code>,
+                <code>setOnResultReadyCallback</code>
+                для задания колбэков, которые SDK вызовет при изменении статуса задания.
+              </div>
+            </li>
+
+            <li class="mt-3">
+              <div><strong>1.1.0 – новые возможности авторизации.</strong></div>
+              <div>
+                <code>authenticate</code> теперь принимает <code>id</code> студента в произвольном
+                формате.
+              </div>
+              <div>
+                Метод <code>setUser</code> позволяет вместо авторизации передать заранее сохраненные
+                параметры пользователя, полученные после авторизации.
+              </div>
+            </li>
+
+            <li class="mt-3">
+              <div><strong>1.0.0 – первый релиз со стабильным API.</strong></div>
+              <div>Авторизация пользователя для заданий PumpRoom, встроенных через iframe.</div>
+            </li>
+          </ul>
+        </details>
       </section>
     </main>
 

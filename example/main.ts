@@ -3,15 +3,15 @@ import "../src/styles/bootstrap.scss";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 // Import SDK from the built library
+import type { LMSIdentityInput, StatesResponse } from "../src/index.js";
 import * as PumpRoomSdk from "../src/index.js";
-import { StatesResponse } from "../src/index.js";
 
 const apiKey = import.meta.env.VITE_PUMPROOM_API_KEY;
 const realm = import.meta.env.VITE_PUMPROOM_REALM;
 
-const profile = {
+const identity: LMSIdentityInput = {
+  provider: "lms",
   id: "demo_user@inzhenerka.tech",
-  name: "demo_user",
 };
 
 PumpRoomSdk.init({
@@ -39,7 +39,7 @@ PumpRoomSdk.setOnResultReadyCallback(async (data) => {
 
 // States module testing UI functionality
 document.addEventListener("DOMContentLoaded", async () => {
-  await PumpRoomSdk.authenticate({ lms: profile });
+  await PumpRoomSdk.authenticate({ identity });
   console.log("Authentication successful, loading states...");
   // Load states when page loads
   await loadStates();
