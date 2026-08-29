@@ -480,8 +480,6 @@ export type TaskStatus = "loading" | "ready" | "error";
 export interface TaskDetails {
   /** Unique identifier of the task */
   uid: string;
-  /** Optional description of the task */
-  description: string | null;
 }
 
 /**

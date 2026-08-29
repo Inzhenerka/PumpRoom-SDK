@@ -88,7 +88,6 @@ describe("callbacks module", () => {
 
     const mockTask = {
       uid: "test-task-uid",
-      description: "Test task description",
     };
 
     // Create a mock callback
@@ -133,7 +132,6 @@ describe("callbacks module", () => {
 
     const mockTask = {
       uid: "async-test-task-uid",
-      description: "Async test task description",
     };
 
     // Create a mock async callback that returns a promise
@@ -188,7 +186,6 @@ describe("callbacks module", () => {
 
     const mockTask = {
       uid: "test-task-uid",
-      description: "Test task description",
     };
 
     // Create a mock callback
@@ -233,7 +230,6 @@ describe("callbacks module", () => {
 
     const mockTask = {
       uid: "async-test-task-uid",
-      description: "Async test task description",
     };
 
     // Create a mock async callback that returns a promise

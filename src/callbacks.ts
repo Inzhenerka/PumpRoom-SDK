@@ -76,7 +76,6 @@ export function setOnInitCallback(callback: OnInitCallback): void {
  * setOnTaskLoadedCallback((payload) => {
  *   console.log('Task loaded:', payload.task);
  *   console.log('Task UID:', payload.task.uid);
- *   console.log('Task Description:', payload.task.description);
  *   console.log('Instance UID:', payload.instanceContext.instanceUid);
  * });
  *
@@ -110,7 +109,6 @@ export function setOnTaskLoadedCallback(callback: OnTaskLoadedCallback): void {
  * setOnTaskSubmittedCallback((payload) => {
  *   console.log('Task submitted:', payload.task);
  *   console.log('Task UID:', payload.task.uid);
- *   console.log('Task Description:', payload.task.description);
  *   console.log('Instance UID:', payload.instanceContext.instanceUid);
  * });
  *
