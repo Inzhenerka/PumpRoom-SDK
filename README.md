@@ -16,7 +16,7 @@ changes without reloading the page, call `authenticate()` again with the new ide
 
 ## Trusted iframe origins
 
-Set `trustedOrigins: []` to enable origin and iframe-source checks for standard origins:
+SDK messages are accepted only from embedded iframes at standard PumpRoom origins:
 `https://pumproom.inzhenerka-cloud.com`, `https://dev.pumproom.inzhenerka-cloud.com`,
 `https://dev-pumproom.inzhenerka-cloud.com`.
 For a custom deployment, add its exact origin (no wildcard or path):
@@ -25,8 +25,7 @@ For a custom deployment, add its exact origin (no wildcard or path):
 init({ apiKey: "...", realm: "...", trustedOrigins: ["https://tasks.school.example"] });
 ```
 
-Entries supplement the standard origins. Omitting the option preserves legacy behavior without
-sender checks. Enabling it is recommended; strict checks are planned for the next major release.
+Use `trustedOrigins` to supplement the standard origins for a custom deployment.
 
 # SDK Development
 

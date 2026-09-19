@@ -33,7 +33,7 @@ function request(origin: string, source: Window | null): MessageEvent {
 
 beforeEach(() => {
   setupSdk();
-  init({ apiKey: "key", realm: "test", trustedOrigins: [] });
+  init({ apiKey: "key", realm: "test" });
   global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => user });
 });
 afterEach(() => {
@@ -108,30 +108,24 @@ describe("trusted message senders", () => {
     expect(
       getPumpRoomEventMessage(request(origin, frame.contentWindow), "getPumpRoomUser"),
     ).not.toBeNull();
-    init({ apiKey: "key", realm: "test", trustedOrigins: [] });
+    init({ apiKey: "key", realm: "test" });
     expect(
       getPumpRoomEventMessage(request(origin, frame.contentWindow), "getPumpRoomUser"),
     ).toBeNull();
   });
 
-  it("preserves legacy credential delivery when trustedOrigins is omitted", async () => {
-    init({ apiKey: "key", realm: "test" });
+  it("rejects an untrusted sender when trustedOrigins is omitted", async () => {
     const post = vi.spyOn(window, "postMessage");
     await authenticate({ identity: { provider: "lms", id: "student" } });
     window.dispatchEvent(request("https://custom-lms.example", window));
-    expect(post).toHaveBeenCalledWith(
-      { service: "pumproom", type: "setPumpRoomUser", payload: user },
-      "https://custom-lms.example",
-    );
+    expect(post).not.toHaveBeenCalled();
   });
 
-  it("returns to legacy behavior after reinitialization without trustedOrigins", () => {
+  it("returns to standard origins after reinitialization without trustedOrigins", () => {
     const event = request("https://custom-lms.example", window);
     expect(getPumpRoomEventMessage(event, "getPumpRoomUser")).toBeNull();
     init({ apiKey: "key", realm: "test" });
     expect(getConfig()?.trustedOrigins).toBeUndefined();
-    expect(getPumpRoomEventMessage(event, "getPumpRoomUser")).not.toBeNull();
-    init({ apiKey: "key", realm: "test", trustedOrigins: [] });
     expect(getPumpRoomEventMessage(event, "getPumpRoomUser")).toBeNull();
   });
 

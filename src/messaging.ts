@@ -6,14 +6,13 @@
  *
  * @module Messaging
  */
+import { DEFAULT_TRUSTED_ORIGINS } from "./constants.ts";
 import { getConfig } from "./globals.ts";
 import type { MessageReturnType, PumpRoomMessageType } from "./types/messages.js";
 
-/** Check the iframe sender when origin protection has been explicitly enabled. */
+/** Accept messages only from an attached iframe at a trusted origin. */
 function isTrustedMessage(event: MessageEvent): boolean {
-  const origins = getConfig()?.trustedOrigins;
-  // Preserve legacy integrations until sender checks become mandatory in a major release.
-  if (origins === undefined) return true;
+  const origins: readonly string[] = getConfig()?.trustedOrigins ?? DEFAULT_TRUSTED_ORIGINS;
   if (!event.source || origins.indexOf(event.origin) === -1 || typeof document === "undefined") {
     return false;
   }
