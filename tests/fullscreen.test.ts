@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { setFullscreenListener } from "../src/fullscreen.ts";
 import { enforceIframeHeight } from "../src/iframe.ts";
+import { trustedMessage } from "./test-utils.ts";
 
 beforeEach(() => {
   // reset listeners
@@ -14,13 +15,13 @@ describe("fullscreen helpers", () => {
     Object.defineProperty(window, "scrollY", { value: 120, configurable: true });
     window.dispatchEvent(new Event("scroll"));
 
-    const event = new MessageEvent("message", {
+    const event = trustedMessage({
       data: {
         service: "pumproom",
         type: "toggleFullscreen",
         payload: { fullscreenState: false },
       },
-      origin: "https://pumproom.tech",
+      origin: "https://pumproom.inzhenerka-cloud.com",
     });
     window.dispatchEvent(event);
 
@@ -29,7 +30,7 @@ describe("fullscreen helpers", () => {
 
   it("enforces iframe minimal height", () => {
     const frame = document.createElement("iframe");
-    frame.src = "https://pumproom.test/embed";
+    frame.src = "https://pumproom.inzhenerka-cloud.com/embed";
     frame.setAttribute("height", "300");
     document.body.appendChild(frame);
     enforceIframeHeight(600);

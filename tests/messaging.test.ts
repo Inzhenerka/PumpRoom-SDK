@@ -1,24 +1,25 @@
 import { describe, expect, it } from "vitest";
 
 import { getPumpRoomEventMessage } from "../src/messaging.ts";
+import { trustedMessage } from "./test-utils.ts";
 
 describe("messaging", () => {
   it("validates message structure", () => {
     // Valid message
-    const validEvent = new MessageEvent("message", {
+    const validEvent = trustedMessage({
       data: { service: "pumproom", type: "toggleFullscreen", payload: { fullscreenState: true } },
     });
 
     // Invalid messages
-    const noDataEvent = new MessageEvent("message", {});
-    const nonObjectDataEvent = new MessageEvent("message", { data: "not an object" });
-    const wrongServiceEvent = new MessageEvent("message", {
+    const noDataEvent = trustedMessage({});
+    const nonObjectDataEvent = trustedMessage({ data: "not an object" });
+    const wrongServiceEvent = trustedMessage({
       data: { service: "other", type: "toggleFullscreen" },
     });
-    const noTypeEvent = new MessageEvent("message", {
+    const noTypeEvent = trustedMessage({
       data: { service: "pumproom" },
     });
-    const nonStringTypeEvent = new MessageEvent("message", {
+    const nonStringTypeEvent = trustedMessage({
       data: { service: "pumproom", type: 123 },
     });
 
@@ -38,10 +39,10 @@ describe("messaging", () => {
   });
 
   it("returns typed messages based on target_type", () => {
-    const toggleFullscreenEvent = new MessageEvent("message", {
+    const toggleFullscreenEvent = trustedMessage({
       data: { service: "pumproom", type: "toggleFullscreen", payload: { fullscreenState: true } },
     });
-    const setPumpRoomUserEvent = new MessageEvent("message", {
+    const setPumpRoomUserEvent = trustedMessage({
       data: {
         service: "pumproom",
         type: "setPumpRoomUser",

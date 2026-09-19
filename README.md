@@ -14,6 +14,20 @@ Cached credentials are bound to the current LMS identity and realm. Existing cac
 entries migrate automatically after a successful authentication. If an LMS account
 changes without reloading the page, call `authenticate()` again with the new identity.
 
+## Trusted iframe origins
+
+Set `trustedOrigins: []` to enable origin and iframe-source checks for standard origins:
+`https://pumproom.inzhenerka-cloud.com`, `https://dev.pumproom.inzhenerka-cloud.com`,
+`https://dev-pumproom.inzhenerka-cloud.com`.
+For a custom deployment, add its exact origin (no wildcard or path):
+
+```ts
+init({ apiKey: "...", realm: "...", trustedOrigins: ["https://tasks.school.example"] });
+```
+
+Entries supplement the standard origins. Omitting the option preserves legacy behavior without
+sender checks. Enabling it is recommended; strict checks are planned for the next major release.
+
 # SDK Development
 
 ## Installing Dependencies

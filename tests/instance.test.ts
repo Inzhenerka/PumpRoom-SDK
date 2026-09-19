@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setEnvironmentListener } from "../src/environment.ts";
 import { getTaskInstances, registerTaskInstance } from "../src/instance.ts";
 import type { InstanceContext } from "../src/types/index.ts";
+import { getTestFrame, trustedMessage } from "./test-utils.ts";
 
 // Since we can't directly access the private instanceRegistry, we'll use
 // a different approach for testing. We'll create a fresh test for each case
@@ -128,14 +129,14 @@ describe("instance module", () => {
     };
 
     // Create and dispatch a getEnvironment message event
-    const event = new MessageEvent("message", {
+    const event = trustedMessage({
       data: {
         service: "pumproom",
         type: "getEnvironment",
         payload: { instanceContext },
       },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
 
     window.dispatchEvent(event);

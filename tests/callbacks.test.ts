@@ -10,6 +10,7 @@ import {
   setOnTaskLoadedCallback,
   setOnTaskSubmittedCallback,
 } from "../src/callbacks.ts";
+import { getTestFrame, trustedMessage } from "./test-utils.ts";
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -97,7 +98,7 @@ describe("callbacks module", () => {
     setOnTaskLoadedCallback(mockCallback);
 
     // Create and dispatch a onTaskLoaded message event with the mock instance context and task
-    const event = new MessageEvent("message", {
+    const event = trustedMessage({
       data: {
         service: "pumproom",
         type: "onTaskLoaded",
@@ -106,8 +107,8 @@ describe("callbacks module", () => {
           task: mockTask,
         },
       },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
 
     // Simulate handling the message
@@ -145,7 +146,7 @@ describe("callbacks module", () => {
     setOnTaskLoadedCallback(mockAsyncCallback);
 
     // Create and dispatch a onTaskLoaded message event with the mock instance context and task
-    const event = new MessageEvent("message", {
+    const event = trustedMessage({
       data: {
         service: "pumproom",
         type: "onTaskLoaded",
@@ -154,8 +155,8 @@ describe("callbacks module", () => {
           task: mockTask,
         },
       },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
 
     // Simulate handling the message
@@ -195,7 +196,7 @@ describe("callbacks module", () => {
     setOnTaskSubmittedCallback(mockCallback);
 
     // Create and dispatch a onTaskSubmitted message event with the mock instance context and task
-    const event = new MessageEvent("message", {
+    const event = trustedMessage({
       data: {
         service: "pumproom",
         type: "onTaskSubmitted",
@@ -204,8 +205,8 @@ describe("callbacks module", () => {
           task: mockTask,
         },
       },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
 
     // Simulate handling the message
@@ -243,7 +244,7 @@ describe("callbacks module", () => {
     setOnTaskSubmittedCallback(mockAsyncCallback);
 
     // Create and dispatch a onTaskSubmitted message event with the mock instance context and task
-    const event = new MessageEvent("message", {
+    const event = trustedMessage({
       data: {
         service: "pumproom",
         type: "onTaskSubmitted",
@@ -252,8 +253,8 @@ describe("callbacks module", () => {
           task: mockTask,
         },
       },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
 
     // Simulate handling the message
@@ -297,7 +298,7 @@ describe("callbacks module", () => {
     setOnResultReadyCallback(mockCallback);
 
     // Create and dispatch a onResultReady message event with the mock instance context and result
-    const event = new MessageEvent("message", {
+    const event = trustedMessage({
       data: {
         service: "pumproom",
         type: "onResultReady",
@@ -306,8 +307,8 @@ describe("callbacks module", () => {
           result: mockResult,
         },
       },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
 
     // Simulate handling the message
@@ -349,7 +350,7 @@ describe("callbacks module", () => {
     setOnResultReadyCallback(mockAsyncCallback);
 
     // Create and dispatch a onResultReady message event with the mock instance context and result
-    const event = new MessageEvent("message", {
+    const event = trustedMessage({
       data: {
         service: "pumproom",
         type: "onResultReady",
@@ -358,8 +359,8 @@ describe("callbacks module", () => {
           result: mockResult,
         },
       },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
 
     // Simulate handling the message

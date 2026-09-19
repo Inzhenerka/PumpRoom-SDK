@@ -6,7 +6,8 @@
  *
  * @module IFrame
  */
-import { PUMPROOM_DOMAINS } from "./constants.ts";
+import { DEFAULT_TRUSTED_ORIGINS } from "./constants.ts";
+import { getConfig } from "./globals.ts";
 
 /**
  * Checks if an iframe is a PumpRoom iframe based on its source URL
@@ -16,7 +17,13 @@ import { PUMPROOM_DOMAINS } from "./constants.ts";
  * @internal
  */
 function isPumpRoomIframe(iframe: HTMLIFrameElement): boolean {
-  return PUMPROOM_DOMAINS.some((domain) => iframe.src.startsWith(domain));
+  if (!iframe.getAttribute("src")) return false;
+  const origins: readonly string[] = getConfig()?.trustedOrigins ?? DEFAULT_TRUSTED_ORIGINS;
+  try {
+    return origins.indexOf(new URL(iframe.src, document.baseURI).origin) !== -1;
+  } catch {
+    return false;
+  }
 }
 
 /**

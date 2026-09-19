@@ -7,6 +7,7 @@
  * @module Globals
  */
 import type { ApiClient } from "./api-client.ts";
+import { DEFAULT_TRUSTED_ORIGINS } from "./constants.ts";
 import type {
   InstanceContext,
   InternalConfig,
@@ -57,7 +58,31 @@ let registeredStates: string[] = [];
  */
 export function setConfig(cfg: PumpRoomConfig): void {
   const { cacheUser = true, ...rest } = cfg;
-  config = { ...rest, cacheUser };
+  let trustedOrigins: string[] | undefined;
+  if (cfg.trustedOrigins !== undefined) {
+    if (!Array.isArray(cfg.trustedOrigins)) throw new Error("trustedOrigins must be an array");
+    trustedOrigins = [
+      ...new Set([
+        ...DEFAULT_TRUSTED_ORIGINS,
+        ...cfg.trustedOrigins.map((value) => {
+          const url = new URL(value);
+          if (
+            typeof value !== "string" ||
+            (url.protocol !== "http:" && url.protocol !== "https:") ||
+            url.username ||
+            url.password ||
+            url.pathname !== "/" ||
+            url.search ||
+            url.hash ||
+            url.hostname.includes("*")
+          )
+            throw new Error("trustedOrigins entries must be exact HTTP(S) origins");
+          return url.origin;
+        }),
+      ]),
+    ];
+  }
+  config = { ...rest, cacheUser, ...(trustedOrigins ? { trustedOrigins } : {}) };
 }
 
 /**

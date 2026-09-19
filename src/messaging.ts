@@ -6,7 +6,26 @@
  *
  * @module Messaging
  */
+import { getConfig } from "./globals.ts";
 import type { MessageReturnType, PumpRoomMessageType } from "./types/messages.js";
+
+/** Check the iframe sender when origin protection has been explicitly enabled. */
+function isTrustedMessage(event: MessageEvent): boolean {
+  const origins = getConfig()?.trustedOrigins;
+  // Preserve legacy integrations until sender checks become mandatory in a major release.
+  if (origins === undefined) return true;
+  if (!event.source || origins.indexOf(event.origin) === -1 || typeof document === "undefined") {
+    return false;
+  }
+  return Array.from(document.querySelectorAll("iframe")).some((iframe) => {
+    if (iframe.contentWindow !== event.source || !iframe.getAttribute("src")) return false;
+    try {
+      return new URL(iframe.src, document.baseURI).origin === event.origin;
+    } catch {
+      return false;
+    }
+  });
+}
 
 /**
  * Extracts and validates a PumpRoom message from a MessageEvent
@@ -34,6 +53,7 @@ export function getPumpRoomEventMessage<T extends PumpRoomMessageType>(
   event: MessageEvent,
   target_type: T,
 ): MessageReturnType<T> | null {
+  if (!isTrustedMessage(event)) return null;
   // Basic validation of the message
   if (!event.data || typeof event.data !== "object") return null;
   if (event.data.service !== "pumproom") return null;

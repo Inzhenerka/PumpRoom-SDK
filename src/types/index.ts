@@ -339,6 +339,11 @@ export type CourseDataCallback = (data: LoadCourseDataOutput) => void;
  * @category Initialization
  */
 export interface PumpRoomConfig {
+  /** Opt in to checking message origins and iframe sources. Omit for legacy behavior.
+   * Use [] to trust only standard PumpRoom origins, or add exact HTTP(S) origins.
+   * Wildcards and URL paths are not allowed. Strict checks are planned for the next major release.
+   */
+  trustedOrigins?: string[];
   /** API key for authenticating with the PumpRoom API */
   apiKey: string;
   /** Realm identifier that determines the context of operations */
@@ -377,6 +382,8 @@ export interface PumpRoomConfig {
  * @category Configuration
  */
 export interface InternalConfig {
+  /** Normalized trusted origins; undefined disables message sender checks. */
+  trustedOrigins?: string[];
   /** API key for authenticating with the PumpRoom API */
   apiKey: string;
   /** Realm identifier that determines the context of operations */

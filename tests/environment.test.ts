@@ -4,6 +4,7 @@ import { setOnInitCallback } from "../src/callbacks.ts";
 import { sendEnvironment, setEnvironmentListener } from "../src/environment.ts";
 import * as utils from "../src/utils.ts";
 import * as version from "../src/version.ts";
+import { getTestFrame, trustedMessage } from "./test-utils.ts";
 
 // Mock getCurrentNormalizedUrl to avoid window dependency
 vi.mock("../src/utils.ts", () => ({
@@ -20,22 +21,22 @@ describe("environment helpers", () => {
   it("sends environment data to target", () => {
     vi.spyOn(version, "getVersion").mockReturnValue("1.0.0");
     const target = { postMessage: vi.fn() } as unknown as Window;
-    sendEnvironment(target, "https://pumproom.tech");
+    sendEnvironment(target, "https://pumproom.inzhenerka-cloud.com");
     expect(target.postMessage).toHaveBeenCalledWith(
       {
         service: "pumproom",
         type: "setEnvironment",
         payload: { pageURL: "http://localhost/test-page", sdkVersion: "1.0.0", context: null },
       },
-      "https://pumproom.tech",
+      "https://pumproom.inzhenerka-cloud.com",
     );
   });
 
   it("responds to getEnvironment message", () => {
     vi.spyOn(version, "getVersion").mockReturnValue("2.0.0");
-    const postSpy = vi.spyOn(window, "postMessage");
+    const postSpy = vi.spyOn(getTestFrame(), "postMessage");
     setEnvironmentListener();
-    const event = new MessageEvent("message", {
+    const event = trustedMessage({
       data: {
         service: "pumproom",
         type: "getEnvironment",
@@ -43,8 +44,8 @@ describe("environment helpers", () => {
           instanceContext: { instanceUid: "test", repoName: "", taskName: "", realm: "", tags: "" },
         },
       },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
     window.dispatchEvent(event);
 
@@ -54,7 +55,7 @@ describe("environment helpers", () => {
         type: "setEnvironment",
         payload: { pageURL: "http://localhost/test-page", sdkVersion: "2.0.0", context: null },
       },
-      "https://pumproom.tech",
+      "https://pumproom.inzhenerka-cloud.com",
     );
   });
 
@@ -78,14 +79,14 @@ describe("environment helpers", () => {
     setEnvironmentListener();
 
     // Create and dispatch a getEnvironment message event with the mock instance context
-    const event = new MessageEvent("message", {
+    const event = trustedMessage({
       data: {
         service: "pumproom",
         type: "getEnvironment",
         payload: { instanceContext: mockInstanceContext },
       },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
     window.dispatchEvent(event);
 
@@ -117,14 +118,14 @@ describe("environment helpers", () => {
     setEnvironmentListener();
 
     // Create and dispatch a getEnvironment message event with the mock instance context
-    const event = new MessageEvent("message", {
+    const event = trustedMessage({
       data: {
         service: "pumproom",
         type: "getEnvironment",
         payload: { instanceContext: mockInstanceContext },
       },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
     window.dispatchEvent(event);
 

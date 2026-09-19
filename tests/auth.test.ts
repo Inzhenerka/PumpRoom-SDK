@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authenticate, setUser } from "../src/auth.ts";
 import { AUTH_URL, VERIFY_URL } from "../src/constants.ts";
 import { getCurrentUser, setConfig, setCurrentUser } from "../src/globals.ts";
-import { setupSdk } from "./test-utils.ts";
+import { getTestFrame, setupSdk, trustedMessage } from "./test-utils.ts";
 
 function boundCache(user: { uid: string; token: string; is_admin: boolean }, id: string) {
   return { ...user, cacheVersion: 2, authContext: { realm: "test", provider: "lms", id } };
@@ -165,11 +165,11 @@ describe("default user listener", () => {
 
     await authenticate({ identity: { provider: "lms", id: "u" } });
 
-    const postSpy = vi.spyOn(window, "postMessage");
-    const event = new MessageEvent("message", {
+    const postSpy = vi.spyOn(getTestFrame(), "postMessage");
+    const event = trustedMessage({
       data: { service: "pumproom", type: "getPumpRoomUser" },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
 
     window.dispatchEvent(event);
@@ -180,7 +180,7 @@ describe("default user listener", () => {
         type: "setPumpRoomUser",
         payload: response,
       },
-      "https://pumproom.tech",
+      "https://pumproom.inzhenerka-cloud.com",
     );
   });
 
@@ -191,11 +191,11 @@ describe("default user listener", () => {
     await setUser({ uid: "1", token: "t" });
     setCurrentUser(null);
 
-    const postSpy = vi.spyOn(window, "postMessage");
-    const event = new MessageEvent("message", {
+    const postSpy = vi.spyOn(getTestFrame(), "postMessage");
+    const event = trustedMessage({
       data: { service: "pumproom", type: "getPumpRoomUser" },
-      origin: "https://pumproom.tech",
-      source: window,
+      origin: "https://pumproom.inzhenerka-cloud.com",
+      source: getTestFrame(),
     });
 
     window.dispatchEvent(event);

@@ -49,17 +49,11 @@ export const SET_STATES_URL = `${API_BASE_URL}/tracker/set_states`;
  */
 export const LOAD_COURSE_URL = `${API_BASE_URL}/course/load`;
 
-/**
- * List of domains that are considered PumpRoom domains
- * Used to identify PumpRoom iframes
- *
- * @public
- */
-export const PUMPROOM_DOMAINS = [
-  "https://pumproom.",
-  "https://pump-room.",
-  "https://dev.pumproom.",
-  "https://ide.code.winbd.ru",
+/** Standard origins used for iframe sizing and opt-in message sender checks. */
+export const DEFAULT_TRUSTED_ORIGINS = [
+  "https://pumproom.inzhenerka-cloud.com",
+  "https://dev.pumproom.inzhenerka-cloud.com",
+  "https://dev-pumproom.inzhenerka-cloud.com",
 ] as const;
 
 /**
