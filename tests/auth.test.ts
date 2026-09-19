@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { initApiClient } from "../src/api-client.ts";
 import { authenticate, setUser } from "../src/auth.ts";
 import { AUTH_URL, VERIFY_URL } from "../src/constants.ts";
 import { getCurrentUser, setConfig, setCurrentUser } from "../src/globals.ts";
@@ -305,6 +306,26 @@ describe("identity-bound cache migration", () => {
     expect(await authenticate({ identity })).toEqual(newUser);
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith(AUTH_URL, expect.any(Object));
+  });
+
+  it("does not reuse cloud credentials with a custom API", async () => {
+    const apiBaseUrl = "https://pump.example/api";
+    localStorage.setItem("pumproomUser", JSON.stringify(boundCache(oldUser, identity.id)));
+    setConfig({ apiKey: "key", realm: "test", cacheUser: true, apiBaseUrl });
+    initApiClient("key", apiBaseUrl);
+    global.fetch = vi.fn().mockResolvedValue(response(newUser));
+
+    expect(await authenticate({ identity })).toEqual(newUser);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith(
+      `${apiBaseUrl}/integration/authenticate`,
+      expect.any(Object),
+    );
+    expect(JSON.parse(localStorage.getItem("pumproomUser")!)).toEqual({
+      ...newUser,
+      cacheVersion: 2,
+      authContext: { realm: "test", provider: "lms", id: identity.id, apiBaseUrl },
+    });
   });
 
   it.each([oldUser, boundCache(oldUser, "other")])(

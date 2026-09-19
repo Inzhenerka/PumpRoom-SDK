@@ -182,15 +182,25 @@ init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
 setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные от authenticate()</code></pre>
 
             <p>
-              SDK проверяет источник сообщений от iframe. Стандартные адреса PumpRoom разрешены по
-              умолчанию. Если задания размещены на вашем домене, добавьте его в
-              <code>trustedOrigins</code>. Укажите протокол, домен и при необходимости порт, без
-              пути и масок.
+              SDK проверяет источник сообщений от iframe. Если <code>trustedOrigins</code> не
+              указан, разрешены стандартные адреса PumpRoom. Явно заданный список полностью заменяет
+              стандартные адреса. Укажите протокол, домен и при необходимости порт, без пути и
+              масок. Пустой список запрещает сообщения от любых iframe.
             </p>
             <pre><code class="language-javascript border border-primary-subtle">init({
     apiKey: 'ВАШ_КЛЮЧ',
     realm: 'ВАШ_ID',
     trustedOrigins: ['https://tasks.school.example'],
+});</code></pre>
+
+            <p>
+              Для on-premise установки укажите базовый адрес PumpRoom API. Допускается адрес с
+              префиксом пути.
+            </p>
+            <pre><code class="language-javascript border border-primary-subtle">init({
+    apiKey: 'ВАШ_КЛЮЧ',
+    realm: 'ВАШ_ID',
+    apiBaseUrl: 'https://pumproom.school.example/api',
 });</code></pre>
 
             <h5 class="mt-4 mb-3">Версии</h5>
@@ -272,7 +282,8 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
             <div><strong>2.2.0 – Настройка доверенных источников сообщений.</strong></div>
             <div>
               Добавлена настройка <code>trustedOrigins</code> для проверки источников сообщений от
-              iframe. Исправлено кеширование авторизации при смене пользователя LMS.
+              iframe и настройка <code>apiBaseUrl</code> для on-premise установок. Исправлено
+              кеширование авторизации при смене пользователя LMS.
             </div>
           </li>
 

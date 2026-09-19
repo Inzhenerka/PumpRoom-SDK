@@ -339,10 +339,13 @@ export type CourseDataCallback = (data: LoadCourseDataOutput) => void;
  * @category Initialization
  */
 export interface PumpRoomConfig {
-  /** Additional exact HTTP(S) origins allowed to send messages from embedded iframes.
-   * Standard PumpRoom origins are always trusted. Wildcards and URL paths are not allowed.
+  /** Exact HTTP(S) origins allowed to send messages from embedded iframes.
+   * When omitted, standard PumpRoom origins are trusted. When provided, this list replaces them.
+   * Wildcards and URL paths are not allowed.
    */
   trustedOrigins?: string[];
+  /** PumpRoom API base URL. May include a path prefix for an on-premises deployment. */
+  apiBaseUrl?: string;
   /** API key for authenticating with the PumpRoom API */
   apiKey: string;
   /** Realm identifier that determines the context of operations */
@@ -381,8 +384,10 @@ export interface PumpRoomConfig {
  * @category Configuration
  */
 export interface InternalConfig {
-  /** Normalized trusted origins, including standard PumpRoom origins when configured. */
+  /** Normalized explicitly configured trusted origins, or undefined to use standard origins. */
   trustedOrigins?: string[];
+  /** Normalized PumpRoom API base URL without a trailing slash. */
+  apiBaseUrl: string;
   /** API key for authenticating with the PumpRoom API */
   apiKey: string;
   /** Realm identifier that determines the context of operations */

@@ -16,16 +16,30 @@ changes without reloading the page, call `authenticate()` again with the new ide
 
 ## Trusted iframe origins
 
-SDK messages are accepted only from embedded iframes at standard PumpRoom origins:
+When `trustedOrigins` is omitted, SDK messages are accepted only from embedded iframes at standard
+PumpRoom origins:
 `https://pumproom.inzhenerka-cloud.com`, `https://dev.pumproom.inzhenerka-cloud.com`,
 `https://dev-pumproom.inzhenerka-cloud.com`.
-For a custom deployment, add its exact origin (no wildcard or path):
+For a custom deployment, provide the complete list of trusted origins (no wildcard or path):
 
 ```ts
 init({ apiKey: "...", realm: "...", trustedOrigins: ["https://tasks.school.example"] });
 ```
 
-Use `trustedOrigins` to supplement the standard origins for a custom deployment.
+An explicitly configured `trustedOrigins` list replaces the standard origins. Use an empty list to
+reject messages from every iframe origin.
+
+## Custom API URL
+
+On-premises deployments can route all SDK requests to their own PumpRoom API:
+
+```ts
+init({
+  apiKey: "...",
+  realm: "...",
+  apiBaseUrl: "https://pumproom.school.example/api",
+});
+```
 
 # SDK Development
 

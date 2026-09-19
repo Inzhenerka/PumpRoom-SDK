@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { API_BASE_URL } from "../src/constants.ts";
 import * as fullscreen from "../src/fullscreen.ts";
 import {
   getConfig,
@@ -24,7 +25,23 @@ afterEach(() => {
 describe("globals", () => {
   it("initializes config", () => {
     setConfig({ apiKey: "key", realm: "test" });
-    expect(getConfig()).toEqual({ apiKey: "key", realm: "test", cacheUser: true });
+    expect(getConfig()).toEqual({
+      apiKey: "key",
+      realm: "test",
+      apiBaseUrl: API_BASE_URL,
+      cacheUser: true,
+    });
+  });
+
+  it("normalizes a custom API base URL", () => {
+    setConfig({ apiKey: "key", realm: "test", apiBaseUrl: "https://pump.example/api/" });
+    expect(getConfig()?.apiBaseUrl).toBe("https://pump.example/api");
+  });
+
+  it("rejects an invalid API base URL", () => {
+    expect(() =>
+      setConfig({ apiKey: "key", realm: "test", apiBaseUrl: "javascript:alert(1)" }),
+    ).toThrow("apiBaseUrl");
   });
 
   it("calls fullscreen handler when initialized via init", () => {
@@ -59,6 +76,14 @@ describe("globals", () => {
 
     setCurrentUser(user);
     init({ apiKey: "another-key", realm: "another-realm" });
+    expect(getCurrentUser()).toBeNull();
+
+    setCurrentUser(user);
+    init({
+      apiKey: "another-key",
+      realm: "another-realm",
+      apiBaseUrl: "https://on-prem.example/api",
+    });
     expect(getCurrentUser()).toBeNull();
   });
 

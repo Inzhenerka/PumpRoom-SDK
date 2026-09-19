@@ -22,7 +22,7 @@ import { initApiClient } from "./api-client.ts";
 import { setTaskListener } from "./callbacks.ts";
 import { setEnvironmentListener } from "./environment.ts";
 import { setFullscreenListener } from "./fullscreen.ts";
-import { setConfig } from "./globals.ts";
+import { getConfig, setConfig } from "./globals.ts";
 import { enforceIframeHeight } from "./iframe.ts";
 import { PumpRoomConfig } from "./types/index.ts";
 import { getVersion } from "./version.ts";
@@ -88,6 +88,7 @@ console.debug("PumpRoom SDK v" + getVersion() + " loaded");
  * init({
  *   apiKey: 'your-api-key',
  *   realm: 'your-realm',
+ *   apiBaseUrl: 'https://pumproom.example.com/api',
  *   cacheUser: true,
  *   minHeight: 500
  * });
@@ -95,7 +96,9 @@ console.debug("PumpRoom SDK v" + getVersion() + " loaded");
  */
 export function init(cfg: PumpRoomConfig): void {
   setConfig(cfg);
-  initApiClient(cfg.apiKey);
+  const config = getConfig();
+  if (!config) throw new Error("SDK configuration failed");
+  initApiClient(config.apiKey, config.apiBaseUrl);
   setFullscreenListener();
   setEnvironmentListener();
   setTaskListener();

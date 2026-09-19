@@ -85,7 +85,7 @@ describe("trusted message senders", () => {
     ).toBeNull();
   });
 
-  it("accepts an explicitly configured custom origin and retains standard origins", async () => {
+  it("accepts an explicitly configured custom origin and replaces standard origins", async () => {
     init({ apiKey: "key", realm: "test", trustedOrigins: ["https://TASKS.school.example/"] });
     const frame = frameAt("https://tasks.school.example");
     const post = vi.spyOn(frame.contentWindow!, "postMessage");
@@ -98,7 +98,15 @@ describe("trusted message senders", () => {
     const standard = frameAt(production);
     expect(
       getPumpRoomEventMessage(request(production, standard.contentWindow), "getPumpRoomUser"),
-    ).not.toBeNull();
+    ).toBeNull();
+  });
+
+  it("trusts no iframe origins when configured with an empty list", () => {
+    init({ apiKey: "key", realm: "test", trustedOrigins: [] });
+    const standard = frameAt(production);
+    expect(
+      getPumpRoomEventMessage(request(production, standard.contentWindow), "getPumpRoomUser"),
+    ).toBeNull();
   });
 
   it("does not retain custom origins after reinitialization", () => {

@@ -1,9 +1,11 @@
 import {
+  API_BASE_URL,
   AUTH_URL,
   GET_STATES_URL,
   LOAD_COURSE_URL,
   SET_STATES_URL,
   VERIFY_URL,
+  normalizeApiBaseUrl,
 } from "./constants.ts";
 import { getApiClientInstance, getConfig, setApiClientInstance } from "./globals.ts";
 import type { FetchStatesInput, StoreStatesInput } from "./types/index.ts";
@@ -45,9 +47,15 @@ type RequestContext = LMSContextAPI & {
  */
 export class ApiClient {
   private readonly apiKey: string;
+  private readonly apiBaseUrl: string;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, apiBaseUrl = API_BASE_URL) {
     this.apiKey = apiKey;
+    this.apiBaseUrl = normalizeApiBaseUrl(apiBaseUrl);
+  }
+
+  private endpoint(defaultUrl: string): string {
+    return `${this.apiBaseUrl}${new URL(defaultUrl).pathname}`;
   }
 
   /**
@@ -93,7 +101,7 @@ export class ApiClient {
       context: this.buildContext(),
     };
 
-    const resp = await fetch(VERIFY_URL, {
+    const resp = await fetch(this.endpoint(VERIFY_URL), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -135,7 +143,7 @@ export class ApiClient {
       context: this.buildContext(),
     };
 
-    const response = await fetch(AUTH_URL, {
+    const response = await fetch(this.endpoint(AUTH_URL), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -181,7 +189,7 @@ export class ApiClient {
       sdk_version: getVersion(),
     };
 
-    const response = await fetch(LOAD_COURSE_URL, {
+    const response = await fetch(this.endpoint(LOAD_COURSE_URL), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -231,7 +239,7 @@ export class ApiClient {
       sdk_version: getVersion(),
       context,
     };
-    const response = await fetch(GET_STATES_URL, {
+    const response = await fetch(this.endpoint(GET_STATES_URL), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -284,7 +292,7 @@ export class ApiClient {
       sdk_version: getVersion(),
       context,
     };
-    const response = await fetch(SET_STATES_URL, {
+    const response = await fetch(this.endpoint(SET_STATES_URL), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -315,8 +323,8 @@ export class ApiClient {
  * const client = getApiClient();
  * ```
  */
-export function initApiClient(apiKey: string): void {
-  setApiClientInstance(new ApiClient(apiKey));
+export function initApiClient(apiKey: string, apiBaseUrl = API_BASE_URL): void {
+  setApiClientInstance(new ApiClient(apiKey, apiBaseUrl));
 }
 
 /**

@@ -36,6 +36,20 @@ describe("iframe", () => {
     expect(frame.getAttribute("height")).toBe("600px");
   });
 
+  it("does not size standard origins when a custom list replaces them", () => {
+    setConfig({
+      apiKey: "key",
+      realm: "test",
+      trustedOrigins: ["https://tasks.school.example"],
+    });
+    const frame = document.createElement("iframe");
+    frame.src = `${DEFAULT_TRUSTED_ORIGINS[0]}/embed`;
+    frame.setAttribute("height", "300");
+    document.body.appendChild(frame);
+    iframe.enforceIframeHeight(600);
+    expect(frame.getAttribute("height")).toBe("300");
+  });
+
   it.each([
     "https://pumproom.other.example",
     "https://pumproom.inzhenerka-cloud.com.other.example",

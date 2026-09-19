@@ -15,6 +15,35 @@
 export const API_BASE_URL = "https://pumproom-api.inzhenerka-cloud.com";
 
 /**
+ * Normalizes and validates a PumpRoom API base URL.
+ *
+ * @param value - HTTP(S) URL, optionally including a path prefix
+ * @returns URL without a trailing slash
+ * @internal
+ */
+export function normalizeApiBaseUrl(value: string): string {
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error("apiBaseUrl must be a valid HTTP(S) URL");
+  }
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error("apiBaseUrl must be a valid HTTP(S) URL");
+  }
+  if (
+    (url.protocol !== "http:" && url.protocol !== "https:") ||
+    url.username ||
+    url.password ||
+    url.search ||
+    url.hash
+  ) {
+    throw new Error("apiBaseUrl must be a valid HTTP(S) URL without credentials, query, or hash");
+  }
+  return url.toString().replace(/\/+$/, "");
+}
+
+/**
  * URL for the authentication endpoint
  *
  * @public

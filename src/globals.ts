@@ -7,7 +7,7 @@
  * @module Globals
  */
 import type { ApiClient } from "./api-client.ts";
-import { DEFAULT_TRUSTED_ORIGINS } from "./constants.ts";
+import { API_BASE_URL, normalizeApiBaseUrl } from "./constants.ts";
 import type {
   InstanceContext,
   InternalConfig,
@@ -57,16 +57,19 @@ let registeredStates: string[] = [];
  * ```
  */
 export function setConfig(cfg: PumpRoomConfig): void {
+  const apiBaseUrl = normalizeApiBaseUrl(cfg.apiBaseUrl ?? API_BASE_URL);
   const authenticationScopeChanged =
-    config !== null && (config.apiKey !== cfg.apiKey || config.realm !== cfg.realm);
-  const { cacheUser = true, ...rest } = cfg;
+    config !== null &&
+    (config.apiKey !== cfg.apiKey ||
+      config.realm !== cfg.realm ||
+      config.apiBaseUrl !== apiBaseUrl);
+  const { cacheUser = true, apiBaseUrl: _apiBaseUrl, ...rest } = cfg;
   let trustedOrigins: string[] | undefined;
   if (cfg.trustedOrigins !== undefined) {
     if (!Array.isArray(cfg.trustedOrigins)) throw new Error("trustedOrigins must be an array");
     trustedOrigins = [
-      ...new Set([
-        ...DEFAULT_TRUSTED_ORIGINS,
-        ...cfg.trustedOrigins.map((value) => {
+      ...new Set(
+        cfg.trustedOrigins.map((value) => {
           const url = new URL(value);
           if (
             typeof value !== "string" ||
@@ -81,10 +84,10 @@ export function setConfig(cfg: PumpRoomConfig): void {
             throw new Error("trustedOrigins entries must be exact HTTP(S) origins");
           return url.origin;
         }),
-      ]),
+      ),
     ];
   }
-  config = { ...rest, cacheUser, ...(trustedOrigins ? { trustedOrigins } : {}) };
+  config = { ...rest, apiBaseUrl, cacheUser, ...(trustedOrigins ? { trustedOrigins } : {}) };
   if (authenticationScopeChanged) {
     currentUser = null;
   }

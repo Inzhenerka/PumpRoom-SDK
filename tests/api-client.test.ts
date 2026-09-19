@@ -23,6 +23,21 @@ describe("ApiClient", () => {
   });
 
   describe("fetchStates", () => {
+    it("uses a custom API base URL with a path prefix", async () => {
+      apiClient = new ApiClient("test-api-key", "https://pump.example/on-prem/api/");
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: "success", states: [] }),
+      });
+
+      await apiClient.fetchStates(["test"], mockUser);
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://pump.example/on-prem/api/tracker/get_states",
+        expect.any(Object),
+      );
+    });
+
     it("fetches states from the backend", async () => {
       // Mock the fetch response
       const mockResponse = {

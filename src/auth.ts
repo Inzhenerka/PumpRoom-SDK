@@ -8,7 +8,7 @@
  * @category Authentication
  */
 import { getApiClient } from "./api-client.ts";
-import { USER_STORAGE_KEY } from "./constants.ts";
+import { API_BASE_URL, USER_STORAGE_KEY } from "./constants.ts";
 import {
   getConfig,
   getCurrentUser,
@@ -41,6 +41,7 @@ interface AuthContext {
   realm: string;
   provider: AuthenticateOptions["identity"]["provider"];
   id: string;
+  apiBaseUrl?: string;
 }
 
 type CachedUser = PumpRoomUser & {
@@ -131,6 +132,7 @@ export async function authenticate({ identity }: AuthenticateOptions): Promise<P
     realm: config.realm,
     provider: identity.provider,
     id: identity.id,
+    ...(config.apiBaseUrl !== API_BASE_URL ? { apiBaseUrl: config.apiBaseUrl } : {}),
   };
   const apiClient = getApiClient();
   let currentUser: PumpRoomUser | null = null;
@@ -141,7 +143,8 @@ export async function authenticate({ identity }: AuthenticateOptions): Promise<P
       cachedUser?.cacheVersion === 2 &&
       cachedUser.authContext?.realm === authContext.realm &&
       cachedUser.authContext?.provider === authContext.provider &&
-      cachedUser.authContext?.id === authContext.id
+      cachedUser.authContext?.id === authContext.id &&
+      (cachedUser.authContext?.apiBaseUrl ?? API_BASE_URL) === config.apiBaseUrl
     ) {
       const result = await apiClient.verifyToken(withoutCacheMetadata(cachedUser), config.realm);
       assertCurrent();
