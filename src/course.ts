@@ -13,6 +13,7 @@ import { getApiClient } from "./api-client.ts";
 import { getConfig } from "./globals.ts";
 import { getCourseFromLocalStorage, saveCourseToLocalStorage } from "./storage.ts";
 import type { CourseDataCallback, LoadCourseDataOutput } from "./types/index.ts";
+import { getCurrentNormalizedUrl } from "./utils.ts";
 
 /**
  * Loads course data for the current page
@@ -41,7 +42,8 @@ export async function loadCourseData(callback?: CourseDataCallback): Promise<Loa
     throw new Error("SDK is not initialized");
   }
 
-  const cached = getCourseFromLocalStorage();
+  const pageUrl = getCurrentNormalizedUrl();
+  const cached = getCourseFromLocalStorage(pageUrl);
   if (cached && callback) {
     callback(cached);
   }
@@ -49,7 +51,7 @@ export async function loadCourseData(callback?: CourseDataCallback): Promise<Loa
   const apiClient = getApiClient();
   const response = await apiClient.loadCourseData(config.realm);
 
-  saveCourseToLocalStorage(response);
+  saveCourseToLocalStorage(response, pageUrl);
 
   if (callback) {
     callback(response);

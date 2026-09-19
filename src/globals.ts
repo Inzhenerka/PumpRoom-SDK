@@ -57,6 +57,8 @@ let registeredStates: string[] = [];
  * ```
  */
 export function setConfig(cfg: PumpRoomConfig): void {
+  const authenticationScopeChanged =
+    config !== null && (config.apiKey !== cfg.apiKey || config.realm !== cfg.realm);
   const { cacheUser = true, ...rest } = cfg;
   let trustedOrigins: string[] | undefined;
   if (cfg.trustedOrigins !== undefined) {
@@ -83,6 +85,9 @@ export function setConfig(cfg: PumpRoomConfig): void {
     ];
   }
   config = { ...rest, cacheUser, ...(trustedOrigins ? { trustedOrigins } : {}) };
+  if (authenticationScopeChanged) {
+    currentUser = null;
+  }
 }
 
 /**

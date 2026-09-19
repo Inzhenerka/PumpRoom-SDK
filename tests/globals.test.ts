@@ -39,6 +39,29 @@ describe("globals", () => {
     expect(getCurrentUser()).toEqual(user);
   });
 
+  it("keeps the current user when reinitialized with the same authentication scope", () => {
+    const user = { uid: "1", token: "t", is_admin: false };
+    init({ apiKey: "key", realm: "test" });
+    setCurrentUser(user);
+
+    init({ apiKey: "key", realm: "test", minHeight: 600 });
+
+    expect(getCurrentUser()).toEqual(user);
+  });
+
+  it("clears the current user when the authentication scope changes", () => {
+    const user = { uid: "1", token: "t", is_admin: false };
+    init({ apiKey: "key", realm: "test" });
+    setCurrentUser(user);
+
+    init({ apiKey: "key", realm: "another-realm" });
+    expect(getCurrentUser()).toBeNull();
+
+    setCurrentUser(user);
+    init({ apiKey: "another-key", realm: "another-realm" });
+    expect(getCurrentUser()).toBeNull();
+  });
+
   describe("state registration", () => {
     it("registers state names", () => {
       // Initially, no states are registered

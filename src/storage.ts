@@ -69,8 +69,11 @@ export function storeData(key: string, data: unknown): void {
  *
  * @experimental
  */
-export function generateStateKey(stateName: string, userId: string): string {
-  const pageUrl = getCurrentNormalizedUrl();
+export function generateStateKey(
+  stateName: string,
+  userId: string,
+  pageUrl: string | null = getCurrentNormalizedUrl(),
+): string {
   if (!pageUrl) {
     throw new Error("Unable to determine current page URL");
   }
@@ -80,14 +83,12 @@ export function generateStateKey(stateName: string, userId: string): string {
 /**
  * Generates a unique key for course data in localStorage
  *
- * @param realm - Realm identifier
- * @returns Unique key for the course data
+ * @param pageUrl - Page URL captured when the operation started
  * @returns Unique key for the course data
  *
  * @experimental
  */
-export function generateCourseKey(): string {
-  const pageUrl = getCurrentNormalizedUrl();
+export function generateCourseKey(pageUrl: string | null = getCurrentNormalizedUrl()): string {
   if (!pageUrl) {
     throw new Error("Unable to determine current page URL");
   }
@@ -99,13 +100,18 @@ export function generateCourseKey(): string {
  *
  * @param states - Array of states to save
  * @param userId - User ID
+ * @param pageUrl - Page URL captured when the operation started
  *
  * @experimental
  */
-export function saveStatesToLocalStorage(states: StateOutput[], userId: string): void {
+export function saveStatesToLocalStorage(
+  states: StateOutput[],
+  userId: string,
+  pageUrl?: string | null,
+): void {
   try {
     states.forEach((state) => {
-      const key = generateStateKey(state.name, userId);
+      const key = generateStateKey(state.name, userId, pageUrl);
       localStorage.setItem(key, JSON.stringify(state));
     });
   } catch (error) {
@@ -118,16 +124,21 @@ export function saveStatesToLocalStorage(states: StateOutput[], userId: string):
  *
  * @param stateNames - Array of state names to retrieve
  * @param userId - User ID
+ * @param pageUrl - Page URL captured when the operation started
  * @returns Array of states retrieved from localStorage
  *
  * @experimental
  */
-export function getStatesFromLocalStorage(stateNames: string[], userId: string): StateOutput[] {
+export function getStatesFromLocalStorage(
+  stateNames: string[],
+  userId: string,
+  pageUrl?: string | null,
+): StateOutput[] {
   const states: StateOutput[] = [];
 
   try {
     stateNames.forEach((stateName) => {
-      const key = generateStateKey(stateName, userId);
+      const key = generateStateKey(stateName, userId, pageUrl);
       const stateJson = localStorage.getItem(key);
 
       if (stateJson) {
@@ -146,12 +157,16 @@ export function getStatesFromLocalStorage(stateNames: string[], userId: string):
  * Saves course data to localStorage
  *
  * @param data - Course data to store
+ * @param pageUrl - Page URL captured when the operation started
  *
  * @experimental
  */
-export function saveCourseToLocalStorage(data: LoadCourseDataOutput): void {
+export function saveCourseToLocalStorage(
+  data: LoadCourseDataOutput,
+  pageUrl?: string | null,
+): void {
   try {
-    const key = generateCourseKey();
+    const key = generateCourseKey(pageUrl);
     localStorage.setItem(key, JSON.stringify(data));
   } catch (error) {
     console.warn("Failed to save course data to localStorage:", error);
@@ -161,13 +176,14 @@ export function saveCourseToLocalStorage(data: LoadCourseDataOutput): void {
 /**
  * Retrieves course data from localStorage
  *
+ * @param pageUrl - Page URL captured when the operation started
  * @returns Cached course data or null if not found
  *
  * @experimental
  */
-export function getCourseFromLocalStorage(): LoadCourseDataOutput | null {
+export function getCourseFromLocalStorage(pageUrl?: string | null): LoadCourseDataOutput | null {
   try {
-    const key = generateCourseKey();
+    const key = generateCourseKey(pageUrl);
     const cached = localStorage.getItem(key);
     return cached ? (JSON.parse(cached) as LoadCourseDataOutput) : null;
   } catch (error) {

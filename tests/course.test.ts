@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { COURSE_STORAGE_PREFIX } from "../src/constants.ts";
 import { loadCourseData } from "../src/course.ts";
 import { getCourseFromLocalStorage, saveCourseToLocalStorage } from "../src/storage.ts";
+import * as utils from "../src/utils.ts";
 import { setupSdk } from "./test-utils.ts";
 
 // Mock fetch
@@ -82,5 +84,37 @@ describe("course", () => {
     expect(result).toEqual(fresh);
     expect(callback).toHaveBeenCalledTimes(1);
     expect(callback).toHaveBeenCalledWith(fresh);
+  });
+
+  it("stores course data under the URL captured before the request", async () => {
+    const initialUrl = "https://lms.example/course/one";
+    const nextUrl = "https://lms.example/course/two";
+    const urlSpy = vi.spyOn(utils, "getCurrentNormalizedUrl").mockReturnValue(initialUrl);
+    const fresh = {
+      course: {
+        uid: "course-1",
+        visible_name: "Course One",
+        url: initialUrl,
+        is_paid: true,
+        student_chat_url: null,
+        helper_task: null,
+        vote_task: null,
+      },
+    };
+    let resolveFetch!: (value: unknown) => void;
+    global.fetch = vi.fn().mockReturnValue(
+      new Promise((resolve) => {
+        resolveFetch = resolve;
+      }),
+    );
+
+    const pending = loadCourseData();
+    await vi.waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    urlSpy.mockReturnValue(nextUrl);
+    resolveFetch({ ok: true, json: async () => fresh });
+    await pending;
+
+    expect(localStorage.getItem(`${COURSE_STORAGE_PREFIX}:${initialUrl}`)).not.toBeNull();
+    expect(localStorage.getItem(`${COURSE_STORAGE_PREFIX}:${nextUrl}`)).toBeNull();
   });
 });

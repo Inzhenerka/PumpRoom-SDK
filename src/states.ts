@@ -20,6 +20,7 @@ import {
 import { getStatesFromLocalStorage, saveStatesToLocalStorage } from "./storage.ts";
 import type { State, StateOutput, StatesCallback, StatesResponse } from "./types/index.ts";
 import { StateDataType } from "./types/index.ts";
+import { getCurrentNormalizedUrl } from "./utils.ts";
 
 /**
  * Fetches states from the backend
@@ -81,8 +82,10 @@ export async function fetchStates(
     throw new Error("User is not authenticated");
   }
 
+  const pageUrl = getCurrentNormalizedUrl();
+
   // Check localStorage for cached states
-  const cachedStates = getStatesFromLocalStorage(stateNames, currentUser.uid);
+  const cachedStates = getStatesFromLocalStorage(stateNames, currentUser.uid, pageUrl);
 
   // If we have cached states and a callback, call the callback with the cached states
   if (cachedStates.length > 0) {
@@ -100,7 +103,7 @@ export async function fetchStates(
   });
 
   // Update localStorage with the fetched states
-  saveStatesToLocalStorage(response.states, currentUser.uid);
+  saveStatesToLocalStorage(response.states, currentUser.uid, pageUrl);
 
   // If we have a callback, call it with the fetched states
   if (callback) {
@@ -162,6 +165,8 @@ export async function storeStates(states: State[]): Promise<StatesResponse> {
     throw new Error("User is not authenticated");
   }
 
+  const pageUrl = getCurrentNormalizedUrl();
+
   // Get the API client
   const apiClient = getApiClient();
 
@@ -183,7 +188,7 @@ export async function storeStates(states: State[]): Promise<StatesResponse> {
             : StateDataType.str,
   }));
 
-  saveStatesToLocalStorage(stateOutputs, currentUser.uid);
+  saveStatesToLocalStorage(stateOutputs, currentUser.uid, pageUrl);
 
   return response;
 }

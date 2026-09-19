@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { STORAGE_PREFIX } from "../src/constants.ts";
+
 let mockRegisteredStates: string[] = [];
 
 vi.mock("../src/globals.ts", async () => {
@@ -32,6 +34,7 @@ import {
   resetRegisteredStates,
   storeStates,
 } from "../src/states.ts";
+import * as utils from "../src/utils.ts";
 import * as version from "../src/version.ts";
 import { mockUser, setupSdk } from "./test-utils.ts";
 
@@ -156,6 +159,36 @@ describe("states", () => {
       await expect(async () => {
         await fetchStates(["test1"]);
       }).rejects.toThrow("Request error: 500 Internal Server Error");
+    });
+
+    it("stores fetched states under the URL captured before the request", async () => {
+      vi.mocked(globals.getCurrentUser).mockReturnValue(mockUser);
+      const initialUrl = "https://lms.example/course/one";
+      const nextUrl = "https://lms.example/course/two";
+      const urlSpy = vi.spyOn(utils, "getCurrentNormalizedUrl").mockReturnValue(initialUrl);
+      let resolveFetch!: (value: unknown) => void;
+      global.fetch = vi.fn().mockReturnValue(
+        new Promise((resolve) => {
+          resolveFetch = resolve;
+        }),
+      );
+
+      const pending = fetchStates(["test1"]);
+      await vi.waitFor(() => expect(global.fetch).toHaveBeenCalled());
+      urlSpy.mockReturnValue(nextUrl);
+      resolveFetch({
+        ok: true,
+        json: async () => ({
+          status: "success",
+          states: [{ name: "test1", value: "value1", data_type: "str" }],
+        }),
+      });
+      await pending;
+
+      expect(
+        localStorage.getItem(`${STORAGE_PREFIX}:${initialUrl}:test1:${mockUser.uid}`),
+      ).not.toBeNull();
+      expect(localStorage.getItem(`${STORAGE_PREFIX}:${nextUrl}:test1:${mockUser.uid}`)).toBeNull();
     });
   });
 
