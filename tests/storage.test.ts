@@ -20,10 +20,10 @@ vi.mock("../src/utils.ts", () => ({
 }));
 
 beforeEach(() => {
+  vi.restoreAllMocks();
   if (typeof localStorage !== "undefined") {
     localStorage.clear();
   }
-  vi.clearAllMocks();
 });
 
 describe("storage", () => {
@@ -44,18 +44,12 @@ describe("storage", () => {
     });
 
     it("ignores storage failures", () => {
-      const orig = global.localStorage;
-      global.localStorage = {
-        setItem: () => {
-          throw new Error("fail");
-        },
-        getItem: orig.getItem.bind(orig),
-        clear: orig.clear.bind(orig),
-        removeItem: orig.removeItem.bind(orig),
-      } as any;
+      vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+        throw new Error("fail");
+      });
+      vi.spyOn(console, "error").mockImplementation(() => undefined);
       const user = { uid: "u", token: "t", is_admin: false };
       expect(() => storeData(USER_STORAGE_KEY, user)).not.toThrow();
-      global.localStorage = orig;
     });
 
     it("handles browsers that deny access to localStorage", () => {
@@ -133,15 +127,10 @@ describe("storage", () => {
     });
 
     it("handles localStorage errors when saving", () => {
-      const orig = global.localStorage;
-      global.localStorage = {
-        setItem: () => {
-          throw new Error("fail");
-        },
-        getItem: orig.getItem.bind(orig),
-        clear: orig.clear.bind(orig),
-        removeItem: orig.removeItem.bind(orig),
-      } as any;
+      vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+        throw new Error("fail");
+      });
+      vi.spyOn(console, "warn").mockImplementation(() => undefined);
 
       const userId = "user123";
       const states: StateOutput[] = [
@@ -150,28 +139,19 @@ describe("storage", () => {
 
       // Should not throw
       expect(() => saveStatesToLocalStorage(states, userId)).not.toThrow();
-
-      global.localStorage = orig;
     });
 
     it("handles localStorage errors when retrieving", () => {
-      const orig = global.localStorage;
-      global.localStorage = {
-        setItem: orig.setItem.bind(orig),
-        getItem: () => {
-          throw new Error("fail");
-        },
-        clear: orig.clear.bind(orig),
-        removeItem: orig.removeItem.bind(orig),
-      } as any;
+      vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+        throw new Error("fail");
+      });
+      vi.spyOn(console, "warn").mockImplementation(() => undefined);
 
       const userId = "user123";
 
       // Should not throw and return empty array
       const retrievedStates = getStatesFromLocalStorage(["state1"], userId);
       expect(retrievedStates).toEqual([]);
-
-      global.localStorage = orig;
     });
   });
 

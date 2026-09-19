@@ -2,7 +2,7 @@ import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import { defineConfig } from "vite";
 
-import pkg from "./package.json";
+import pkg from "./package.json" with { type: "json" };
 
 const version = pkg.version;
 const majorVersion = version.split(".")[0]; // Извлекаем первую цифру версии
