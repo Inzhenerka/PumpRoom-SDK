@@ -2,12 +2,24 @@
   "name": "pumproom-sdk",
   "version": "2.1.0",
   "description": "Lightweight SDK for integrating Learning Management Systems with PumpRoom platform",
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/bundle/pumproom-sdk-latest.esm.js",
-      "require": "./dist/bundle/pumproom-sdk-latest.umd.js"
-    }
+  "keywords": [
+    "ai",
+    "education",
+    "integration",
+    "lms",
+    "pumproom",
+    "sdk"
+  ],
+  "homepage": "https://pumproom-sdk.inzhenerka-cloud.com/",
+  "license": "UNLICENSED",
+  "author": {
+    "name": "Inzhenerka.Tech",
+    "email": "info@inzhenerka.tech",
+    "url": "https://inzhenerka.tech"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Inzhenerka/PumpRoom-SDK.git"
   },
   "files": [
     "dist/bundle",
@@ -15,6 +27,15 @@
     "README.md",
     "LICENSE"
   ],
+  "type": "module",
+  "sideEffects": true,
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/bundle/pumproom-sdk-latest.esm.js",
+      "require": "./dist/bundle/pumproom-sdk-latest.umd.js"
+    }
+  },
   "scripts": {
     "build": "vite build -c vite.config.lib.ts && tsc -p tsconfig.build.json --emitDeclarationOnly && bun run docs && vite build -c vite.config.site.ts",
     "build-lib": "vite build -c vite.config.lib.ts && tsc -p tsconfig.build.json --emitDeclarationOnly",
@@ -26,13 +47,12 @@
     "typecheck": "tsc -p tsconfig.json",
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
-    "format": "prettier -w . --cache",
-    "format:check": "prettier -c . --cache",
+    "format": "oxfmt .",
+    "format:check": "oxfmt . --check",
     "test": "vitest run --coverage",
     "prep": "bun format && bun check && bun lint",
     "postversion": "git push && git push --tags"
   },
-  "packageManager": "bun@1.4.2",
   "devDependencies": {
     "@types/node": "^26.5.1",
     "@vitest/coverage-istanbul": "^5.0.0",
@@ -40,37 +60,17 @@
     "highlight.js": "^11.12.0",
     "highlightjs-copy": "^1.0.6",
     "jsdom": "^30.0.1",
+    "oxfmt": "^0.68.0",
     "oxlint": "^1.83.0",
-    "prettier": "^3.9.6",
     "sass": "^1.104.1",
     "typedoc": "^0.28.20",
     "typescript": "^6.0.3",
     "vite": "^8.3.0",
     "vitest": "^5.0.0"
   },
-  "type": "module",
-  "sideEffects": true,
   "engines": {
-    "node": ">=22.12.0",
-    "bun": ">=1.4.2"
+    "bun": ">=1.4.2",
+    "node": ">=22.12.0"
   },
-  "license": "UNLICENSED",
-  "author": {
-    "name": "Inzhenerka.Tech",
-    "email": "info@inzhenerka.tech",
-    "url": "https://inzhenerka.tech"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Inzhenerka/PumpRoom-SDK.git"
-  },
-  "homepage": "https://pumproom-sdk.inzhenerka-cloud.com/",
-  "keywords": [
-    "pumproom",
-    "lms",
-    "sdk",
-    "integration",
-    "education",
-    "ai"
-  ]
+  "packageManager": "bun@1.4.2"
 }

@@ -2,7 +2,6 @@ import "./src/styles/bootstrap.scss";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "highlight.js/styles/github.css";
 import "highlightjs-copy/dist/highlightjs-copy.min.css";
-
 import hljs from "highlight.js/lib/core";
 import bash from "highlight.js/lib/languages/bash";
 import javascript from "highlight.js/lib/languages/javascript";
