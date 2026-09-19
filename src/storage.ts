@@ -27,8 +27,8 @@ import { getCurrentNormalizedUrl } from "./utils.js";
  * ```
  */
 export function retrieveData(key: string): unknown | null {
-  if (typeof localStorage === "undefined") return null;
   try {
+    if (typeof localStorage === "undefined") return null;
     const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : null;
   } catch (err) {
@@ -52,8 +52,8 @@ export function retrieveData(key: string): unknown | null {
  * ```
  */
 export function storeData(key: string, data: unknown): void {
-  if (typeof localStorage === "undefined") return;
   try {
+    if (typeof localStorage === "undefined") return;
     localStorage.setItem(key, JSON.stringify(data));
   } catch (err) {
     console.error("Cache save error", err);

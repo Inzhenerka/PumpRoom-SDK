@@ -27,6 +27,29 @@ describe("authenticate", () => {
     expect(getCurrentUser()).toEqual(response);
   });
 
+  it("authenticates without caching when localStorage access is denied", async () => {
+    setConfig({ apiKey: "key", realm: "test", cacheUser: true });
+    const response = { uid: "1", token: "tok", is_admin: false };
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
+    const storageSpy = vi.spyOn(globalThis, "localStorage", "get").mockImplementation(() => {
+      throw new DOMException("Access denied", "SecurityError");
+    });
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    try {
+      const user = await authenticate({
+        identity: { provider: "lms", id: "lms-user-1" },
+      });
+
+      expect(fetch).toHaveBeenCalledWith(AUTH_URL, expect.any(Object));
+      expect(user).toEqual(response);
+      expect(getCurrentUser()).toEqual(response);
+    } finally {
+      storageSpy.mockRestore();
+      errorSpy.mockRestore();
+    }
+  });
+
   it("uses cached user when verified", async () => {
     setConfig({ apiKey: "key", realm: "test", cacheUser: true });
     const cached = {

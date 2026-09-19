@@ -57,6 +57,22 @@ describe("storage", () => {
       expect(() => storeData(USER_STORAGE_KEY, user)).not.toThrow();
       global.localStorage = orig;
     });
+
+    it("handles browsers that deny access to localStorage", () => {
+      const storageSpy = vi.spyOn(globalThis, "localStorage", "get").mockImplementation(() => {
+        throw new DOMException("Access denied", "SecurityError");
+      });
+      const errorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+      try {
+        expect(retrieveData(USER_STORAGE_KEY)).toBeNull();
+        expect(() => storeData(USER_STORAGE_KEY, { uid: "u" })).not.toThrow();
+        expect(errorSpy).toHaveBeenCalledTimes(2);
+      } finally {
+        storageSpy.mockRestore();
+        errorSpy.mockRestore();
+      }
+    });
   });
 
   describe("state storage operations", () => {
