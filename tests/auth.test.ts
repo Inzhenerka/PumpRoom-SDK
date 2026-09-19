@@ -5,6 +5,10 @@ import { AUTH_URL, VERIFY_URL } from "../src/constants.ts";
 import { getCurrentUser, setConfig, setCurrentUser } from "../src/globals.ts";
 import { setupSdk } from "./test-utils.ts";
 
+function boundCache(user: { uid: string; token: string; is_admin: boolean }, id: string) {
+  return { ...user, cacheVersion: 2, authContext: { realm: "test", provider: "lms", id } };
+}
+
 beforeEach(() => {
   setupSdk();
 });
@@ -25,8 +29,17 @@ describe("authenticate", () => {
 
   it("uses cached user when verified", async () => {
     setConfig({ apiKey: "key", realm: "test", cacheUser: true });
-    const cached = { uid: "2", token: "cached", is_admin: true };
-    localStorage.setItem("pumproomUser", JSON.stringify(cached));
+    const cached = {
+      uid: "2",
+      token: "cached",
+      is_admin: true,
+      provider: "lms",
+      available_providers: ["lms", "telegram"],
+    };
+    localStorage.setItem(
+      "pumproomUser",
+      JSON.stringify(boundCache(cached, `lms-user-${cached.uid}`)),
+    );
 
     const verifyResp = { is_valid: true, is_admin: true };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
@@ -42,7 +55,10 @@ describe("authenticate", () => {
   it("clears invalid cached user", async () => {
     setConfig({ apiKey: "key", realm: "test", cacheUser: true });
     const cached = { uid: "3", token: "bad", is_admin: false };
-    localStorage.setItem("pumproomUser", JSON.stringify(cached));
+    localStorage.setItem(
+      "pumproomUser",
+      JSON.stringify(boundCache(cached, `lms-user-${cached.uid}`)),
+    );
 
     const verifyResp = { is_valid: false, is_admin: false };
     const authResp = { uid: "3", token: "new", is_admin: false };
@@ -195,17 +211,19 @@ describe("error handling in authentication", () => {
   it("keeps cached credentials when verification is unavailable", async () => {
     setConfig({ apiKey: "key", realm: "test", cacheUser: true });
     const user = { uid: "11", token: "token", is_admin: false };
-    localStorage.setItem("pumproomUser", JSON.stringify(user));
+    localStorage.setItem("pumproomUser", JSON.stringify(boundCache(user, "u")));
 
     global.fetch = vi.fn().mockRejectedValue(new Error("API error"));
 
     await expect(authenticate({ identity: { provider: "lms", id: "u" } })).rejects.toThrow(
       "API error",
     );
-    expect(JSON.parse(localStorage.getItem("pumproomUser") || "null")).toEqual(user);
+    expect(JSON.parse(localStorage.getItem("pumproomUser") || "null")).toEqual(
+      boundCache(user, "u"),
+    );
   });
 
-  it("clears malformed cached credentials before authenticating", async () => {
+  it("replaces malformed cached credentials after authenticating", async () => {
     setConfig({ apiKey: "key", realm: "test", cacheUser: true });
     const response = { uid: "12", token: "new-token", is_admin: false };
     localStorage.setItem("pumproomUser", JSON.stringify({ uid: "12" }));
@@ -218,6 +236,149 @@ describe("error handling in authentication", () => {
 
     expect(fetch).toHaveBeenCalledWith(AUTH_URL, expect.any(Object));
     expect(result).toEqual(response);
-    expect(JSON.parse(localStorage.getItem("pumproomUser") || "null")).toEqual(response);
+    expect(JSON.parse(localStorage.getItem("pumproomUser") || "null")).toEqual(
+      boundCache(response, "u"),
+    );
+  });
+});
+
+describe("identity-bound cache migration", () => {
+  const oldUser = { uid: "old", token: "existing", is_admin: false };
+  const newUser = { uid: "new", token: "new-token", is_admin: false };
+  const identity = { provider: "lms" as const, id: "student@example.com" };
+  const response = (user: typeof oldUser) => ({ ok: true, json: async () => user });
+
+  beforeEach(() => setupSdk(true));
+
+  it.each([oldUser, newUser])(
+    "resolves legacy credentials by current identity: $uid",
+    async (resolved) => {
+      localStorage.setItem("pumproomUser", JSON.stringify(oldUser));
+      global.fetch = vi.fn().mockResolvedValue(response(resolved));
+      expect(await authenticate({ identity })).toEqual(resolved);
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(fetch).toHaveBeenCalledWith(
+        AUTH_URL,
+        expect.objectContaining({
+          body: expect.stringContaining(identity.id),
+        }),
+      );
+      expect(JSON.parse(localStorage.getItem("pumproomUser")!)).toEqual(
+        boundCache(resolved, identity.id),
+      );
+    },
+  );
+
+  it.each([
+    { realm: "test", provider: "lms", id: "other@example.com" },
+    { realm: "other", provider: "lms", id: identity.id },
+    { realm: "test", provider: "telegram", id: identity.id },
+  ])("reauthenticates when context differs: %j", async (authContext) => {
+    localStorage.setItem(
+      "pumproomUser",
+      JSON.stringify({ ...boundCache(oldUser, identity.id), authContext }),
+    );
+    global.fetch = vi.fn().mockResolvedValue(response(newUser));
+    expect(await authenticate({ identity })).toEqual(newUser);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith(AUTH_URL, expect.any(Object));
+  });
+
+  it.each([oldUser, boundCache(oldUser, "other")])(
+    "preserves storage and clears active credentials on failure",
+    async (cached) => {
+      const raw = JSON.stringify(cached);
+      localStorage.setItem("pumproomUser", raw);
+      setCurrentUser(oldUser);
+      global.fetch = vi.fn().mockRejectedValue(new Error("offline"));
+      await expect(authenticate({ identity })).rejects.toThrow("offline");
+      expect(localStorage.getItem("pumproomUser")).toBe(raw);
+      expect(getCurrentUser()).toBeNull();
+    },
+  );
+
+  it("validates GetCourse identity before checking even a matching cache", async () => {
+    setupSdk(true, "getcourse");
+    localStorage.setItem("pumproomUser", JSON.stringify(boundCache(oldUser, "{email}")));
+    setCurrentUser(oldUser);
+    vi.spyOn(window, "alert").mockImplementation(() => {});
+    global.fetch = vi.fn();
+    await expect(authenticate({ identity: { ...identity, id: "{email}" } })).rejects.toThrow(
+      "GetCourse UID",
+    );
+    expect(fetch).not.toHaveBeenCalled();
+    expect(getCurrentUser()).toBeNull();
+  });
+
+  it("rejects a stale auth response without overwriting the newer account", async () => {
+    let finish!: (value: ReturnType<typeof response>) => void;
+    global.fetch = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finish = resolve;
+          }),
+      )
+      .mockResolvedValueOnce(response(newUser));
+    const stale = authenticate({ identity: { ...identity, id: "old" } });
+    expect(getCurrentUser()).toBeNull();
+    await authenticate({ identity });
+    finish(response(oldUser));
+    await expect(stale).rejects.toThrow("superseded");
+    expect(getCurrentUser()).toEqual(newUser);
+    expect(JSON.parse(localStorage.getItem("pumproomUser")!)).toEqual(
+      boundCache(newUser, identity.id),
+    );
+  });
+
+  it("rejects stale verification without restoring the old cache", async () => {
+    localStorage.setItem("pumproomUser", JSON.stringify(boundCache(oldUser, "old")));
+    let finish!: (value: unknown) => void;
+    global.fetch = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finish = resolve;
+          }),
+      )
+      .mockResolvedValueOnce(response(newUser));
+    const stale = authenticate({ identity: { ...identity, id: "old" } });
+    await authenticate({ identity });
+    finish({ ok: true, json: async () => ({ is_valid: true, is_admin: true }) });
+    await expect(stale).rejects.toThrow("superseded");
+    expect(getCurrentUser()).toEqual(newUser);
+    expect(JSON.parse(localStorage.getItem("pumproomUser")!)).toEqual(
+      boundCache(newUser, identity.id),
+    );
+  });
+
+  it("strips inherited context in setUser and migrates it on the next authenticate", async () => {
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ is_valid: true, is_admin: false }) })
+      .mockResolvedValueOnce(response(newUser));
+    await setUser(boundCache(oldUser, "old"));
+    expect(JSON.parse(localStorage.getItem("pumproomUser")!)).toEqual(oldUser);
+    expect(await authenticate({ identity })).toEqual(newUser);
+  });
+
+  it("does not let a pending setUser overwrite a newer authenticate", async () => {
+    let finish!: (value: unknown) => void;
+    global.fetch = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finish = resolve;
+          }),
+      )
+      .mockResolvedValueOnce(response(newUser));
+    const stale = setUser(oldUser);
+    await authenticate({ identity });
+    finish({ ok: true, json: async () => ({ is_valid: true, is_admin: false }) });
+    expect(await stale).toBeNull();
+    expect(getCurrentUser()).toEqual(newUser);
   });
 });

@@ -8,6 +8,12 @@ Lightweight library for integrating LMS with PumpRoom. Provides methods for API 
 
 **[📖 Integration and usage guide](https://pumproom-sdk.inzhenerka-cloud.com/)**
 
+## Authentication cache
+
+Cached credentials are bound to the current LMS identity and realm. Existing cache
+entries migrate automatically after a successful authentication. If an LMS account
+changes without reloading the page, call `authenticate()` again with the new identity.
+
 # SDK Development
 
 ## Installing Dependencies

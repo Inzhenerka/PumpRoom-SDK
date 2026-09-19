@@ -37,25 +37,26 @@ function isPumpRoomUser(value: unknown): value is PumpRoomUser {
   );
 }
 
-/**
- * Verifies a cached user token with the API
- *
- * @param user - The user to verify
- * @returns Promise resolving to true if the token is valid, false otherwise
- * @internal
- */
-async function verifyCachedUser(user: PumpRoomUser): Promise<boolean> {
-  const config = getConfig();
-  if (!config) return false;
+interface AuthContext {
+  realm: string;
+  provider: AuthenticateOptions["identity"]["provider"];
+  id: string;
+}
 
-  const apiClient = getApiClient();
-  const result = await apiClient.verifyToken(user, config.realm);
+type CachedUser = PumpRoomUser & {
+  cacheVersion?: unknown;
+  authContext?: Partial<AuthContext> | null;
+};
 
-  if (result.is_valid) {
-    user.is_admin = result.is_admin;
-    storeData(USER_STORAGE_KEY, user);
-  }
-  return result.is_valid;
+// Both authentication entry points share a generation so stale responses cannot
+// publish credentials after a newer login attempt or configuration change.
+let authGeneration = 0;
+
+function withoutCacheMetadata(user: CachedUser): PumpRoomUser {
+  const result = { ...user };
+  delete result.cacheVersion;
+  delete result.authContext;
+  return result;
 }
 
 /**
@@ -91,54 +92,75 @@ export async function authenticate({ identity }: AuthenticateOptions): Promise<P
     throw new Error("SDK is not initialized");
   }
 
-  let currentUser = getCurrentUser();
-  let fromCache = false;
+  const generation = ++authGeneration;
+  setCurrentUser(null);
+  const assertCurrent = (): void => {
+    if (generation !== authGeneration || getConfig() !== config) {
+      throw new Error("Authentication superseded by a newer request or configuration");
+    }
+  };
+
+  // Validate before considering cached credentials, including legacy records.
+  if (
+    config.type === "getcourse" &&
+    (typeof identity?.id !== "string" || !identity.id.trim() || identity.id.includes("{"))
+  ) {
+    const msg =
+      "Некорректный идентификатор пользователя из GetCourse. При встраивании JavaScript-кода включите галочку «Заменять переменные пользователя».";
+    if (typeof window !== "undefined" && typeof window.alert === "function") {
+      try {
+        window.alert(msg);
+      } catch {
+        /* ignore */
+      }
+    } else {
+      console.warn(msg);
+    }
+    throw new Error("GetCourse UID validation failed");
+  }
+  if (
+    !identity ||
+    typeof identity.id !== "string" ||
+    !identity.id.trim() ||
+    (identity.provider !== "lms" && identity.provider !== "telegram")
+  ) {
+    throw new Error("Invalid user identity");
+  }
+
+  const authContext: AuthContext = {
+    realm: config.realm,
+    provider: identity.provider,
+    id: identity.id,
+  };
+  const apiClient = getApiClient();
+  let currentUser: PumpRoomUser | null = null;
   if (config.cacheUser) {
     const cachedValue = retrieveData(USER_STORAGE_KEY);
-    const cachedUser = isPumpRoomUser(cachedValue) ? cachedValue : null;
-    if (cachedValue !== null && !cachedUser && typeof localStorage !== "undefined") {
-      localStorage.removeItem(USER_STORAGE_KEY);
-    } else if (cachedUser && (await verifyCachedUser(cachedUser))) {
-      currentUser = cachedUser;
-      fromCache = true;
-    } else if (cachedUser && typeof localStorage !== "undefined") {
-      localStorage.removeItem(USER_STORAGE_KEY);
-    }
-  }
-
-  if (!fromCache) {
-    const apiClient = getApiClient();
-
-    // Validate GetCourse placeholders if requested via init configuration
-    if (config.type === "getcourse") {
-      const uid = identity.id;
-      const hasCurly = typeof uid === "string" && uid.indexOf("{") !== -1;
-      const invalid = !uid || hasCurly;
-      if (invalid) {
-        const msg =
-          "Некорректный идентификатор пользователя из GetCourse. При встраивании JavaScript-кода включите галочку «Заменять переменные пользователя».";
-        if (typeof window !== "undefined" && typeof window.alert === "function") {
-          try {
-            window.alert(msg);
-          } catch {
-            /* ignore */
-          }
-        } else {
-          console.warn(msg);
-        }
-        throw new Error("GetCourse UID validation failed");
+    const cachedUser: CachedUser | null = isPumpRoomUser(cachedValue) ? cachedValue : null;
+    if (
+      cachedUser?.cacheVersion === 2 &&
+      cachedUser.authContext?.realm === authContext.realm &&
+      cachedUser.authContext?.provider === authContext.provider &&
+      cachedUser.authContext?.id === authContext.id
+    ) {
+      const result = await apiClient.verifyToken(withoutCacheMetadata(cachedUser), config.realm);
+      assertCurrent();
+      if (result.is_valid) {
+        currentUser = { ...withoutCacheMetadata(cachedUser), is_admin: result.is_admin };
       }
     }
-
-    currentUser = await apiClient.authenticate({ identity }, config.realm);
-
-    if (config.cacheUser) {
-      storeData(USER_STORAGE_KEY, currentUser);
-    }
   }
 
+  // Unbound legacy records must be resolved by identity, never adopted blindly.
+  // Preserve storage on failures so migration can be retried on the next call.
   if (!currentUser) {
-    throw new Error("Authentication failed");
+    const result = await apiClient.authenticate({ identity }, config.realm);
+    assertCurrent();
+    if (!isPumpRoomUser(result)) throw new Error("Authentication failed");
+    currentUser = withoutCacheMetadata(result);
+  }
+  if (config.cacheUser) {
+    storeData(USER_STORAGE_KEY, { ...currentUser, cacheVersion: 2, authContext });
   }
 
   if (!isAutoListenerRegistered()) {
@@ -182,18 +204,22 @@ export async function setUser(user: Omit<PumpRoomUser, "is_admin">): Promise<Pum
     throw new Error("SDK is not initialized");
   }
 
+  const generation = ++authGeneration;
+  setCurrentUser(null);
   let verified: PumpRoomUser;
 
   try {
     const apiClient = getApiClient();
     const result = await apiClient.verifyToken({ ...user, is_admin: false }, config.realm);
 
+    if (generation !== authGeneration || getConfig() !== config) return null;
+
     if (!result.is_valid) {
       console.error("Invalid user passed to setUser");
       return null;
     }
 
-    verified = { ...user, is_admin: result.is_admin };
+    verified = withoutCacheMetadata({ ...user, is_admin: result.is_admin });
   } catch (err) {
     console.error("Verification error", err);
     return null;
