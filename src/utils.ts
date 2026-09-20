@@ -1,3 +1,5 @@
+import { getConfig } from "./globals.ts";
+
 /**
  * Normalizes a URL by removing query parameters and fragment identifier
  * @param url - The URL to normalize
@@ -23,6 +25,9 @@ function normalizeUrl(url: string): string {
  */
 export function getCurrentNormalizedUrl(): string | null {
   try {
+    const configuredUrl = getConfig()?.pageUrl;
+    if (configuredUrl) return configuredUrl;
+
     // Check if we're in a browser environment
     if (typeof window === "undefined" || !window.location) {
       return null;

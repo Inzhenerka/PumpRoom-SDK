@@ -41,6 +41,22 @@ init({
 });
 ```
 
+## Stable content URL
+
+For SCORM players that launch different SCOs from the same browser URL, provide a stable canonical
+URL for the current content. The SDK uses it for API requests and local cache keys:
+
+```ts
+init({
+  apiKey: "...",
+  realm: "...",
+  pageUrl: "https://lms.example/scorm/course-42/lesson-1",
+});
+```
+
+When omitted, the SDK uses `window.location.href`. Query parameters and fragments are removed in
+both cases.
+
 # SDK Development
 
 ## Installing Dependencies

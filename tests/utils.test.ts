@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { setConfig } from "../src/globals.ts";
 import { getCurrentNormalizedUrl } from "../src/utils.ts";
 
 describe("utils", () => {
@@ -8,6 +9,7 @@ describe("utils", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    setConfig({ apiKey: "key", realm: "test" });
   });
 
   afterEach(() => {
@@ -128,6 +130,19 @@ describe("utils", () => {
 
       const result = getCurrentNormalizedUrl();
       expect(result).toBe("https://example.com/path");
+    });
+
+    it("uses the configured page URL instead of window.location", () => {
+      setConfig({
+        apiKey: "key",
+        realm: "test",
+        pageUrl: "https://lms.example/scorm/course-42/lesson-1",
+      });
+      global.window = {
+        location: { href: "https://lms.example/scorm/player?lesson=1" },
+      } as any;
+
+      expect(getCurrentNormalizedUrl()).toBe("https://lms.example/scorm/course-42/lesson-1");
     });
   });
 });

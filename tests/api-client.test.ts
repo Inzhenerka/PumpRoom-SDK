@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ApiClient } from "../src/api-client.ts";
+import { setConfig } from "../src/globals.ts";
 import * as utils from "../src/utils.ts";
 import * as version from "../src/version.ts";
 
@@ -17,12 +18,27 @@ describe("ApiClient", () => {
     vi.resetAllMocks();
     // Reset the fetch mock
     (global.fetch as any).mockReset();
+    setConfig({ apiKey: "test-api-key", realm: "test" });
 
     // Create a new ApiClient instance for each test
     apiClient = new ApiClient("test-api-key");
   });
 
   describe("fetchStates", () => {
+    it("sends an explicit page URL instead of the SCORM launch URL", async () => {
+      const pageUrl = "https://lms.example/scorm/course-42/lesson-1";
+      setConfig({ apiKey: "test-api-key", realm: "test", pageUrl });
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: "success", states: [] }),
+      });
+
+      await apiClient.fetchStates(["test"], mockUser);
+
+      const body = JSON.parse((global.fetch as any).mock.calls[0][1].body);
+      expect(body.url).toBe(pageUrl);
+    });
+
     it("uses a custom API base URL with a path prefix", async () => {
       apiClient = new ApiClient("test-api-key", "https://pump.example/on-prem/api/");
       (global.fetch as any).mockResolvedValueOnce({

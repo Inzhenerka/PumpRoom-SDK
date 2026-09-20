@@ -44,6 +44,31 @@ export function normalizeApiBaseUrl(value: string): string {
 }
 
 /**
+ * Normalizes and validates an explicit LMS content URL.
+ *
+ * @param value - Stable HTTP(S) URL identifying the current content
+ * @returns URL without query parameters or a fragment
+ * @internal
+ */
+export function normalizePageUrl(value: string): string {
+  if (typeof value !== "string" || !value.trim()) {
+    throw new Error("pageUrl must be a valid HTTP(S) URL");
+  }
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error("pageUrl must be a valid HTTP(S) URL");
+  }
+  if ((url.protocol !== "http:" && url.protocol !== "https:") || url.username || url.password) {
+    throw new Error("pageUrl must be a valid HTTP(S) URL without credentials");
+  }
+  url.search = "";
+  url.hash = "";
+  return url.toString();
+}
+
+/**
  * URL for the authentication endpoint
  *
  * @public

@@ -203,6 +203,17 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
     apiBaseUrl: 'https://pumproom.school.example/api',
 });</code></pre>
 
+            <p>
+              Если SCORM-плеер запускает разные SCO по одному адресу, укажите стабильный
+              канонический URL текущего элемента. SDK будет использовать его в API-запросах и ключах
+              локального кеша вместо адреса окна.
+            </p>
+            <pre><code class="language-javascript border border-primary-subtle">init({
+    apiKey: 'ВАШ_КЛЮЧ',
+    realm: 'ВАШ_ID',
+    pageUrl: 'https://lms.example/scorm/course-42/lesson-1',
+});</code></pre>
+
             <h5 class="mt-4 mb-3">Версии</h5>
             <p>Вы можете использовать разные версии SDK:</p>
             <ul>
@@ -282,8 +293,9 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
             <div><strong>2.2.0 – Настройка доверенных источников сообщений.</strong></div>
             <div>
               Добавлена настройка <code>trustedOrigins</code> для проверки источников сообщений от
-              iframe и настройка <code>apiBaseUrl</code> для on-premise установок. Исправлено
-              кеширование авторизации при смене пользователя LMS.
+              iframe, <code>apiBaseUrl</code> для on-premise установок и <code>pageUrl</code> для
+              стабильной идентификации SCORM-контента. Исправлено кеширование авторизации при смене
+              пользователя LMS.
             </div>
           </li>
 

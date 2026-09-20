@@ -38,6 +38,21 @@ describe("globals", () => {
     expect(getConfig()?.apiBaseUrl).toBe("https://pump.example/api");
   });
 
+  it("normalizes an explicit page URL", () => {
+    setConfig({
+      apiKey: "key",
+      realm: "test",
+      pageUrl: "https://lms.example/course-42/lesson-1?token=secret#section",
+    });
+    expect(getConfig()?.pageUrl).toBe("https://lms.example/course-42/lesson-1");
+  });
+
+  it("rejects an invalid explicit page URL", () => {
+    expect(() => setConfig({ apiKey: "key", realm: "test", pageUrl: "scorm:lesson-1" })).toThrow(
+      "pageUrl",
+    );
+  });
+
   it("rejects an invalid API base URL", () => {
     expect(() =>
       setConfig({ apiKey: "key", realm: "test", apiBaseUrl: "javascript:alert(1)" }),

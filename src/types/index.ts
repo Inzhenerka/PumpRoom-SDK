@@ -346,6 +346,8 @@ export interface PumpRoomConfig {
   trustedOrigins?: string[];
   /** PumpRoom API base URL. May include a path prefix for an on-premises deployment. */
   apiBaseUrl?: string;
+  /** Stable URL identifying the current LMS content. Overrides the browser URL when provided. */
+  pageUrl?: string;
   /** API key for authenticating with the PumpRoom API */
   apiKey: string;
   /** Realm identifier that determines the context of operations */
@@ -388,6 +390,8 @@ export interface InternalConfig {
   trustedOrigins?: string[];
   /** Normalized PumpRoom API base URL without a trailing slash. */
   apiBaseUrl: string;
+  /** Normalized explicit LMS content URL, when configured. */
+  pageUrl?: string;
   /** API key for authenticating with the PumpRoom API */
   apiKey: string;
   /** Realm identifier that determines the context of operations */

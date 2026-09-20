@@ -89,6 +89,7 @@ console.debug("PumpRoom SDK v" + getVersion() + " loaded");
  *   apiKey: 'your-api-key',
  *   realm: 'your-realm',
  *   apiBaseUrl: 'https://pumproom.example.com/api',
+ *   pageUrl: 'https://lms.example.com/scorm/course-42/lesson-1',
  *   cacheUser: true,
  *   minHeight: 500
  * });

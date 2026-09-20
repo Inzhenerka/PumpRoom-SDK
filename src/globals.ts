@@ -7,7 +7,7 @@
  * @module Globals
  */
 import type { ApiClient } from "./api-client.ts";
-import { API_BASE_URL, normalizeApiBaseUrl } from "./constants.ts";
+import { API_BASE_URL, normalizeApiBaseUrl, normalizePageUrl } from "./constants.ts";
 import type {
   InstanceContext,
   InternalConfig,
@@ -58,12 +58,13 @@ let registeredStates: string[] = [];
  */
 export function setConfig(cfg: PumpRoomConfig): void {
   const apiBaseUrl = normalizeApiBaseUrl(cfg.apiBaseUrl ?? API_BASE_URL);
+  const pageUrl = cfg.pageUrl === undefined ? undefined : normalizePageUrl(cfg.pageUrl);
   const authenticationScopeChanged =
     config !== null &&
     (config.apiKey !== cfg.apiKey ||
       config.realm !== cfg.realm ||
       config.apiBaseUrl !== apiBaseUrl);
-  const { cacheUser = true, apiBaseUrl: _apiBaseUrl, ...rest } = cfg;
+  const { cacheUser = true, apiBaseUrl: _apiBaseUrl, pageUrl: _pageUrl, ...rest } = cfg;
   let trustedOrigins: string[] | undefined;
   if (cfg.trustedOrigins !== undefined) {
     if (!Array.isArray(cfg.trustedOrigins)) throw new Error("trustedOrigins must be an array");
@@ -87,7 +88,13 @@ export function setConfig(cfg: PumpRoomConfig): void {
       ),
     ];
   }
-  config = { ...rest, apiBaseUrl, cacheUser, ...(trustedOrigins ? { trustedOrigins } : {}) };
+  config = {
+    ...rest,
+    apiBaseUrl,
+    cacheUser,
+    ...(pageUrl ? { pageUrl } : {}),
+    ...(trustedOrigins ? { trustedOrigins } : {}),
+  };
   if (authenticationScopeChanged) {
     currentUser = null;
   }
