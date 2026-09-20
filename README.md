@@ -63,7 +63,7 @@ both cases.
 
 Requirements:
 
-- Node.js >=20
+- Node.js >=22.12
 - Bun
 
 To install dependencies:
