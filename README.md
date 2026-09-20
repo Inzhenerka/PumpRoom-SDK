@@ -99,10 +99,18 @@ The HTML report will appear in the `coverage` directory.
 
 ### Publishing
 
-Release a new version:
+Prepare and inspect a release without changing the repository:
 
 ```bash
-npm version <patch|minor|major>
+bun run release:dry-run
 ```
 
-This will update the version in package.json, create a git tag, and push changes to the repository.
+Create the release commit and tag:
+
+```bash
+bun run release
+```
+
+`release-it` selects the next version from conventional commits, updates `package.json`, creates
+and pushes the release commit and `v*` tag. The tag workflow tests and builds the exact revision,
+publishes the npm package, deploys the SDK site, and creates the GitHub Release.

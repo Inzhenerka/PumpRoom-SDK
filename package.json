@@ -51,9 +51,11 @@
     "format:check": "oxfmt . --check",
     "test": "vitest run --coverage",
     "prep": "bun format && bun check && bun lint",
-    "postversion": "git push && git push --tags"
+    "release": "release-it --ci",
+    "release:dry-run": "release-it --ci --dry-run"
   },
   "devDependencies": {
+    "@release-it/conventional-changelog": "^12.0.0",
     "@types/node": "^26.5.1",
     "@vitest/coverage-istanbul": "^5.0.0",
     "bootstrap": "^5.3.8",
@@ -62,6 +64,7 @@
     "jsdom": "^30.0.1",
     "oxfmt": "^0.68.0",
     "oxlint": "^1.83.0",
+    "release-it": "^21.0.2",
     "sass": "^1.104.1",
     "typedoc": "^0.28.20",
     "typescript": "^6.0.3",
@@ -72,5 +75,35 @@
     "bun": ">=1.4.2",
     "node": ">=22.12.0"
   },
-  "packageManager": "bun@1.4.2"
+  "packageManager": "bun@1.4.2",
+  "release-it": {
+    "git": {
+      "requireBranch": "main",
+      "requireCommits": true,
+      "requireUpstream": true,
+      "commitMessage": "chore: release ${version}",
+      "tagName": "v${version}",
+      "tagAnnotation": "${version}"
+    },
+    "npm": {
+      "publish": false
+    },
+    "hooks": {
+      "before:init": [
+        "bun run format:check",
+        "bun run lint",
+        "bun run check",
+        "bun run test",
+        "bun run build"
+      ]
+    },
+    "plugins": {
+      "@release-it/conventional-changelog": {
+        "preset": {
+          "name": "conventionalcommits"
+        },
+        "infile": false
+      }
+    }
+  }
 }
