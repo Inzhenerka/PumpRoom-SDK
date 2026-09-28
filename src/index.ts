@@ -31,6 +31,7 @@ export { authenticate, setUser } from "./auth.ts";
 export {
   setOnInitCallback,
   setOnResultReadyCallback,
+  setOnTaskResultChangedCallback,
   setOnTaskLoadedCallback,
   setOnTaskSubmittedCallback,
 } from "./callbacks.ts";
@@ -40,6 +41,7 @@ export { getTaskInstances } from "./instance.ts";
 export { clearStates, fetchStates, getRegisteredStates, storeStates } from "./states.ts";
 export type {
   AuthenticateOptions,
+  CompletionStatus,
   CourseDataCallback,
   CourseDataOutput,
   EnvironmentData,
@@ -53,6 +55,9 @@ export type {
   LoadedTaskData,
   OnInitCallback,
   OnResultReadyCallback,
+  OnTaskResultChangedCallback,
+  TaskResult,
+  TaskResultData,
   OnTaskLoadedCallback,
   OnTaskSubmittedCallback,
   PumpRoomConfig,
@@ -65,6 +70,7 @@ export type {
   StatesResponse,
   SubmissionResult,
   SubmissionStatus,
+  SuccessStatus,
   TaskDataOutput,
   TaskDetails,
 } from "./types/index.ts";

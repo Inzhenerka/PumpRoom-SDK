@@ -1,3 +1,7 @@
+import {
+  getOnTaskResultChangedCallback,
+  setOnTaskResultChangedCallback as setTaskResultCallback,
+} from "./globals.ts";
 /**
  * Callbacks module for PumpRoom SDK
  *
@@ -17,6 +21,7 @@ import {
   setOnTaskSubmittedCallback as setOnTaskSubmittedCallbackGlobal,
 } from "./globals.ts";
 import { getPumpRoomEventMessage } from "./messaging.ts";
+import type { OnTaskResultChangedCallback } from "./types/index.ts";
 import type {
   EnvironmentData,
   OnInitCallback,
@@ -242,4 +247,22 @@ export function setTaskListener(): void {
   window.addEventListener("message", handleTaskLoadedMessage);
   window.addEventListener("message", handleTaskSubmittedMessage);
   window.addEventListener("message", handleResultReadyMessage);
+  window.addEventListener("message", handleTaskResultChangedMessage);
+}
+
+/**
+ * Subscribe before loading the iframe to receive its initial saved result and later changes.
+ * A null result means no persisted result is available (for example, anonymous access).
+ * @category Callbacks
+ * @public
+ */
+export function setOnTaskResultChangedCallback(callback: OnTaskResultChangedCallback): void {
+  setTaskResultCallback(callback);
+}
+
+/** @internal */
+export function handleTaskResultChangedMessage(event: MessageEvent): void {
+  const data = getPumpRoomEventMessage(event, "onTaskResultChanged");
+  if (!data) return;
+  getOnTaskResultChangedCallback()?.(data.payload);
 }

@@ -114,3 +114,24 @@ bun run release
 `release-it` selects the next version from conventional commits, updates `package.json`, creates
 and pushes the release commit and `v*` tag. The tag workflow tests and builds the exact revision,
 publishes the npm package, deploys the SDK site, and creates the GitHub Release.
+
+### Learning results
+
+Register the callback before loading the iframe to receive its saved result and subsequent changes:
+
+```typescript
+import { setOnTaskResultChangedCallback } from "pumproom-sdk";
+
+setOnTaskResultChangedCallback(({ task, taskResult }) => {
+  console.log(task.uid, taskResult);
+});
+```
+
+The event describes the main embedded task; nested Master steps do not replace its result.
+The UI suppresses repeated revisions within the current load. Loading the task again emits its current result.
+
+Result fields retain their API names: `completion_status` (`not_attempted`, `incomplete`, `completed`),
+`success_status` (`unknown`, `passed`, `failed`), `score` (0–100 or null),
+`progress` (0–1 or null), `revision` and `updated_at` (ISO datetime or null).
+A null result means no persisted result is available, for example for anonymous access.
+`onResultReady` remains the separate notification about an individual submission.

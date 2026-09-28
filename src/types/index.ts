@@ -552,3 +552,26 @@ export interface ResultData {
   /** Result of the submission */
   result: SubmissionResult;
 }
+
+/** Completion states returned by the PumpRoom API. */
+export type CompletionStatus = "not_attempted" | "incomplete" | "completed";
+
+/** Success states returned by the PumpRoom API. */
+export type SuccessStatus = "unknown" | "passed" | "failed";
+
+/** Persisted learning result from the API. */
+export interface TaskResult {
+  completion_status: CompletionStatus;
+  success_status: SuccessStatus;
+  score: number | null;
+  progress: number | null;
+  revision: number;
+  updated_at: string | null;
+}
+
+export interface TaskResultData extends LoadedTaskData {
+  taskResult: TaskResult | null;
+}
+
+/** Receives the initial result and subsequent changes for the embedded task. */
+export type OnTaskResultChangedCallback = (data: TaskResultData) => void | Promise<void>;

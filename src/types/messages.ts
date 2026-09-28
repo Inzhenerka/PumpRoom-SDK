@@ -1,4 +1,11 @@
-import { EnvironmentData, LoadedTaskData, PumpRoomUser, ResultData, TaskStatus } from "./index.ts";
+import {
+  TaskResultData,
+  EnvironmentData,
+  LoadedTaskData,
+  PumpRoomUser,
+  ResultData,
+  TaskStatus,
+} from "./index.ts";
 
 /**
  * Union of all message types understood by the SDK.
@@ -14,7 +21,8 @@ export type PumpRoomMessageType =
   | "reportStatus"
   | "onTaskLoaded"
   | "onTaskSubmitted"
-  | "onResultReady";
+  | "onResultReady"
+  | "onTaskResultChanged";
 
 /**
  * Message format exchanged with PumpRoom via postMessage
@@ -169,4 +177,11 @@ export type MessageReturnType<T extends PumpRoomMessageType> = T extends "toggle
                     ? OnTaskSubmittedMessage
                     : T extends "onResultReady"
                       ? OnResultReadyMessage
-                      : PumproomMessage;
+                      : T extends "onTaskResultChanged"
+                        ? OnTaskResultChangedMessage
+                        : PumproomMessage;
+
+export interface OnTaskResultChangedMessage extends PumproomMessage {
+  type: "onTaskResultChanged";
+  payload: TaskResultData;
+}

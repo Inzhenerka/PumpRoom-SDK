@@ -8,6 +8,7 @@
  */
 import type { ApiClient } from "./api-client.ts";
 import { API_BASE_URL, normalizeApiBaseUrl, normalizePageUrl } from "./constants.ts";
+import type { OnTaskResultChangedCallback } from "./types/index.ts";
 import type {
   InstanceContext,
   InternalConfig,
@@ -374,4 +375,12 @@ export function getRegisteredStates(): string[] {
  */
 export function resetRegisteredStates(): void {
   registeredStates = [];
+}
+
+let onTaskResultChangedCallback: OnTaskResultChangedCallback | null = null;
+export function setOnTaskResultChangedCallback(callback: OnTaskResultChangedCallback): void {
+  onTaskResultChangedCallback = callback;
+}
+export function getOnTaskResultChangedCallback(): OnTaskResultChangedCallback | null {
+  return onTaskResultChangedCallback;
 }
