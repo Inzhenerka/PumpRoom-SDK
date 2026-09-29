@@ -18,6 +18,10 @@ RUN bun run build
 
 FROM nginxinc/nginx-unprivileged:1.30.5-alpine-slim@sha256:e28dcf0a161ddcbf228c7364b4a14f9bad4763ae8f5317c437b896afa3df4b84 AS runtime
 
+LABEL org.opencontainers.image.title="PumpRoom SDK" \
+      org.opencontainers.image.description="Browser SDK and integration documentation for PumpRoom" \
+      org.opencontainers.image.source="https://github.com/Inzhenerka/PumpRoom-SDK"
+
 COPY --chown=101:101 nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --chown=101:101 --from=builder /app/dist /usr/share/nginx/html
 

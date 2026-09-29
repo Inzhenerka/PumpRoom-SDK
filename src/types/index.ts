@@ -561,15 +561,22 @@ export type SuccessStatus = "unknown" | "passed" | "failed";
 
 /** Persisted learning result from the API. */
 export interface TaskResult {
+  /** Whether the task has been started or completed. */
   completion_status: CompletionStatus;
+  /** Whether the completed work passed the task criteria. */
   success_status: SuccessStatus;
+  /** Numeric result from 0 to 100, or null when the task has no meaningful score. */
   score: number | null;
+  /** Completion fraction from 0 to 1, or null when progress is not measurable. */
   progress: number | null;
+  /** Monotonically increasing revision of the persisted result. */
   revision: number;
+  /** ISO timestamp of the last persisted change, or null for an unsaved initial result. */
   updated_at: string | null;
 }
 
 export interface TaskResultData extends LoadedTaskData {
+  /** Current persisted result, or null when no result is available. */
   taskResult: TaskResult | null;
 }
 
