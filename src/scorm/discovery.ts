@@ -1,4 +1,7 @@
-/** Supported SCORM run-time versions. */
+/**
+ * Supported SCORM run-time versions.
+ * @category SCORM
+ */
 export type ScormVersion = "1.2" | "2004";
 
 const methods = {

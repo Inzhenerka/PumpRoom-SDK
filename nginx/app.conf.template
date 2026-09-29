@@ -1,0 +1,30 @@
+# PUMPROOM_SDK_PATH_PREFIX is empty for a standalone site, /sdk in PumpRoom Web.
+location = ${PUMPROOM_SDK_PATH_PREFIX}/index.html {
+    add_header Cache-Control no-store always;
+    try_files $uri =404;
+}
+location ~* ^${PUMPROOM_SDK_PATH_PREFIX}/.*\.html$ {
+    add_header Cache-Control no-store always;
+    try_files $uri =404;
+}
+# Floating aliases are revalidated; versioned bundles are immutable.
+location ~ ^${PUMPROOM_SDK_PATH_PREFIX}/bundle/pumproom-sdk-(?:latest|v[0-9]+)\.(?:esm|umd)\.js(?:\.map)?$ {
+    add_header Access-Control-Allow-Origin "*" always;
+    add_header Cross-Origin-Resource-Policy cross-origin always;
+    add_header Cache-Control no-cache always;
+    try_files $uri =404;
+}
+location ${PUMPROOM_SDK_PATH_PREFIX}/bundle/ {
+    add_header Access-Control-Allow-Origin "*" always;
+    add_header Cross-Origin-Resource-Policy cross-origin always;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    try_files $uri =404;
+}
+location ${PUMPROOM_SDK_PATH_PREFIX}/assets/ {
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    try_files $uri =404;
+}
+location ${PUMPROOM_SDK_PATH_PREFIX}/ {
+    add_header Cache-Control no-store always;
+    try_files $uri $uri/ $uri.html =404;
+}

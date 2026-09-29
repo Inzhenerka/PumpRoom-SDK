@@ -23,6 +23,8 @@ LABEL org.opencontainers.image.title="PumpRoom SDK" \
       org.opencontainers.image.source="https://github.com/Inzhenerka/PumpRoom-SDK"
 
 COPY --chown=101:101 nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY --chown=101:101 nginx/app.conf.template /etc/nginx/pumproom/sdk/app.conf.template
+COPY --chown=101:101 --chmod=755 scripts/generate-nginx-config.sh /docker-entrypoint.d/40-generate-nginx-config.sh
 COPY --chown=101:101 --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 8012

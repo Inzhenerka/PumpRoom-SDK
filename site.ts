@@ -14,7 +14,7 @@ hljs.registerLanguage("javascript", javascript);
 hljs.registerLanguage("xml", xml);
 
 export function replaceSdkBaseUrl(root: ParentNode = document): void {
-  const baseUrl = window.location.origin;
+  const baseUrl = new URL(".", window.location.href).href.replace(/\/$/, "");
   root.querySelectorAll("code").forEach((element) => {
     if (element.textContent?.includes("__BASE_URL__")) {
       element.textContent = element.textContent.split("__BASE_URL__").join(baseUrl);

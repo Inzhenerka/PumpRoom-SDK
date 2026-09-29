@@ -99,6 +99,8 @@ export interface RealmPayload {
 export interface AuthenticateOptions {
   /** Student identity. */
   identity: LMSIdentityInput;
+  /** Cancel authentication without publishing late credentials. */
+  signal?: AbortSignal;
 }
 
 /**

@@ -2,10 +2,16 @@ import type { TaskResultData } from "../types/index.ts";
 import { discoverApi, type ScormVersion } from "./discovery.ts";
 import { formatSessionTime, mapResult } from "./mapping.ts";
 
-/** Supported SCORM run-time versions. */
+/**
+ * Supported SCORM run-time versions.
+ * @category SCORM
+ */
 export type { ScormVersion } from "./discovery.ts";
 
-/** Configuration for one SCO reporting one embedded PumpRoom task. */
+/**
+ * Configuration for one SCO reporting one embedded PumpRoom task.
+ * @category SCORM
+ */
 export interface ScormOptions {
   /** Only events for this task UID are reported. */
   taskUid: string;
@@ -21,7 +27,10 @@ export interface ScormOptions {
   onError?: (error: Error) => void;
 }
 
-/** Learner identity as reported by the LMS, without interpreting it as an email. */
+/**
+ * Learner identity as reported by the LMS, without interpreting it as an email.
+ * @category SCORM
+ */
 export interface ScormLearner {
   /** LMS-local identifier; scope it to the LMS installation when authenticating. */
   id: string;
@@ -29,7 +38,10 @@ export interface ScormLearner {
   name: string;
 }
 
-/** Explicitly initialized SCORM session owned by the launch page. */
+/**
+ * Explicitly initialized SCORM session owned by the launch page.
+ * @category SCORM
+ */
 export interface ScormConnection {
   /** Detected run-time version. */
   readonly version: ScormVersion;
@@ -45,7 +57,10 @@ export interface ScormConnection {
   finish(): void;
 }
 
-/** SCORM operation rejected by the LMS. */
+/**
+ * SCORM operation rejected by the LMS.
+ * @category SCORM
+ */
 export class ScormError extends Error {
   /** Name of the rejected API operation, including the field for reads and writes. */
   readonly operation: string;

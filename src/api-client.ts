@@ -93,7 +93,11 @@ export class ApiClient {
    * }
    * ```
    */
-  async verifyToken(user: PumpRoomUser, realm: string): Promise<VerifyTokenResult> {
+  async verifyToken(
+    user: PumpRoomUser,
+    realm: string,
+    signal?: AbortSignal,
+  ): Promise<VerifyTokenResult> {
     const payload: VerifyTokenInput = {
       realm,
       token: user.token,
@@ -102,6 +106,7 @@ export class ApiClient {
     };
 
     const resp = await fetch(this.endpoint(VERIFY_URL), {
+      ...(signal ? { signal } : {}),
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -144,6 +149,7 @@ export class ApiClient {
     };
 
     const response = await fetch(this.endpoint(AUTH_URL), {
+      ...(options.signal ? { signal: options.signal } : {}),
       method: "POST",
       headers: {
         "Content-Type": "application/json",

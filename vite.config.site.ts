@@ -19,6 +19,7 @@ function htmlVersionPlugin(): Plugin {
 }
 
 export default defineConfig({
+  base: "./",
   define: {
     __VERSION__: JSON.stringify(version),
   },

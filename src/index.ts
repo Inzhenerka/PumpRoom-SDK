@@ -10,7 +10,9 @@
  * @categoryDescription Callbacks
  *  Functions for setting up event handlers and callback functions that respond to SDK lifecycle events.
  * @categoryDescription Tasks
- *  Functions for working with task instances and retrieving task-related information.
+ *  Task embedding, mounted iframe handles, settings and task instance information.
+ * @categoryDescription SCORM
+ *  LMS launch, mounted SCO handles, learner identity and SCORM session management.
  * @categoryDescription States
  *  [Experimental] Functions for managing persistent state data, including storing, retrieving, and clearing application states.
  * @categoryDescription Courses
@@ -18,15 +20,13 @@
  * @module PumpRoomSDK
  */
 
-import { initApiClient } from "./api-client.ts";
-import { setTaskListener } from "./callbacks.ts";
-import { setEnvironmentListener } from "./environment.ts";
-import { setFullscreenListener } from "./fullscreen.ts";
-import { getConfig, setConfig } from "./globals.ts";
-import { enforceIframeHeight } from "./iframe.ts";
-import { PumpRoomConfig } from "./types/index.ts";
 import { getVersion } from "./version.ts";
 
+export { init } from "./init.ts";
+export { mountTask } from "./embed.ts";
+export type { MountedTask, MountTaskOptions } from "./embed.ts";
+export { mountScormTask } from "./scorm/mount.ts";
+export type { MountedScormTask, MountScormTaskOptions } from "./scorm/mount.ts";
 export { authenticate, setUser } from "./auth.ts";
 export {
   setOnInitCallback,
@@ -79,39 +79,3 @@ export type {
 export { getVersion } from "./version.ts";
 
 console.debug("PumpRoom SDK v" + getVersion() + " loaded");
-
-/**
- * Initializes the PumpRoom SDK with the provided configuration.
- *
- * This function must be called before using any other SDK functionality.
- * It sets up the API client, event listeners, and iframe configuration.
- *
- * @param cfg - The SDK configuration object
- * @category Initialization
- * @public
- * @example
- * ```typescript
- * import { init } from 'pumproom-sdk';
- *
- * init({
- *   apiKey: 'your-api-key',
- *   realm: 'your-realm',
- *   apiBaseUrl: 'https://pumproom.example.com/api',
- *   pageUrl: 'https://lms.example.com/scorm/course-42/lesson-1',
- *   cacheUser: true,
- *   minHeight: 500
- * });
- * ```
- */
-export function init(cfg: PumpRoomConfig): void {
-  setConfig(cfg);
-  const config = getConfig();
-  if (!config) throw new Error("SDK configuration failed");
-  initApiClient(config.apiKey, config.apiBaseUrl);
-  setFullscreenListener();
-  setEnvironmentListener();
-  setTaskListener();
-  if (cfg.minHeight) {
-    enforceIframeHeight(cfg.minHeight);
-  }
-}

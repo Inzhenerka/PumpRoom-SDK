@@ -212,6 +212,13 @@ export function registerTaskInstance(instanceContext: InstanceContext): void {
   }
 }
 
+/** Remove an instance only if it still belongs to the caller. @internal */
+export function unregisterTaskInstance(instanceContext: InstanceContext): void {
+  if (instanceRegistry[instanceContext.instanceUid] === instanceContext) {
+    delete instanceRegistry[instanceContext.instanceUid];
+  }
+}
+
 /**
  * Gets all registered instances
  *

@@ -57,7 +57,80 @@ init({
 When omitted, the SDK uses `window.location.href`. Query parameters and fragments are removed in
 both cases.
 
-## SCORM launch-page adapter
+## Managed task embedding
+
+`mountTask()` creates one iframe and owns its event handlers and lifetime. It does not
+authenticate: call `init()` and `authenticate()` / `setUser()` first for an authenticated task.
+For anonymous examples, pass `user: null`; no SDK initialization is required.
+
+```ts
+import { mountTask } from "pumproom-sdk";
+
+const task = mountTask(document.getElementById("task")!, {
+  url: "https://tasks.school.example/?realm=school&repo_name=course&task_name=lesson",
+  title: "Lesson",
+  user: null,
+  onTaskResultChanged: (data) => console.log(data.taskResult),
+  onError: (error) => console.error(error),
+});
+await task.ready;
+// On component unmount or before replacing the task:
+task.destroy();
+```
+
+`ready` waits for the task's `onTaskLoaded` message, not the iframe's HTML load event.
+The default timeout is 30 seconds (`timeoutMs`); height defaults to 600 pixels (`height`).
+An optional `taskUid` filters events to the expected task. Pass an `AbortSignal` to cancel loading
+or destroy the frame. Timeout/load failure removes the iframe; callback errors are reported
+without removing a working task. `destroy()` is idempotent and rejects pending readiness.
+
+Events are scoped to the exact iframe window and URL origin. Managed frames do not invoke global
+SDK callbacks or use global message responders; manually embedded iframes continue to work as before.
+Credentials and environment are captured when mounting. Reauthentication or a realm change requires
+destroying and mounting again. For authenticated frames, the URL realm and origin must match the
+SDK configuration (`trustedOrigins` for custom deployments). `user: null` prevents credential sharing
+with public examples even if another task on the page is authenticated.
+
+## SCORM launch page
+
+For a SCO containing one task, the SDK handles connection, identity mapping, authentication,
+embedding and result reporting in one call:
+
+```ts
+import { mountScormTask } from "./pumproom-sdk.esm.js";
+
+const task = await mountScormTask(document.getElementById("task")!, {
+  apiKey: "PUBLIC_INTEGRATION_KEY",
+  realm: "school",
+  apiBaseUrl: "https://api.school.example",
+  url: "https://tasks.school.example/?realm=school&repo_name=course&task_name=lesson",
+  taskUid: "TASK_UID",
+  lmsId: "school-lms",
+  scormVersion: "2004",
+  pageUrl: "https://lms.school.example/content/lesson-1",
+  onError: (error) => console.error("Could not save or load the task", error),
+});
+// For an explicit close action; normal pagehide is also handled by the SCORM adapter:
+// task.destroy();
+```
+
+Catch rejection of `mountScormTask()` in the launch page and display a startup error. The resolved
+handle exposes the iframe, `ready`, `scorm` and `destroy()`. Destruction also finishes the SCORM
+session and may throw if the LMS rejects persistence. `signal` cancels authentication/loading
+or closes the mounted task. Use one SCORM mount per launch document; it owns SDK configuration.
+
+Embedding settings and event callbacks are shared with `mountTask()`. The URL realm must match
+the configured realm. `onTaskResultChanged` runs after reporting to the LMS, even if that reporting
+fails; LMS and callback errors are delivered to `onError`. Learner credentials are managed by
+the wrapper, so it does not accept a `user` option.
+
+The default LMS identity is `encodeURIComponent(lmsId) + ":" + encodeURIComponent(learner.id)`.
+Keep `lmsId` stable per installation, not per course. For existing users, supply
+`mapLearner: learner => ({ provider: "lms", id: existingId(learner.id) })` to preserve the existing
+identity scheme. Authentication caching is off by default in this wrapper. The LMS learner ID is
+not cryptographic proof of identity; use the integration's public key, never an administrative secret.
+
+### Low-level SCORM adapter
 
 SCORM support is included in the main SDK bundle but remains opt-in: call `connectScorm()`
 from the launch page hosted by the LMS, not from the cross-origin PumpRoom UI iframe.

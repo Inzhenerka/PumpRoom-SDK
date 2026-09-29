@@ -36,7 +36,7 @@ export interface PumpRoomEnvironment {
  * @returns The environment information
  * @internal
  */
-function buildEnvironment(): PumpRoomEnvironment {
+export function buildEnvironment(): PumpRoomEnvironment {
   const config = getConfig();
   const pageURL = getCurrentNormalizedUrl();
   if (!pageURL) {

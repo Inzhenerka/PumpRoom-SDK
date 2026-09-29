@@ -10,6 +10,18 @@ import { DEFAULT_TRUSTED_ORIGINS } from "./constants.ts";
 import { getConfig } from "./globals.ts";
 import type { MessageReturnType, PumpRoomMessageType } from "./types/messages.js";
 
+const managedFrames = new WeakSet<HTMLIFrameElement>();
+
+/** @internal */
+export function registerManagedFrame(frame: HTMLIFrameElement): void {
+  managedFrames.add(frame);
+}
+
+/** @internal */
+export function unregisterManagedFrame(frame: HTMLIFrameElement): void {
+  managedFrames.delete(frame);
+}
+
 /** Accept messages only from an attached iframe at a trusted origin. */
 function isTrustedMessage(event: MessageEvent): boolean {
   const origins: readonly string[] = getConfig()?.trustedOrigins ?? DEFAULT_TRUSTED_ORIGINS;
@@ -17,6 +29,8 @@ function isTrustedMessage(event: MessageEvent): boolean {
     return false;
   }
   return Array.from(document.querySelectorAll("iframe")).some((iframe) => {
+    // Managed frames have their own credentials, environment and callbacks.
+    if (managedFrames.has(iframe)) return false;
     if (iframe.contentWindow !== event.source || !iframe.getAttribute("src")) return false;
     try {
       return new URL(iframe.src, document.baseURI).origin === event.origin;
@@ -51,8 +65,22 @@ function isTrustedMessage(event: MessageEvent): boolean {
 export function getPumpRoomEventMessage<T extends PumpRoomMessageType>(
   event: MessageEvent,
   target_type: T,
+  scope?: { iframe: HTMLIFrameElement; origin: string },
 ): MessageReturnType<T> | null {
-  if (!isTrustedMessage(event)) return null;
+  if (scope) {
+    if (
+      !scope.iframe.isConnected ||
+      !event.source ||
+      event.source !== scope.iframe.contentWindow ||
+      event.origin !== scope.origin
+    )
+      return null;
+    try {
+      if (new URL(scope.iframe.src).origin !== scope.origin) return null;
+    } catch {
+      return null;
+    }
+  } else if (!isTrustedMessage(event)) return null;
   // Basic validation of the message
   if (!event.data || typeof event.data !== "object") return null;
   if (event.data.service !== "pumproom") return null;

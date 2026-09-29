@@ -15,6 +15,50 @@ beforeEach(() => {
 });
 
 describe("authenticate", () => {
+  it("rejects pre-aborted authentication without starting a request", async () => {
+    const abort = new AbortController();
+    abort.abort();
+    global.fetch = vi.fn();
+    await expect(
+      authenticate({ identity: { provider: "lms", id: "student" }, signal: abort.signal }),
+    ).rejects.toMatchObject({ name: "AbortError" });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("passes cancellation to fetch and never installs a late response", async () => {
+    const abort = new AbortController();
+    let finish!: (value: unknown) => void;
+    global.fetch = vi.fn().mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const pending = authenticate({
+      identity: { provider: "lms", id: "student" },
+      signal: abort.signal,
+    });
+    expect(fetch).toHaveBeenCalledWith(AUTH_URL, expect.objectContaining({ signal: abort.signal }));
+    abort.abort();
+    finish({ ok: true, json: async () => ({ uid: "late", token: "late", is_admin: false }) });
+    await expect(pending).rejects.toMatchObject({ name: "AbortError" });
+    expect(getCurrentUser()).toBeNull();
+  });
+
+  it("passes cancellation to cached-token verification", async () => {
+    setConfig({ apiKey: "key", realm: "test", cacheUser: true });
+    const cached = { uid: "student", token: "cached", is_admin: false };
+    localStorage.setItem("pumproomUser", JSON.stringify(boundCache(cached, "student")));
+    global.fetch = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => ({ is_valid: true, is_admin: false }) });
+    const abort = new AbortController();
+    await authenticate({ identity: { provider: "lms", id: "student" }, signal: abort.signal });
+    expect(fetch).toHaveBeenCalledWith(
+      VERIFY_URL,
+      expect.objectContaining({ signal: abort.signal }),
+    );
+  });
   it("requests auth endpoint", async () => {
     const response = { uid: "1", token: "tok", is_admin: false };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });

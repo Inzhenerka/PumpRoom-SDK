@@ -87,7 +87,14 @@ function withoutCacheMetadata(user: CachedUser): PumpRoomUser {
  * }
  * ```
  */
-export async function authenticate({ identity }: AuthenticateOptions): Promise<PumpRoomUser> {
+export async function authenticate({
+  identity,
+  signal,
+}: AuthenticateOptions): Promise<PumpRoomUser> {
+  const assertNotAborted = () => {
+    if (signal?.aborted) throw new DOMException("Authentication aborted", "AbortError");
+  };
+  assertNotAborted();
   const config = getConfig();
   if (!config) {
     throw new Error("SDK is not initialized");
@@ -96,6 +103,7 @@ export async function authenticate({ identity }: AuthenticateOptions): Promise<P
   const generation = ++authGeneration;
   setCurrentUser(null);
   const assertCurrent = (): void => {
+    assertNotAborted();
     if (generation !== authGeneration || getConfig() !== config) {
       throw new Error("Authentication superseded by a newer request or configuration");
     }
@@ -146,7 +154,11 @@ export async function authenticate({ identity }: AuthenticateOptions): Promise<P
       cachedUser.authContext?.id === authContext.id &&
       (cachedUser.authContext?.apiBaseUrl ?? API_BASE_URL) === config.apiBaseUrl
     ) {
-      const result = await apiClient.verifyToken(withoutCacheMetadata(cachedUser), config.realm);
+      const result = await apiClient.verifyToken(
+        withoutCacheMetadata(cachedUser),
+        config.realm,
+        signal,
+      );
       assertCurrent();
       if (result.is_valid) {
         currentUser = { ...withoutCacheMetadata(cachedUser), is_admin: result.is_admin };
@@ -157,7 +169,10 @@ export async function authenticate({ identity }: AuthenticateOptions): Promise<P
   // Unbound legacy records must be resolved by identity, never adopted blindly.
   // Preserve storage on failures so migration can be retried on the next call.
   if (!currentUser) {
-    const result = await apiClient.authenticate({ identity }, config.realm);
+    const result = await apiClient.authenticate(
+      { identity, ...(signal ? { signal } : {}) },
+      config.realm,
+    );
     assertCurrent();
     if (!isPumpRoomUser(result)) throw new Error("Authentication failed");
     currentUser = withoutCacheMetadata(result);

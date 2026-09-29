@@ -13,7 +13,7 @@
   "name": "PumpRoom SDK",
   "includeVersion": true,
   "categorizeByGroup": false,
-  "categoryOrder": ["Initialization", "Authentication", "Callbacks", "Tasks", "*"],
+  "categoryOrder": ["Initialization", "Authentication", "Callbacks", "Tasks", "SCORM", "*"],
   "searchInComments": true,
   "hideGenerator": true,
   "customFooterHtml": "PumpRoom SDK",
