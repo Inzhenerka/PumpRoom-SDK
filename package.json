@@ -37,10 +37,10 @@
     }
   },
   "scripts": {
-    "build": "vite build -c vite.config.lib.ts && tsc -p tsconfig.build.json --emitDeclarationOnly && bun run docs && vite build -c vite.config.site.ts",
+    "build": "bun run build-lib && bun run docs && vite build -c vite.config.site.ts",
     "build-lib": "vite build -c vite.config.lib.ts && tsc -p tsconfig.build.json --emitDeclarationOnly",
     "build-site": "bun run docs && vite build -c vite.config.site.ts",
-    "dev": "vite build -c vite.config.lib.ts && bun run docs && vite -c vite.config.site.ts",
+    "dev": "bun run build-lib && bun run docs && vite -c vite.config.site.ts",
     "preview": "vite preview -c vite.config.site.ts",
     "docs": "typedoc --options typedoc.json",
     "check": "tsc --noEmit",

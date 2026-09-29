@@ -57,6 +57,82 @@ init({
 When omitted, the SDK uses `window.location.href`. Query parameters and fragments are removed in
 both cases.
 
+## SCORM launch-page adapter
+
+SCORM support is included in the main SDK bundle but remains opt-in: call `connectScorm()`
+from the launch page hosted by the LMS, not from the cross-origin PumpRoom UI iframe.
+Importing or initializing the SDK does not initialize SCORM.
+One connection reports one PumpRoom task as one SCO.
+
+```ts
+import { connectScorm, setOnTaskResultChangedCallback } from "pumproom-sdk";
+
+const scorm = connectScorm({
+  taskUid: "YOUR_TASK_UID",
+  version: "2004", // Must match imsmanifest.xml; "1.2" is also supported.
+  onError: (error) => console.error("SCORM lifecycle error", error),
+});
+if (!scorm) throw new Error("The LMS SCORM API is not accessible");
+
+const learner = scorm.getLearner();
+console.log(learner.id, learner.name);
+
+// Register before loading the iframe; combine with your existing callback if needed.
+setOnTaskResultChangedCallback((data) => {
+  try {
+    scorm.handleTaskResult(data);
+  } catch (error) {
+    // Surface persistence failures to the learner; never claim the grade was saved.
+    console.error("Could not save the result to the LMS", error);
+  }
+});
+```
+
+The snippet only wires result reporting. The launch page still configures the ordinary SDK with
+`init()`, authenticates the learner and creates the task iframe. Treat `learner.id` as an LMS-local
+identifier, not an email or proof of identity. Define an installation-scoped identity mapping agreed
+with your PumpRoom integration; SCORM itself does not provide trusted server-side authentication.
+Use a stable `pageUrl`, the customer's `apiBaseUrl` and explicit `trustedOrigins` for on-premises.
+
+The adapter discovers the API in accessible parent/opener windows, initializes it explicitly and
+throws on rejected LMS operations. `connectScorm()` returns `null` when no compatible API is
+accessible (including cross-origin restrictions). Specify `instanceUid` if the same task appears
+in multiple iframes. It uses events already validated by the SDK, without installing a second
+message listener or replacing SDK callbacks.
+
+| PumpRoom result     | SCORM 2004                                | SCORM 1.2                                |
+| ------------------- | ----------------------------------------- | ---------------------------------------- |
+| `completion_status` | `cmi.completion_status`                   | Combined into `cmi.core.lesson_status`   |
+| `success_status`    | `cmi.success_status`                      | Used only when completion is `completed` |
+| `score` (0–100)     | Raw score, min/max and scaled score (0–1) | Raw score and min/max                    |
+| `progress` (0–1)    | `cmi.progress_measure`                    | Not reported: no equivalent field        |
+
+In 1.2, an incomplete failed task stays `incomplete`; a completed task becomes `passed`, `failed`
+or `completed` when success is unknown. Unknown (`null`) scores/progress are not written, so any
+previous LMS numeric value remains unchanged. Null results and unsaved initial snapshots
+(`revision: 0`, `not_attempted`) do not overwrite resumed LMS data. A persisted result is reported
+on first receipt; subsequent duplicate/older revisions are ignored after a successful commit.
+A failed write/commit throws and the same event can be retried; retries are not automatic.
+
+Each result is committed immediately. By default, `pagehide` commits elapsed session time and
+terminates the session, or only commits if the page enters the browser's back/forward cache.
+Unfinished work uses `suspend`; finished work uses the version's normal exit value. Explicitly call
+`finish()` from your own close flow if needed; successful repeated calls are harmless. For full
+lifecycle control use `autoFinish: false`, `commit()` and `finish()`. Browser crashes and forced
+closure cannot guarantee a final save. Completion alone does not terminate the session.
+
+The adapter mirrors the current PumpRoom task result; it does not implement LMS attempts, course
+aggregation or `suspend_data` restoration. A new LMS attempt does not reset the API's stored result.
+Validate these policies in the target LMS before rollout.
+
+SCORM and authentication share the existing `/bundle/pumproom-sdk-v<version>.esm.js` or
+`/bundle/pumproom-sdk-v<version>.umd.js` bundle (UMD: `PumpRoomSdk.connectScorm`).
+No additional script is needed. Major-version and `latest` aliases are also emitted.
+For a reproducible SCORM ZIP, vendor one SDK bundle from an exact release inside the ZIP.
+`imsmanifest.xml`, launch HTML, configuration and ZIP
+generation remain the package builder's responsibility. Bundling the adapter does not make the
+remote UI/API available offline.
+
 # SDK Development
 
 ## Installing Dependencies

@@ -38,6 +38,8 @@ export {
 export { loadCourseData } from "./course.ts";
 export { getCurrentUser } from "./globals.ts";
 export { getTaskInstances } from "./instance.ts";
+export { connectScorm, ScormError } from "./scorm/index.ts";
+export type { ScormConnection, ScormLearner, ScormOptions, ScormVersion } from "./scorm/index.ts";
 export { clearStates, fetchStates, getRegisteredStates, storeStates } from "./states.ts";
 export type {
   AuthenticateOptions,
