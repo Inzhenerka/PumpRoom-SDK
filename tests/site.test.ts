@@ -22,9 +22,13 @@ vi.mock("highlight.js/styles/github.css", () => ({}));
 vi.mock("highlightjs-copy/dist/highlightjs-copy.min.css", () => ({}));
 
 describe("site script", () => {
-  it("initializes highlight.js on DOMContentLoaded", async () => {
+  it("uses the current site origin in snippets before highlighting them", async () => {
+    document.body.innerHTML = "<code>__BASE_URL__/bundle/sdk.js</code>";
     await import("../site.ts");
     document.dispatchEvent(new Event("DOMContentLoaded"));
+    expect(document.querySelector("code")?.textContent).toBe(
+      `${window.location.origin}/bundle/sdk.js`,
+    );
     expect(pluginCtor).toHaveBeenCalledWith({ autohide: false });
     expect(addPlugin).toHaveBeenCalledWith({ name: "plugin" });
     expect(highlightAll).toHaveBeenCalled();

@@ -1,0 +1,18 @@
+services:
+  pumproom-sdk:
+    image: ${PUMPROOM_SDK_IMAGE:?Set PUMPROOM_SDK_IMAGE to a versioned PumpRoom SDK image}
+    restart: unless-stopped
+    ports:
+      - "${PUMPROOM_SDK_BIND_ADDRESS:-127.0.0.1}:${PUMPROOM_SDK_PORT:-8012}:8012"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m,uid=101,gid=101,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

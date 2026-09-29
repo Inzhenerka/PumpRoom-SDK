@@ -7,17 +7,13 @@ import pkg from "./package.json" with { type: "json" };
 
 const version = pkg.version;
 const majorVersion = version.split(".")[0];
-const baseUrl = pkg.homepage.replace(/\/$/, "");
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function htmlVersionPlugin(): Plugin {
   return {
     name: "html-version-replace",
     transformIndexHtml(html) {
-      return html
-        .replace(/__VERSION__/g, version)
-        .replace(/__MAJOR_VERSION__/g, majorVersion)
-        .replace(/__BASE_URL__/g, baseUrl);
+      return html.replace(/__VERSION__/g, version).replace(/__MAJOR_VERSION__/g, majorVersion);
     },
   };
 }
@@ -25,7 +21,6 @@ function htmlVersionPlugin(): Plugin {
 export default defineConfig({
   define: {
     __VERSION__: JSON.stringify(version),
-    __BASE_URL__: JSON.stringify(baseUrl),
   },
   publicDir: resolve(__dirname, "public"),
   build: {
@@ -44,11 +39,11 @@ export default defineConfig({
     },
   },
   server: {
-    port: 8005,
+    port: 8012,
     open: "/",
   },
   preview: {
-    port: 8005,
+    port: 8012,
     open: "/",
   },
   plugins: [htmlVersionPlugin()],

@@ -5,9 +5,6 @@ on:
     tags:
       - "v*"
 
-permissions:
-  contents: read
-
 concurrency:
   group: sdk-release
   cancel-in-progress: false
@@ -16,6 +13,8 @@ jobs:
   build:
     name: 🔧 Build and test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: 👋 Checkout
         uses: actions/checkout@v6
@@ -68,13 +67,6 @@ jobs:
           mkdir -p npm-package
           npm pack --ignore-scripts --pack-destination npm-package
 
-      - name: 📤 Upload site artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: site-dist
-          path: dist/
-          if-no-files-found: error
-
       - name: 📤 Upload release archive
         uses: actions/upload-artifact@v4
         with:
@@ -113,31 +105,32 @@ jobs:
       - name: 📦 Publish package
         run: npm publish ./npm-package/*.tgz --ignore-scripts --provenance
 
+  deploy:
+    name: 🚀 Deploy to production
+    needs: [build, publish-npm]
+    permissions:
+      contents: read
+      packages: write
+      deployments: write
+    uses: Inzhenerka/PumpRoom-CI/.github/workflows/deploy_coolify.yml@main
+    with:
+      environment: production
+      url: https://pumproom-sdk.inzhenerka-cloud.com/
+    secrets:
+      coolify_webhook: ${{ secrets.COOLIFY_WEBHOOK }}
+      coolify_token: ${{ secrets.COOLIFY_TOKEN }}
+
   release:
     name: 🚀 Release
-    needs: [build, publish-npm]
+    needs: [build, publish-npm, deploy]
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      deployments: write
     steps:
-      - name: 📥 Download site artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: site-dist
-          path: dist
-
       - name: 📥 Download release archive
         uses: actions/download-artifact@v4
         with:
           name: release-archive
-
-      - name: ⚙️ Install AWS CLI
-        uses: unfor19/install-aws-cli-action@v1
-        with:
-          version: 2
-          verbose: false
-          arch: amd64
 
       - name: 🏷️ Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -146,25 +139,3 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 🔼 Upload site
-        run: |
-          AWS_ACCESS_KEY_ID=${{ secrets.ACCESS_KEY_ID }} \
-          AWS_SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }} \
-          aws s3 sync "dist/" "s3://pumproom-sdk-site/" \
-            --endpoint-url https://storage.yandexcloud.net
-        shell: bash
-
-      - name: 🔃 Purge CDN cache
-        uses: yc-actions/yc-cdn-cache@v2
-        with:
-          yc-sa-json-credentials: ${{ secrets.yc_sa_json_credentials }}
-          cdn-resource-id: bc8rsghmnpm27w7z5ppm
-
-      - name: 🏁 Create GitHub deployment
-        uses: chrnorm/deployment-action@v2
-        with:
-          token: "${{ github.token }}"
-          initial-status: success
-          environment-url: https://pumproom-sdk.inzhenerka-cloud.com
-          environment: prod

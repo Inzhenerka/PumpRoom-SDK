@@ -3,6 +3,8 @@ node_modules
 coverage
 .idea
 .env
+.env.local
+.env.onprem
 report.xml
 public/docs
 .eslintcache

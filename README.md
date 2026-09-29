@@ -81,10 +81,49 @@ bun run build
 ## Running the Development Server
 
 The server runs Vite with live reload. The landing page is displayed at `/`, and
-the example from the `example` directory is available at `/example/`.
+the example from the `example` directory is available at `/example/`. Copy `.env.example`
+to `.env.local` to configure the example credentials. The development server listens on
+`http://localhost:8012`.
 
 ```bash
 bun dev
+```
+
+## On-premises site
+
+The documentation site and browser bundles are distributed as an immutable nginx image. Bundle
+links shown on the site are based on the browser's current origin, so the same image works under
+the cloud domain and a customer domain without rebuilding it.
+
+1. Copy and edit the environment template:
+
+   ```shell
+   cp .env.onprem.example .env.onprem
+   ```
+
+2. Pull and start the versioned image:
+
+   ```shell
+   docker compose --env-file .env.onprem pull
+   docker compose --env-file .env.onprem up -d
+   ```
+
+By default, the site listens on `http://localhost:8012`; its health endpoint is
+`http://localhost:8012/healthz`. Put an ingress or reverse proxy with TLS in front of the
+container. Set `PUMPROOM_SDK_BIND_ADDRESS=0.0.0.0` only when direct external access is intentional.
+
+| Variable                    | Required | Purpose                                  |
+| --------------------------- | -------- | ---------------------------------------- |
+| `PUMPROOM_SDK_IMAGE`        | yes      | Versioned GHCR image or immutable digest |
+| `PUMPROOM_SDK_PORT`         | no       | Host port; defaults to `8012`            |
+| `PUMPROOM_SDK_BIND_ADDRESS` | no       | Bind address; defaults to `127.0.0.1`    |
+
+The SDK library itself does not read container environment variables. An LMS configures its
+PumpRoom API and iframe origins explicitly through `init({ apiBaseUrl, trustedOrigins })`, which
+keeps npm, CDN and on-premises usage identical. To build the container from the current checkout:
+
+```shell
+docker compose -f compose.yaml -f compose.build.yaml --env-file .env.onprem up -d --build
 ```
 
 ### Testing
@@ -113,7 +152,9 @@ bun run release
 
 `release-it` selects the next version from conventional commits, updates `package.json`, creates
 and pushes the release commit and `v*` tag. The tag workflow tests and builds the exact revision,
-publishes the npm package, deploys the SDK site, and creates the GitHub Release.
+publishes the npm package and GHCR image, deploys the SDK site through Coolify, and creates the
+GitHub Release. Configure the repository secrets `COOLIFY_WEBHOOK` and `COOLIFY_TOKEN` before the
+first deployment.
 
 ### Learning results
 

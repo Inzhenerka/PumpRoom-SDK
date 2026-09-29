@@ -142,7 +142,7 @@
               <b>Javascript-код</b> и вставить в него код:
             </p>
             <pre><code class="language-javascript border border-primary-subtle">document.head.appendChild(Object.assign(document.createElement('script'), {
-  src: 'https://pumproom-sdk.inzhenerka-cloud.com/bundle/pumproom-sdk-v2.umd.js',
+  src: '__BASE_URL__/bundle/pumproom-sdk-v2.umd.js',
   async: true, onload() {
     window.PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID', 'type': 'getcourse' });
     window.PumpRoomSdk.authenticate({ identity: { provider: 'lms', id: '{uid}' } }).catch(console.error);
@@ -294,7 +294,9 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
             <div>
               Добавлен коллбэк <code>setOnTaskResultChangedCallback</code> для получения
               сохранённого результата задания и его изменений. Результат содержит статус
-              прохождения, статус успешности, оценку, прогресс и ревизию.
+              прохождения, статус успешности, оценку, прогресс и ревизию. Сайт SDK теперь
+              поставляется в Docker-образе и формирует ссылки на bundle из текущего origin, поэтому
+              один образ подходит для cloud и on-premise.
             </div>
           </li>
 

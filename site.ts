@@ -13,8 +13,18 @@ hljs.registerLanguage("html", xml);
 hljs.registerLanguage("javascript", javascript);
 hljs.registerLanguage("xml", xml);
 
+export function replaceSdkBaseUrl(root: ParentNode = document): void {
+  const baseUrl = window.location.origin;
+  root.querySelectorAll("code").forEach((element) => {
+    if (element.textContent?.includes("__BASE_URL__")) {
+      element.textContent = element.textContent.split("__BASE_URL__").join(baseUrl);
+    }
+  });
+}
+
 // Initialize Highlight.js and add the Copy Button Plugin
 document.addEventListener("DOMContentLoaded", () => {
+  replaceSdkBaseUrl();
   hljs.addPlugin(new CopyButtonPlugin({ autohide: false }));
   hljs.highlightAll();
 
