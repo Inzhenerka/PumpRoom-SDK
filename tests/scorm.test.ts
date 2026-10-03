@@ -136,6 +136,97 @@ describe("SCORM mapping", () => {
 });
 
 describe.each(["1.2", "2004"] as const)("SCORM %s connection", (version) => {
+  it("updates an output-check pass after a failed retry", () => {
+    const lms = mockLms(version);
+    const scorm = connectScorm({ taskUid: "task", version, window: lms.launch })!;
+    scorm.handleTaskResult(
+      event({
+        ...result,
+        revision: 1,
+        completion_status: "incomplete",
+        success_status: "failed",
+        score: 0,
+        progress: 0,
+      }),
+    );
+    expect(lms.values[version === "1.2" ? "cmi.core.lesson_status" : "cmi.completion_status"]).toBe(
+      "incomplete",
+    );
+    const passed = event({ ...result, revision: 2, score: 100 });
+    expect(scorm.handleTaskResult(passed)).toBe(true);
+    expect(lms.values[version === "1.2" ? "cmi.core.lesson_status" : "cmi.success_status"]).toBe(
+      "passed",
+    );
+    expect(lms.values[version === "1.2" ? "cmi.core.score.raw" : "cmi.score.raw"]).toBe("100");
+    expect(scorm.handleTaskResult(passed)).toBe(false);
+    expect(lms.commit).toHaveBeenCalledTimes(2);
+    expect(
+      scorm.handleTaskResult(
+        event({
+          ...result,
+          revision: 3,
+          completion_status: "incomplete",
+          success_status: "failed",
+          score: 0,
+          progress: 0,
+        }),
+      ),
+    ).toBe(true);
+    expect(lms.values[version === "1.2" ? "cmi.core.lesson_status" : "cmi.completion_status"]).toBe(
+      "incomplete",
+    );
+    if (version === "2004") expect(lms.values["cmi.success_status"]).toBe("failed");
+    expect(lms.values[version === "1.2" ? "cmi.core.score.raw" : "cmi.score.raw"]).toBe("0");
+    expect(lms.commit).toHaveBeenCalledTimes(3);
+    scorm.finish();
+  });
+  it.each(["passed", "failed"] as const)(
+    "publishes a pending retry before its final %s grade",
+    (success) => {
+      const lms = mockLms(version);
+      const scorm = connectScorm({ taskUid: "task", version, window: lms.launch })!;
+      const scoreField = version === "1.2" ? "cmi.core.score.raw" : "cmi.score.raw";
+      const statusField = version === "1.2" ? "cmi.core.lesson_status" : "cmi.completion_status";
+      scorm.handleTaskResult(event({ ...result, score: 100, revision: 1 }));
+
+      const pending = {
+        ...result,
+        completion_status: "incomplete" as const,
+        success_status: "unknown" as const,
+        score: null,
+        progress: null,
+        revision: 2,
+      };
+      lms.setValue.mockClear();
+      expect(scorm.handleTaskResult(event(pending))).toBe(true);
+      expect(lms.values[statusField]).toBe("incomplete");
+      if (version === "2004") expect(lms.values["cmi.success_status"]).toBe("unknown");
+      // An unknown grade does not write a fabricated zero or clear an LMS number.
+      expect(lms.setValue.mock.calls.some(([key]) => key.includes(".score."))).toBe(false);
+      expect(lms.values[scoreField]).toBe("100");
+
+      const passed = success === "passed";
+      expect(
+        scorm.handleTaskResult(
+          event({
+            ...result,
+            completion_status: passed ? "completed" : "incomplete",
+            success_status: success,
+            score: passed ? 100 : 0,
+            progress: passed ? 1 : 0,
+            revision: 3,
+          }),
+        ),
+      ).toBe(true);
+      expect(lms.values[scoreField]).toBe(passed ? "100" : "0");
+      expect(lms.values[statusField]).toBe(
+        passed ? (version === "1.2" ? "passed" : "completed") : "incomplete",
+      );
+      if (version === "2004") expect(lms.values["cmi.success_status"]).toBe(success);
+      expect(scorm.handleTaskResult(event(pending))).toBe(false);
+      scorm.finish();
+    },
+  );
   it("reports trusted SDK events but ignores messages outside its iframe boundary", () => {
     const lms = mockLms(version);
     const scorm = connectScorm({ taskUid: "task", window: lms.launch })!;
