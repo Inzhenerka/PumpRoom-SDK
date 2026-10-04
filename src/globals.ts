@@ -58,6 +58,11 @@ let registeredStates: string[] = [];
  * ```
  */
 export function setConfig(cfg: PumpRoomConfig): void {
+  for (const field of ["apiKey", "realm"] as const) {
+    if (typeof cfg[field] !== "string" || !cfg[field].trim()) {
+      throw new Error(`${field} must be a non-empty string`);
+    }
+  }
   const apiBaseUrl = normalizeApiBaseUrl(cfg.apiBaseUrl ?? API_BASE_URL);
   const pageUrl = cfg.pageUrl === undefined ? undefined : normalizePageUrl(cfg.pageUrl);
   const authenticationScopeChanged =
@@ -71,10 +76,16 @@ export function setConfig(cfg: PumpRoomConfig): void {
     if (!Array.isArray(cfg.trustedOrigins)) throw new Error("trustedOrigins must be an array");
     trustedOrigins = [
       ...new Set(
-        cfg.trustedOrigins.map((value) => {
-          const url = new URL(value);
+        cfg.trustedOrigins.map((value, index) => {
+          const errorMessage = `trustedOrigins[${index}] must be an exact HTTP(S) origin`;
+          if (typeof value !== "string") throw new Error(errorMessage);
+          let url: URL;
+          try {
+            url = new URL(value);
+          } catch {
+            throw new Error(errorMessage);
+          }
           if (
-            typeof value !== "string" ||
             (url.protocol !== "http:" && url.protocol !== "https:") ||
             url.username ||
             url.password ||
@@ -83,7 +94,7 @@ export function setConfig(cfg: PumpRoomConfig): void {
             url.hash ||
             url.hostname.includes("*")
           )
-            throw new Error("trustedOrigins entries must be exact HTTP(S) origins");
+            throw new Error(errorMessage);
           return url.origin;
         }),
       ),

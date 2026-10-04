@@ -149,7 +149,9 @@ describe("trusted message senders", () => {
     "data:text/html,test",
   ])("rejects invalid configuration %s before changing configuration", (origin) => {
     const previous = getConfig();
-    expect(() => init({ apiKey: "key", realm: "test", trustedOrigins: [origin] })).toThrow();
+    expect(() => init({ apiKey: "key", realm: "test", trustedOrigins: [origin] })).toThrow(
+      "trustedOrigins[0]",
+    );
     expect(getConfig()).toBe(previous);
   });
 

@@ -18,11 +18,42 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.unstubAllGlobals();
   // Reset registered states after each test
   resetRegisteredStates();
 });
 
 describe("globals", () => {
+  it.each<[string, unknown]>([
+    ["apiKey", ""],
+    ["apiKey", "   "],
+    ["apiKey", undefined],
+    ["apiKey", 123],
+    ["realm", ""],
+    ["realm", "   "],
+    ["realm", undefined],
+    ["realm", 123],
+    ["apiBaseUrl", "not-a-url"],
+    ["trustedOrigins", ["not-an-origin"]],
+    ["trustedOrigins", ["*"]],
+    ["trustedOrigins", [123]],
+    ["trustedOrigins", "https://tasks.example"],
+  ])("rejects invalid %s without requests or replacing active configuration", (field, value) => {
+    init({ apiKey: "key", realm: "test" });
+    const previous = getConfig();
+    const user = { uid: "1", token: "t", is_admin: false };
+    setCurrentUser(user);
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    const listener = vi.spyOn(window, "addEventListener");
+
+    expect(() => init({ apiKey: "key", realm: "test", [field]: value })).toThrow(field);
+    expect(fetch).not.toHaveBeenCalled();
+    expect(listener).not.toHaveBeenCalled();
+    expect(getConfig()).toBe(previous);
+    expect(getCurrentUser()).toBe(user);
+  });
+
   it("initializes config", () => {
     setConfig({ apiKey: "key", realm: "test" });
     expect(getConfig()).toEqual({
