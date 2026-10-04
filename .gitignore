@@ -8,3 +8,4 @@ coverage
 report.xml
 public/docs
 .eslintcache
+.DS_Store

@@ -86,6 +86,12 @@
           </li>
         </ul>
 
+        <p class="mt-3">
+          Примеры ниже используют облачные настройки SDK. Для своей установки настройте адрес API и
+          доверенный origin интерфейса PumpRoom вместе, как показано в
+          <a href="#deployment-config">примере конфигурации on-premises</a>. Загрузка SDK с
+          локального сервера сама по себе не меняет его настройки.
+        </p>
         <div class="tab-content border border-top-0 p-4 bg-white" id="setupTabsContent">
           <div class="tab-pane fade show active" id="cdn" role="tabpanel" aria-labelledby="cdn-tab">
             <p>
@@ -194,16 +200,6 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
 });</code></pre>
 
             <p>
-              Для on-premise установки укажите базовый адрес PumpRoom API. Допускается адрес с
-              префиксом пути.
-            </p>
-            <pre><code class="language-javascript border border-primary-subtle">init({
-    apiKey: 'ВАШ_КЛЮЧ',
-    realm: 'ВАШ_ID',
-    apiBaseUrl: 'https://pumproom.school.example/api',
-});</code></pre>
-
-            <p>
               Если SCORM-плеер запускает разные SCO по одному адресу, укажите стабильный
               канонический URL текущего элемента. SDK будет использовать его в API-запросах и ключах
               локального кеша вместо адреса окна.
@@ -232,6 +228,23 @@ setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные о
               </li>
             </ul>
           </div>
+        </div>
+
+        <div id="deployment-config" class="mt-4">
+          <h3 class="h5">Своя установка (on-premises)</h3>
+          <p>
+            Для on-premises установки передайте в одном вызове <code>init()</code> базовый адрес
+            PumpRoom API и доверенный origin интерфейса PumpRoom внутри iframe. API может содержать
+            префикс пути; origin задаётся без пути и не является адресом LMS или SDK. Эта
+            конфигурация применяется к любому способу подключения SDK; для UMD и GetCourse
+            используйте <code>PumpRoomSdk.init()</code>.
+          </p>
+          <pre><code class="language-javascript border border-primary-subtle">init({
+    apiKey: 'ВАШ_КЛЮЧ',
+    realm: 'ВАШ_ID',
+    apiBaseUrl: 'https://pumproom.school.example/api',
+    trustedOrigins: ['https://tasks.school.example'],
+});</code></pre>
         </div>
 
         <p class="my-4">

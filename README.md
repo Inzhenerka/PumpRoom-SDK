@@ -31,15 +31,22 @@ reject messages from every iframe origin.
 
 ## Custom API URL
 
-On-premises deployments can route all SDK requests to their own PumpRoom API:
+The SDK bundle is identical for cloud and on-premises deployments. Cloud integration examples
+use built-in defaults. For on-premises, the application must configure both its API address and
+the trusted origin of the PumpRoom UI in the same `init()` call:
 
 ```ts
 init({
   apiKey: "...",
   realm: "...",
   apiBaseUrl: "https://pumproom.school.example/api",
+  trustedOrigins: ["https://tasks.school.example"],
 });
 ```
+
+Loading the bundle from a local SDK server does not change these defaults. `trustedOrigins`
+contains the UI origin (protocol, host and port, without a path), not the LMS or SDK server address.
+Explicit configuration applies equally to npm, UMD, ESM and GetCourse integrations.
 
 ## Stable content URL
 
