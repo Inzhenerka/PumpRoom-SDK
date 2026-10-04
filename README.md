@@ -294,6 +294,13 @@ The HTML report will appear in the `coverage` directory.
 
 ### Publishing
 
+Edit `RELEASE_NOTES.md` to update the site's release notes. Use `# v2` (or the relevant major)
+for a version group and `## 2.4.0 — Title` for each release. Write descriptions with ordinary
+Markdown paragraphs, lists, links and inline code; no HTML is needed. Put new releases first
+in their group. The site renders the file during development and production builds, displaying
+the current major and collapsing older groups automatically. `bun dev` reloads the page when
+the file changes. Release notes are maintained manually; `release-it` does not overwrite this file.
+
 Prepare and inspect a release without changing the repository:
 
 ```bash

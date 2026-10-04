@@ -3,6 +3,8 @@
 !package.json
 !bun.lock
 !README.md
+!RELEASE_NOTES.md
+!releaseNotes.ts
 !index.html
 !site.ts
 !tsconfig.json
