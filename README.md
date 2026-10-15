@@ -86,10 +86,13 @@ task.destroy();
 ```
 
 `ready` waits for the task's `onTaskLoaded` message, not the iframe's HTML load event.
-The default timeout is 30 seconds (`timeoutMs`); height defaults to 600 pixels (`height`).
+There is no timeout by default. Set `timeoutMs` explicitly to limit readiness waiting;
+height defaults to 600 pixels (`height`).
 An optional `taskUid` filters events to the expected task. Pass an `AbortSignal` to cancel loading
-or destroy the frame. Timeout/load failure removes the iframe; callback errors are reported
-without removing a working task. `destroy()` is idempotent and rejects pending readiness.
+or destroy the frame. Timeout/load failure rejects `ready` and calls `onError`, keeping the iframe
+visible so the task can display its own loading or error screen. A task that loads later still
+invokes `onTaskLoaded`, but the rejected `ready` promise stays rejected. Only `destroy()` or the
+abort signal removes the iframe. `destroy()` is idempotent and rejects pending readiness.
 
 Events are scoped to the exact iframe window and URL origin. Managed frames do not invoke global
 SDK callbacks or use global message responders; manually embedded iframes continue to work as before.

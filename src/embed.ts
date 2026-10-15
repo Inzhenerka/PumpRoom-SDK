@@ -35,7 +35,7 @@ export interface MountTaskOptions {
   title?: string;
   /** Initial iframe height in pixels. Defaults to 600. */
   height?: number;
-  /** Milliseconds to wait for onTaskLoaded, not the HTML load event. Defaults to 30000. */
+  /** Optional time limit for onTaskLoaded in milliseconds. No timeout by default; timing out leaves the iframe mounted. */
   timeoutMs?: number;
   /** Abort mounting or destroy an already mounted task. */
   signal?: AbortSignal;
@@ -62,7 +62,7 @@ export interface MountTaskOptions {
 export interface MountedTask {
   /** DOM element, available for styling. Do not change its URL; destroy and mount again. */
   readonly iframe: HTMLIFrameElement;
-  /** Resolves on the first matching onTaskLoaded; rejects on timeout, error or early destruction. */
+  /** Resolves on the first matching onTaskLoaded; rejects on timeout, error or early destruction. Rejection does not remove the iframe. */
   readonly ready: Promise<LoadedTaskData>;
   /** Remove the iframe, its listeners, timer and registered instances. Idempotent. */
   destroy(): void;
@@ -81,7 +81,8 @@ export function validateTaskMount(container: HTMLElement, options: MountTaskOpti
   if ((url.protocol !== "https:" && url.protocol !== "http:") || url.username || url.password) {
     throw new Error("Task URL must be HTTP(S) without credentials");
   }
-  for (const value of [options.height ?? 600, options.timeoutMs ?? 30000]) {
+  for (const value of [options.height ?? 600, options.timeoutMs]) {
+    if (value === undefined) continue;
     if (!Number.isFinite(value) || value <= 0 || value > 2147483647)
       throw new Error("Task height and timeout must be positive finite numbers");
   }
@@ -231,16 +232,16 @@ export function mountTask(container: HTMLElement, options: MountTaskOptions): Mo
   const fail = (error: Error) => {
     if (!settled) {
       settled = true;
+      clearTimeout(timer);
       rejectReady(error);
     }
     report(error);
-    destroy();
   };
   const onLoadError = () => fail(new Error("Task iframe failed to load"));
-  const timer = setTimeout(
-    () => fail(new Error("Task readiness timed out")),
-    options.timeoutMs ?? 30000,
-  );
+  const timer =
+    options.timeoutMs === undefined
+      ? undefined
+      : setTimeout(() => fail(new Error("Task readiness timed out")), options.timeoutMs);
   registerManagedFrame(iframe);
   window.addEventListener("message", onMessage);
   iframe.addEventListener("error", onLoadError);

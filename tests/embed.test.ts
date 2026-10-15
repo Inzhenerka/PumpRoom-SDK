@@ -143,21 +143,66 @@ describe("mountTask", () => {
     await vi.runAllTimersAsync();
     expect(callback).not.toHaveBeenCalled();
   });
-  it("reports timeout and removes the failed iframe", async () => {
+  it("waits without a timeout by default and accepts a task loaded later", async () => {
     const onError = vi.fn();
-    const task = mount({ timeoutMs: 100, onError });
+    const onReady = vi.fn();
+    const task = mount({ onError });
+    void task.ready.then(onReady, onError);
+    await vi.advanceTimersByTimeAsync(120000);
+    expect(onReady).not.toHaveBeenCalled();
+    expect(onError).not.toHaveBeenCalled();
+    expect(task.iframe.isConnected).toBe(true);
+    message(task, "onTaskLoaded");
+    await expect(task.ready).resolves.toEqual(payload);
+    expect(onReady).toHaveBeenCalledOnce();
+  });
+  it("reports timeout while preserving the iframe, messages and late task events until destroy", async () => {
+    const onError = vi.fn();
+    const onTaskLoaded = vi.fn();
+    const task = mount({ timeoutMs: 100, onError, onTaskLoaded, user });
+    message(task, "getEnvironment");
     vi.advanceTimersByTime(100);
     await expect(task.ready).rejects.toThrow("timed out");
     expect(onError).toHaveBeenCalledOnce();
+    expect(task.iframe.isConnected).toBe(true);
+    expect(getTaskInstances().frame).toEqual(context);
+    const post = vi.spyOn(task.iframe.contentWindow!, "postMessage");
+    message(task, "getPumpRoomUser");
+    expect(post).toHaveBeenCalledExactlyOnceWith(
+      { service: "pumproom", type: "setPumpRoomUser", payload: user },
+      origin,
+    );
+    message(task, "onTaskLoaded");
+    expect(onTaskLoaded).toHaveBeenCalledExactlyOnceWith(payload);
+    await expect(task.ready).rejects.toThrow("timed out");
+    task.destroy();
     expect(task.iframe.isConnected).toBe(false);
+    expect(getTaskInstances().frame).toBeUndefined();
+    message(task, "onTaskLoaded");
+    expect(onTaskLoaded).toHaveBeenCalledOnce();
   });
-  it("reports iframe errors", async () => {
+  it("reports iframe errors without removing it or reporting a second timeout", async () => {
     const onError = vi.fn();
-    const task = mount({ onError });
+    const task = mount({ timeoutMs: 100, onError });
     task.iframe.dispatchEvent(new Event("error"));
     await expect(task.ready).rejects.toThrow("failed to load");
     expect(onError).toHaveBeenCalledOnce();
+    expect(task.iframe.isConnected).toBe(true);
+    await vi.runAllTimersAsync();
+    expect(onError).toHaveBeenCalledOnce();
+    task.destroy();
     expect(task.iframe.isConnected).toBe(false);
+  });
+  it("allows an abort signal to remove an iframe after readiness times out", async () => {
+    const abort = new AbortController();
+    const onError = vi.fn();
+    const task = mount({ timeoutMs: 100, signal: abort.signal, onError });
+    vi.advanceTimersByTime(100);
+    await expect(task.ready).rejects.toThrow("timed out");
+    expect(task.iframe.isConnected).toBe(true);
+    abort.abort();
+    expect(task.iframe.isConnected).toBe(false);
+    expect(onError).toHaveBeenCalledOnce();
   });
   it("handles cancellation before and after readiness without treating it as a load error", async () => {
     const abort = new AbortController();
