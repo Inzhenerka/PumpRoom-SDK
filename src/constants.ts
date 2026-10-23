@@ -106,6 +106,7 @@ export const LOAD_COURSE_URL = `${API_BASE_URL}/course/load`;
 /** Standard origins used for iframe sizing and opt-in message sender checks. */
 export const DEFAULT_TRUSTED_ORIGINS = [
   "https://pumproom.inzhenerka-cloud.com",
+  "https://lms.pumproom.tech",
   "https://dev.pumproom.inzhenerka-cloud.com",
   "https://dev-pumproom.inzhenerka-cloud.com",
 ] as const;

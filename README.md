@@ -18,7 +18,8 @@ changes without reloading the page, call `authenticate()` again with the new ide
 
 When `trustedOrigins` is omitted, SDK messages are accepted only from embedded iframes at standard
 PumpRoom origins:
-`https://pumproom.inzhenerka-cloud.com`, `https://dev.pumproom.inzhenerka-cloud.com`,
+`https://pumproom.inzhenerka-cloud.com`, `https://lms.pumproom.tech`,
+`https://dev.pumproom.inzhenerka-cloud.com`,
 `https://dev-pumproom.inzhenerka-cloud.com`.
 For a custom deployment, provide the complete list of trusted origins (no wildcard or path):
 
