@@ -9,7 +9,7 @@
   "excludeProtected": false,
   "excludeExternals": true,
   "excludeInternal": true,
-  "readme": "README.md",
+  "readme": "docs/index.md",
   "name": "PumpRoom SDK",
   "includeVersion": true,
   "categorizeByGroup": false,
@@ -18,7 +18,7 @@
   "hideGenerator": true,
   "customFooterHtml": "PumpRoom SDK",
   "navigationLinks": {
-    "Home": "/"
+    "Руководство": "../"
   },
   "sort": ["static-first", "visibility", "alphabetical"],
   "githubPages": false,
@@ -43,5 +43,10 @@
   },
   "cleanOutputDir": true,
   "disableSources": false,
-  "sourceLinkTemplate": "https://github.com/Inzhenerka/PumpRoom-SDK/blob/main/{path}#L{line}"
+  "sourceLinkTemplate": "https://github.com/Inzhenerka/PumpRoom-SDK/blob/main/{path}#L{line}",
+  "favicon": "public/favicon.svg",
+  "customJs": "docs/navigation.js",
+  "customCss": ".generated/typedoc.css",
+  "lightHighlightTheme": "github-light",
+  "darkHighlightTheme": "github-dark"
 }

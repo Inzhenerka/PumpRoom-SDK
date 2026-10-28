@@ -25,6 +25,26 @@ function htmlVersionPlugin(): Plugin {
       });
     },
     transformIndexHtml(html) {
+      html = html.replace(
+        "<!-- THEME_PICKER -->",
+        `
+        <button type="button" class="btn btn-link text-body-secondary text-decoration-none rounded-circle p-2 d-inline-flex align-items-center justify-content-center fs-5"
+          data-sdk-theme disabled title="Тема: системная" aria-label="Включить светлую тему">
+          <span data-theme-icon="os" class="d-inline-flex"><!-- ICON:circle-half --></span>
+          <span data-theme-icon="light" class="d-none"><!-- ICON:sun --></span>
+          <span data-theme-icon="dark" class="d-none"><!-- ICON:moon-stars --></span>
+        </button>
+        <span class="visually-hidden" role="status" data-theme-status></span>`,
+      );
+      html = html.replace(/<!-- ICON:([a-z-]+) -->/g, (_match, name: string) =>
+        readFileSync(
+          resolve(__dirname, "node_modules/bootstrap-icons/icons", `${name}.svg`),
+          "utf8",
+        )
+          .replace("<svg ", '<svg aria-hidden="true" focusable="false" ')
+          .replace('width="16" height="16"', 'width="1em" height="1em"')
+          .replace('class="bi ', 'class="align-text-bottom flex-shrink-0 bi '),
+      );
       if (html.includes("<!-- RELEASE_NOTES -->")) {
         html = html.replace("<!-- RELEASE_NOTES -->", () =>
           renderReleaseNotes(readFileSync(releaseNotesPath, "utf8"), majorVersion),

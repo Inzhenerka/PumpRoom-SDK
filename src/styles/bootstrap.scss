@@ -1,15 +1,6 @@
 @import "bootstrap/scss/functions";
 
-$primary: #6f42c1 !default;
-@import "bootstrap/scss/variables";
-
-$theme-colors: map-merge(
-  $theme-colors,
-  (
-    "primary": $primary,
-  )
-);
-
+@import "theme";
 @import "bootstrap/scss/bootstrap";
 
 .release-notes {
@@ -22,4 +13,18 @@ $theme-colors: map-merge(
   ul {
     margin-bottom: 0.5rem;
   }
+}
+
+// The copy plugin inserts its live announcement inside the code block.
+.hljs-copy-alert {
+  @extend .visually-hidden;
+}
+
+// Scope the upstream syntax palettes to Bootstrap's color mode.
+@include color-mode(light) {
+  @import "highlight.js/styles/github";
+}
+
+@include color-mode(dark) {
+  @import "highlight.js/styles/github-dark";
 }

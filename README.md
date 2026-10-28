@@ -6,7 +6,7 @@ Lightweight library for integrating LMS with PumpRoom. Provides methods for API 
 
 # SDK Usage
 
-**[📖 Integration and usage guide](https://pumproom-sdk.inzhenerka-cloud.com/)**
+**[Integration and usage guide](https://pumproom-sdk.inzhenerka-cloud.com/)**
 
 ## Authentication cache
 

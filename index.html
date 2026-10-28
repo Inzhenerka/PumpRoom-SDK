@@ -6,309 +6,407 @@
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
+    <script src="/theme-init.js"></script>
     <title>PumpRoom SDK</title>
     <!-- CSS will be imported by the bundled script -->
   </head>
-  <body class="d-flex flex-column min-vh-100 bg-light">
-    <nav class="navbar navbar-light bg-white border-bottom mb-4">
-      <div class="container">
+  <body class="d-flex flex-column min-vh-100 bg-body-tertiary">
+    <a class="visually-hidden-focusable p-3 bg-body" href="#main-content">Перейти к содержимому</a>
+    <nav class="navbar bg-body border-bottom" aria-label="Основная навигация">
+      <div class="container gap-2">
         <a class="navbar-brand" href="#">
           <img
             src="/sdk-logo.png"
             alt="PumpRoom SDK"
             height="28"
-            class="d-inline-block align-text-top"
+            class="d-inline-block align-text-top bg-white rounded px-1"
           />
           PumpRoom SDK
         </a>
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="./docs/index.html">📚 Техническая документация</a>
-          </li>
-        </ul>
+        <div class="d-flex flex-wrap align-items-center gap-3 ms-auto">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="./docs/index.html"
+                ><!-- ICON:book -->
+                Техническая документация</a
+              >
+            </li>
+          </ul>
+          <!-- THEME_PICKER -->
+        </div>
       </div>
     </nav>
 
-    <main class="container flex-grow-1">
-      <div class="row justify-content-center mt-5">
-        <div class="col-lg-8">
-          <h1 class="display-5 fw-normal mb-3 text-center">Интеграция PumpRoom с LMS</h1>
-          <p class="lead text-center">
-            Библиотека упрощает авторизацию и обмен данными между вашей LMS и платформой PumpRoom
-          </p>
-        </div>
-      </div>
+    <main class="container flex-grow-1" id="main-content" tabindex="-1">
+      <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+          <div class="row justify-content-center mt-4">
+            <div class="col-lg-10">
+              <h1 class="display-6 fw-semibold mb-3 text-center">Интеграция PumpRoom с LMS</h1>
+              <p class="lead text-center">
+                Библиотека упрощает авторизацию и обмен данными между вашей LMS и платформой
+                PumpRoom
+              </p>
+            </div>
+          </div>
 
-      <section class="my-5">
-        <h2 class="h4 mb-3">Начало работы</h2>
-        <div class="alert alert-info bg-primary-subtle border-primary" role="alert">
-          Прежде чем начать, создайте пространство в
-          <a href="http://admin.pumproom.tech/" target="_blank">админке PumpRoom</a>. Там в разделе
-          Интеграция вы найдете API-ключ <code>apiKey</code> и идентификатор школы
-          <code>realm</code>.
-        </div>
-        <ul class="nav nav-tabs" id="setupTabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button
-              class="nav-link active"
-              id="cdn-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#cdn"
-              type="button"
-              role="tab"
-            >
-              Подключение к любой странице
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button
-              class="nav-link"
-              id="getcourse-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#getcourse"
-              type="button"
-              role="tab"
-            >
-              Подключение к GetCourse
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button
-              class="nav-link"
-              id="npm-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#npm"
-              type="button"
-              role="tab"
-            >
-              Интеграция в проект платформы
-            </button>
-          </li>
-        </ul>
+          <nav class="my-4" aria-label="Разделы руководства">
+            <ul class="nav nav-pills gap-1 justify-content-center">
+              <li class="nav-item"><a class="nav-link" href="#setup">Подключение</a></li>
+              <li class="nav-item">
+                <a class="nav-link" href="#deployment-config">Своя установка</a>
+              </li>
+              <li class="nav-item"><a class="nav-link" href="#lifecycle">События</a></li>
+              <li class="nav-item"><a class="nav-link" href="#versions">История версий</a></li>
+            </ul>
+          </nav>
 
-        <p class="mt-3">
-          Примеры ниже используют облачные настройки SDK. Для своей установки настройте адрес API и
-          доверенный origin интерфейса PumpRoom вместе, как показано в
-          <a href="#deployment-config">примере конфигурации on-premises</a>. Загрузка SDK с
-          локального сервера сама по себе не меняет его настройки.
-        </p>
-        <div class="tab-content border border-top-0 p-4 bg-white" id="setupTabsContent">
-          <div class="tab-pane fade show active" id="cdn" role="tabpanel" aria-labelledby="cdn-tab">
-            <p>
-              Этот способ подойдет вам, если вы используете любую готовую LMS, которая позволяет
-              вставлять на страницу HTML-код.
+          <section class="my-4" id="setup">
+            <h2 class="h4 mb-4 d-flex align-items-center gap-2"><!-- ICON:plug -->Начало работы</h2>
+            <h3 class="h5 mb-3">
+              <span class="badge text-bg-primary me-2">1</span>Получите ключ подключения
+            </h3>
+            <div class="alert alert-primary">
+              Создайте пространство в
+              <a
+                class="alert-link"
+                href="http://admin.pumproom.tech/"
+                target="_blank"
+                rel="noopener"
+                >админке PumpRoom</a
+              >. В разделе «Интеграция» вы найдёте API-ключ <code>apiKey</code> и идентификатор
+              школы <code>realm</code>.
+            </div>
+            <h3 class="h5 mt-4 mb-3">
+              <span class="badge text-bg-primary me-2">2</span>Выберите способ подключения
+            </h3>
+            <p class="text-body-secondary small">
+              Примеры используют облачные настройки. Для своей установки задайте адрес API и
+              доверенный origin интерфейса вместе:
+              <a href="#deployment-config">конфигурация on-premises</a>. Загрузка SDK с локального
+              сервера сама по себе не меняет настройки.
             </p>
+            <ul
+              class="nav nav-tabs"
+              id="setupTabs"
+              role="tablist"
+              aria-label="Способ подключения SDK"
+            >
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link active"
+                  id="cdn-tab"
+                  aria-controls="cdn"
+                  aria-selected="true"
+                  data-bs-toggle="tab"
+                  data-bs-target="#cdn"
+                  type="button"
+                  role="tab"
+                >
+                  HTML / JavaScript
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="getcourse-tab"
+                  aria-controls="getcourse"
+                  aria-selected="false"
+                  data-bs-toggle="tab"
+                  data-bs-target="#getcourse"
+                  type="button"
+                  role="tab"
+                >
+                  GetCourse
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  id="npm-tab"
+                  aria-controls="npm"
+                  aria-selected="false"
+                  data-bs-toggle="tab"
+                  data-bs-target="#npm"
+                  type="button"
+                  role="tab"
+                >
+                  npm
+                </button>
+              </li>
+            </ul>
 
-            <p>Добавьте HTML-код на страницу урока:</p>
-            <pre><code class="language-html border border-primary-subtle">&lt;script src="__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js"&gt;&lt;/script&gt;
+            <div
+              class="tab-content border border-top-0 rounded-bottom p-3 p-md-4 bg-body"
+              id="setupTabsContent"
+            >
+              <div
+                class="tab-pane fade show active"
+                id="cdn"
+                role="tabpanel"
+                aria-labelledby="cdn-tab"
+                tabindex="0"
+              >
+                <p>
+                  Этот способ подойдет вам, если вы используете любую готовую LMS, которая позволяет
+                  вставлять на страницу HTML-код.
+                </p>
+
+                <p>Добавьте HTML-код на страницу урока:</p>
+                <pre><code class="language-html">&lt;script src="__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   PumpRoomSdk.authenticate({
-        identity: { provider: 'lms', id: 'ID_СТУДЕНТА' },
+    identity: { provider: 'lms', id: 'ID_СТУДЕНТА' },
   }).catch(console.error);
 &lt;/script&gt;</code></pre>
 
-            <p>Замените значения 'ВАШ_КЛЮЧ' и 'ВАШ_ID' на параметры из админки PumpRoom.</p>
-            <p>Альтернативный способ (более современный):</p>
-            <pre><code class="language-html border border-primary-subtle">&lt;script type="module"&gt;
+                <p>Замените значения 'ВАШ_КЛЮЧ' и 'ВАШ_ID' на параметры из админки PumpRoom.</p>
+                <details class="mt-3">
+                  <summary class="fw-semibold mb-3">
+                    Альтернатива: подключение через ES-модули
+                  </summary>
+                  <pre><code class="language-html">&lt;script type="module"&gt;
   import { init, authenticate } from '__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js';
 
   init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
   authenticate({
-        identity: { provider: 'lms', id: 'ID_СТУДЕНТА' },
+    identity: { provider: 'lms', id: 'ID_СТУДЕНТА' },
   }).catch(console.error);
 &lt;/script&gt;</code></pre>
+                </details>
 
-            <h5 class="mt-4 mb-3">Версии</h5>
-            <p>Вы можете использовать разные версии SDK:</p>
-            <ul>
-              <li>
-                <strong>v__MAJOR_VERSION__</strong> - стабильная версия __MAJOR_VERSION__.x
-                (рекомендуется):<br />
-                <code>__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js</code><br />
-                <code>__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js</code>
-              </li>
-              <li>
-                <strong>latest</strong> - последняя версия (сейчас v2):<br />
-                <code>__BASE_URL__/bundle/pumproom-sdk-latest.umd.js</code><br />
-                <code>__BASE_URL__/bundle/pumproom-sdk-latest.esm.js</code>
-              </li>
-              <li>
-                <strong>v__VERSION__</strong> - конкретная версия (не рекомендуется):<br />
-                <code>__BASE_URL__/bundle/pumproom-sdk-v__VERSION__.umd.js</code><br />
-                <code>__BASE_URL__/bundle/pumproom-sdk-v__VERSION__.esm.js</code>
-              </li>
-            </ul>
-          </div>
+                <details class="mt-4">
+                  <summary class="fw-semibold mb-3">Как выбрать версию SDK</summary>
+                  <p>
+                    В примерах используется ветка v__MAJOR_VERSION__. Другие варианты подключения:
+                  </p>
+                  <ul>
+                    <li>
+                      <strong>v__MAJOR_VERSION__</strong> - стабильная версия __MAJOR_VERSION__.x
+                      (рекомендуется):<br />
+                      <code>__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.umd.js</code><br />
+                      <code>__BASE_URL__/bundle/pumproom-sdk-v__MAJOR_VERSION__.esm.js</code>
+                    </li>
+                    <li>
+                      <strong>latest</strong> - последняя версия (сейчас v2):<br />
+                      <code>__BASE_URL__/bundle/pumproom-sdk-latest.umd.js</code><br />
+                      <code>__BASE_URL__/bundle/pumproom-sdk-latest.esm.js</code>
+                    </li>
+                    <li>
+                      <strong>v__VERSION__</strong> - конкретная версия (не рекомендуется):<br />
+                      <code>__BASE_URL__/bundle/pumproom-sdk-v__VERSION__.umd.js</code><br />
+                      <code>__BASE_URL__/bundle/pumproom-sdk-v__VERSION__.esm.js</code>
+                    </li>
+                  </ul>
+                </details>
+              </div>
 
-          <div class="tab-pane fade" id="getcourse" role="tabpanel" aria-labelledby="getcourse-tab">
-            <p>
-              На платформе GetCourse, надо на странице урока добавить в самом начале компонент Блок
-              -> Вставка ->
-              <b>Javascript-код</b> и вставить в него код:
-            </p>
-            <pre><code class="language-javascript border border-primary-subtle">document.head.appendChild(Object.assign(document.createElement('script'), {
+              <div
+                class="tab-pane fade"
+                id="getcourse"
+                role="tabpanel"
+                aria-labelledby="getcourse-tab"
+                tabindex="0"
+              >
+                <p>
+                  На платформе GetCourse, надо на странице урока добавить в самом начале компонент
+                  Блок -> Вставка ->
+                  <b>Javascript-код</b> и вставить в него код:
+                </p>
+                <pre><code class="language-javascript">document.head.appendChild(Object.assign(document.createElement('script'), {
   src: '__BASE_URL__/bundle/pumproom-sdk-v2.umd.js',
   async: true, onload() {
     window.PumpRoomSdk.init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID', 'type': 'getcourse' });
     window.PumpRoomSdk.authenticate({ identity: { provider: 'lms', id: '{uid}' } }).catch(console.error);
   }
 }));</code></pre>
-            <p>
-              Замените значения 'ВАШ_КЛЮЧ' и 'ВАШ_ID' на параметры из админки PumpRoom. При
-              встраивании JavaScript-кода включите галочку «Заменять переменные пользователя», чтобы
-              значение {uid} подставлялось корректно.
-            </p>
-          </div>
+                <p>
+                  Замените значения 'ВАШ_КЛЮЧ' и 'ВАШ_ID' на параметры из админки PumpRoom. При
+                  встраивании JavaScript-кода включите галочку «Заменять переменные пользователя»,
+                  чтобы значение {uid} подставлялось корректно.
+                </p>
+              </div>
 
-          <div class="tab-pane fade" id="npm" role="tabpanel" aria-labelledby="npm-tab">
-            <p>
-              Если вы хотите интегрировать SDK в проект своей платформы LMS, установите npm-пакет
-              <a
-                href="https://www.npmjs.com/package/pumproom-sdk"
-                target="_blank"
-                class="text-decoration-none"
+              <div
+                class="tab-pane fade"
+                id="npm"
+                role="tabpanel"
+                aria-labelledby="npm-tab"
+                tabindex="0"
               >
-                pumproom-sdk </a
-              >:
-            </p>
-            <pre><code
-                        class="language-bash border border-primary-subtle">npm install pumproom-sdk@__MAJOR_VERSION__</code></pre>
-            <p>Затем подключите его в свой проект:</p>
-            <pre><code class="language-javascript border border-primary-subtle">import { init, authenticate } from 'pumproom-sdk';
+                <p>
+                  Если вы хотите интегрировать SDK в проект своей платформы LMS, установите
+                  npm-пакет
+                  <a
+                    href="https://www.npmjs.com/package/pumproom-sdk"
+                    target="_blank"
+                    class="text-decoration-none"
+                  >
+                    pumproom-sdk </a
+                  >:
+                </p>
+                <pre><code
+                        class="language-bash">npm install pumproom-sdk@__MAJOR_VERSION__</code></pre>
+                <p>Затем подключите его в свой проект:</p>
+                <pre><code class="language-javascript">import { init, authenticate } from 'pumproom-sdk';
 
 init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
 authenticate({
     identity: { provider: 'lms', id: 'ID_СТУДЕНТА' },
 }).catch(console.error);</code></pre>
-            <p>Если у вас уже есть сохранённый пользователь, его можно передать напрямую:</p>
-            <pre><code class="language-javascript border border-primary-subtle">import { init, setUser } from 'pumproom-sdk';
+                <p>Если у вас уже есть сохранённый пользователь, его можно передать напрямую:</p>
+                <pre><code class="language-javascript">import { init, setUser } from 'pumproom-sdk';
 
 init({ apiKey: 'ВАШ_КЛЮЧ', realm: 'ВАШ_ID' });
 setUser({ uid: 'UID', token: 'TOKEN' }); // Данные полученные от authenticate()</code></pre>
 
-            <p>
-              SDK проверяет источник сообщений от iframe. Если <code>trustedOrigins</code> не
-              указан, разрешены стандартные адреса PumpRoom. Явно заданный список полностью заменяет
-              стандартные адреса. Укажите протокол, домен и при необходимости порт, без пути и
-              масок. Пустой список запрещает сообщения от любых iframe.
-            </p>
-            <pre><code class="language-javascript border border-primary-subtle">init({
+                <p>
+                  SDK проверяет источник сообщений от iframe. Если <code>trustedOrigins</code> не
+                  указан, разрешены стандартные адреса PumpRoom. Явно заданный список полностью
+                  заменяет стандартные адреса. Укажите протокол, домен и при необходимости порт, без
+                  пути и масок. Пустой список запрещает сообщения от любых iframe.
+                </p>
+                <pre><code class="language-javascript">init({
     apiKey: 'ВАШ_КЛЮЧ',
     realm: 'ВАШ_ID',
     trustedOrigins: ['https://tasks.school.example'],
 });</code></pre>
 
-            <p>
-              Если SCORM-плеер запускает разные SCO по одному адресу, укажите стабильный
-              канонический URL текущего элемента. SDK будет использовать его в API-запросах и ключах
-              локального кеша вместо адреса окна.
-            </p>
-            <pre><code class="language-javascript border border-primary-subtle">init({
+                <p>
+                  Если SCORM-плеер запускает разные SCO по одному адресу, укажите стабильный
+                  канонический URL текущего элемента. SDK будет использовать его в API-запросах и
+                  ключах локального кеша вместо адреса окна.
+                </p>
+                <pre><code class="language-javascript">init({
     apiKey: 'ВАШ_КЛЮЧ',
     realm: 'ВАШ_ID',
     pageUrl: 'https://lms.example/scorm/course-42/lesson-1',
 });</code></pre>
 
-            <h5 class="mt-4 mb-3">Версии</h5>
-            <p>Вы можете использовать разные версии SDK:</p>
-            <ul>
-              <li>
-                <strong>v__MAJOR_VERSION__</strong> - стабильная версия __MAJOR_VERSION__.x
-                (рекомендуется):<br />
-                <code>npm install pumproom-sdk@__MAJOR_VERSION__</code>
-              </li>
-              <li>
-                <strong>latest</strong> - последняя версия (сейчас v2):<br />
-                <code>npm install pumproom-sdk@latest</code>
-              </li>
-              <li>
-                <strong>v__VERSION__</strong> - конкретная версия (не рекомендуется):<br />
-                <code>npm install pumproom-sdk@__VERSION__</code>
-              </li>
-            </ul>
-          </div>
-        </div>
+                <details class="mt-4">
+                  <summary class="fw-semibold mb-3">Как выбрать версию SDK</summary>
+                  <p>
+                    В примерах используется ветка v__MAJOR_VERSION__. Другие варианты подключения:
+                  </p>
+                  <ul>
+                    <li>
+                      <strong>v__MAJOR_VERSION__</strong> - стабильная версия __MAJOR_VERSION__.x
+                      (рекомендуется):<br />
+                      <code>npm install pumproom-sdk@__MAJOR_VERSION__</code>
+                    </li>
+                    <li>
+                      <strong>latest</strong> - последняя версия (сейчас v2):<br />
+                      <code>npm install pumproom-sdk@latest</code>
+                    </li>
+                    <li>
+                      <strong>v__VERSION__</strong> - конкретная версия (не рекомендуется):<br />
+                      <code>npm install pumproom-sdk@__VERSION__</code>
+                    </li>
+                  </ul>
+                </details>
+              </div>
+            </div>
 
-        <div id="deployment-config" class="mt-4">
-          <h3 class="h5">Своя установка (on-premises)</h3>
-          <p>
-            Для on-premises установки передайте в одном вызове <code>init()</code> базовый адрес
-            PumpRoom API и доверенный origin интерфейса PumpRoom внутри iframe. API может содержать
-            префикс пути; origin задаётся без пути и не является адресом LMS или SDK. Эта
-            конфигурация применяется к любому способу подключения SDK; для UMD и GetCourse
-            используйте <code>PumpRoomSdk.init()</code>.
-          </p>
-          <pre><code class="language-javascript border border-primary-subtle">init({
+            <div class="mt-4">
+              <h3 class="h5 mb-3">
+                <span class="badge text-bg-primary me-2">3</span>Добавьте задание на страницу урока
+              </h3>
+              <p class="mb-0">
+                После настройки SDK вставьте задание PumpRoom через <code>iframe</code>. SDK
+                обеспечит авторизацию и обмен данными со встроенным заданием.
+              </p>
+            </div>
+          </section>
+
+          <section id="deployment-config" class="my-5">
+            <h2 class="h4 mb-3 d-flex align-items-center gap-2">
+              <!-- ICON:hdd-network -->Своя установка (on-premises)
+            </h2>
+            <p>
+              Для on-premises установки передайте в одном вызове <code>init()</code> базовый адрес
+              PumpRoom API и доверенный origin интерфейса PumpRoom внутри iframe. API может
+              содержать префикс пути; origin задаётся без пути и не является адресом LMS или SDK.
+              Эта конфигурация применяется к любому способу подключения SDK; для UMD и GetCourse
+              используйте <code>PumpRoomSdk.init()</code>.
+            </p>
+            <pre><code class="language-javascript">init({
     apiKey: 'ВАШ_КЛЮЧ',
     realm: 'ВАШ_ID',
     apiBaseUrl: 'https://pumproom.school.example/api',
     trustedOrigins: ['https://tasks.school.example'],
 });</code></pre>
-        </div>
+          </section>
 
-        <p class="my-4">
-          После настройки SDK все задания PumpRoom, интегрированные на страницу урока через
-          <code>iframe</code>, начнут работать автоматически.
-        </p>
-      </section>
+          <section class="my-5" id="lifecycle">
+            <h2 class="h4 mb-3 d-flex align-items-center gap-2">
+              <!-- ICON:arrow-repeat -->Функции жизненного цикла
+            </h2>
+            <p>
+              SDK позволяет задавать коллбэки на разные этапы работы с заданием: инициализация,
+              загрузка задания, отправка решения и получение результата. Это дает возможность
+              интегрировать логику вашей LMS с событиями жизненного цикла заданий PumpRoom,
+              например:
+            </p>
+            <ul>
+              <li>
+                Сразу обрабатывать и сохранять результат выполнения задачи без запросов на
+                API-бэкенд
+              </li>
+              <li>Последовательно открывать контент урока при выполнении задания</li>
+              <li>Получать идентификаторы задания и его экземпляра</li>
+              <li>Замерять время загрузки и выполнения задания</li>
+            </ul>
+            <p>
+              Подробное описание всех доступных коллбэков и примеры их использования доступны в
+              <a href="./docs/index.html">Технической документации</a>.
+            </p>
+          </section>
 
-      <section class="my-5">
-        <h2 class="h4 mb-3">Функции жизненного цикла</h2>
-        <p>
-          SDK позволяет задавать коллбэки на разные этапы работы с заданием: инициализация, загрузка
-          задания, отправка решения и получение результата. Это дает возможность интегрировать
-          логику вашей LMS с событиями жизненного цикла заданий PumpRoom, например:
-        </p>
-        <ul>
-          <li>
-            Сразу обрабатывать и сохранять результат выполнения задачи без запросов на API-бэкенд
-          </li>
-          <li>Последовательно открывать контент урока при выполнении задания</li>
-          <li>Получать идентификаторы задания и его экземпляра</li>
-          <li>Замерять время загрузки и выполнения задания</li>
-        </ul>
-        <p>
-          Подробное описание всех доступных коллбэков и примеры их использования доступны в
-          <a href="./docs/index.html">Технической документации</a>.
-        </p>
-      </section>
+          <section class="my-5">
+            <h2 class="h4 mb-3 d-flex align-items-center gap-2">
+              <!-- ICON:journal-code -->Все возможности
+            </h2>
+            <p>
+              Полное описание всех методов SDK, параметров инициализации и расширенных возможностей
+              интеграции доступно в технической документации.
+            </p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+              <a href="./docs/index.html" class="btn btn-primary">
+                <!-- ICON:book -->
+                Открыть документацию
+              </a>
+            </div>
+          </section>
 
-      <section class="my-5">
-        <h2 class="h4 mb-3">Все возможности</h2>
-        <p>
-          Полное описание всех методов SDK, параметров инициализации и расширенных возможностей
-          интеграции доступно в технической документации.
-        </p>
-        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-          <a href="./docs/index.html" class="btn btn-outline-primary"> 📚 Открыть документацию </a>
+          <section class="my-5" id="versions">
+            <h2 class="h4 mb-3 d-flex align-items-center gap-2">
+              <!-- ICON:clock-history -->История версий
+            </h2>
+            <div class="bg-body border-start border-3 border-secondary px-3 py-2 mb-4">
+              <p class="fw-semibold mb-1">Миграция на v2</p>
+              <p class="small text-body-secondary mb-2">
+                Версия v1 больше не получает обновлений и исправлений. Существующие интеграции с
+                закреплённой ссылкой на v1 пока продолжат работать, но для новых подключений и
+                дальнейших обновлений используйте SDK v2. Псевдоним <code>latest</code> теперь
+                указывает на v2.
+              </p>
+              <p class="small mb-0">
+                При переходе замените <code>authenticate({ lms: { id } })</code> или
+                <code>authenticate({ profile })</code> на
+                <code>authenticate({ identity: { provider: 'lms', id } })</code>.
+              </p>
+            </div>
+            <div class="release-notes">
+              <!-- RELEASE_NOTES -->
+            </div>
+          </section>
         </div>
-      </section>
-
-      <section class="my-5" id="versions">
-        <h2 class="h4 mb-3">История версий</h2>
-        <div class="bg-white border-start border-3 border-secondary px-3 py-2 mb-4">
-          <p class="fw-semibold mb-1">Миграция на v2</p>
-          <p class="small text-body-secondary mb-2">
-            Версия v1 больше не получает обновлений и исправлений. Существующие интеграции с
-            закреплённой ссылкой на v1 пока продолжат работать, но для новых подключений и
-            дальнейших обновлений используйте SDK v2. Псевдоним <code>latest</code> теперь указывает
-            на v2.
-          </p>
-          <p class="small mb-0">
-            При переходе замените <code>authenticate({ lms: { id } })</code> или
-            <code>authenticate({ profile })</code> на
-            <code>authenticate({ identity: { provider: 'lms', id } })</code>.
-          </p>
-        </div>
-        <div class="release-notes">
-          <!-- RELEASE_NOTES -->
-        </div>
-      </section>
+      </div>
     </main>
 
-    <footer class="bg-white border-top text-center py-3 mt-auto">
-      <small class="text-muted">PumpRoom SDK v__VERSION__</small>
+    <footer class="bg-body border-top text-center py-3 mt-auto">
+      <small class="text-body-secondary">PumpRoom SDK v__VERSION__</small>
     </footer>
 
     <!-- JS will be imported by the bundled script -->

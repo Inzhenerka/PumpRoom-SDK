@@ -8,11 +8,15 @@
 !releaseNotes.ts
 !index.html
 !site.ts
+!theme.ts
 !tsconfig.json
 !tsconfig.build.json
 !typedoc.json
 !vite.config.lib.ts
 !vite.config.site.ts
+
+!docs/
+!docs/**
 
 !example/
 !example/**

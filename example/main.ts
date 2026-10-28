@@ -1,6 +1,10 @@
 // Import site styles and libraries
 import "../src/styles/bootstrap.scss";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { initializeThemePicker } from "../theme.ts";
+
+initializeThemePicker();
+
 // Import SDK from the built library
 import type { LMSIdentityInput, StatesResponse } from "../src/index.js";
 import * as PumpRoomSdk from "../src/index.js";

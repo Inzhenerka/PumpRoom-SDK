@@ -7,8 +7,9 @@ WORKDIR /app
 COPY package.json bun.lock bunfig.toml ./
 RUN bun install --frozen-lockfile
 
-COPY README.md RELEASE_NOTES.md index.html site.ts releaseNotes.ts tsconfig.json tsconfig.build.json typedoc.json ./
+COPY README.md RELEASE_NOTES.md index.html site.ts theme.ts releaseNotes.ts tsconfig.json tsconfig.build.json typedoc.json ./
 COPY vite.config.lib.ts vite.config.site.ts ./
+COPY docs ./docs
 COPY example ./example
 COPY public ./public
 COPY src ./src

@@ -1,0 +1,49 @@
+@import "bootstrap/scss/functions";
+@import "theme";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+
+// Adapt TypeDoc's native palette without importing Bootstrap's component styles.
+:root {
+  --dim-toolbar-contents-height: 3.5rem;
+
+  --light-color-background: #{$body-tertiary-bg};
+  --light-color-background-secondary: #{$body-bg};
+  --light-color-background-active: #{$primary-bg-subtle};
+  --light-color-accent: #{$border-color};
+  --light-color-text: #{$body-color};
+  --light-color-contrast-text: #{$body-emphasis-color};
+  --light-color-text-aside: #{$body-secondary-color};
+  --light-color-link: #{$link-color};
+  --light-color-focus-outline: #{$primary};
+
+  --dark-color-background: #{$body-tertiary-bg-dark};
+  --dark-color-background-secondary: #{$body-bg-dark};
+  --dark-color-background-active: #{$primary-bg-subtle-dark};
+  --dark-color-accent: #{$border-color-dark};
+  --dark-color-text: #{$body-color-dark};
+  --dark-color-contrast-text: #{$body-emphasis-color-dark};
+  --dark-color-text-aside: #{$body-secondary-color-dark};
+  --dark-color-link: #{$link-color-dark};
+  --dark-color-focus-outline: #{$link-color-dark};
+}
+
+body {
+  font-family: $font-family-sans-serif;
+}
+
+code,
+pre {
+  font-family: $font-family-monospace;
+}
+
+// Keep long API identifiers inside the available width, including on mobile.
+.tsd-typography table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.col-content {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
