@@ -12,7 +12,32 @@
  *
  * @public
  */
-export const API_BASE_URL = "https://pumproom-api.inzhenerka-cloud.com";
+export const API_BASE_URL = "https://api.pumproom.tech";
+
+/** @internal Cloud aliases of the same API; never used for an explicit API address. */
+const CLOUD_FALLBACK_API_BASE_URLS = ["https://pumproom-api.inzhenerka-cloud.com"] as const;
+
+/** Normalize and copy the ordered API addresses before changing SDK state. @internal */
+export function resolveApiBaseUrls(
+  apiBaseUrl?: string,
+  fallbackApiBaseUrls?: readonly string[],
+): string[] {
+  if (fallbackApiBaseUrls !== undefined && !Array.isArray(fallbackApiBaseUrls)) {
+    throw new Error("fallbackApiBaseUrls must be an array");
+  }
+  const fallbacks =
+    fallbackApiBaseUrls ?? (apiBaseUrl === undefined ? CLOUD_FALLBACK_API_BASE_URLS : []);
+  const normalized = Array.from(fallbacks, (value, index) => {
+    try {
+      return normalizeApiBaseUrl(value);
+    } catch {
+      throw new Error(
+        `fallbackApiBaseUrls[${index}] must be a valid HTTP(S) URL without credentials, query, or hash`,
+      );
+    }
+  });
+  return [...new Set([normalizeApiBaseUrl(apiBaseUrl ?? API_BASE_URL), ...normalized])];
+}
 
 /**
  * Normalizes and validates a PumpRoom API base URL.

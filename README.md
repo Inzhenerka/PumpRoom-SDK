@@ -49,6 +49,44 @@ Loading the bundle from a local SDK server does not change these defaults. `trus
 contains the UI origin (protocol, host and port, without a path), not the LMS or SDK server address.
 Explicit configuration applies equally to npm, UMD, ESM and GetCourse integrations.
 
+### Backup API addresses
+
+Without an explicit API address, the SDK uses `https://api.pumproom.tech` with
+`https://pumproom-api.inzhenerka-cloud.com` as its backup. An explicit `apiBaseUrl`
+uses only that address unless you also supply `fallbackApiBaseUrls`:
+
+```ts
+init({
+  apiKey: "...",
+  realm: "...",
+  apiBaseUrl: "https://pumproom.school.example/api",
+  fallbackApiBaseUrls: ["https://backup.school.example/api"],
+  trustedOrigins: ["https://tasks.school.example"],
+});
+```
+
+Backup addresses are optional and tried in order. They must reach the **same installation**,
+with the same data and API keys, and allow the application's origin through CORS.
+An explicit on-premises address never falls back to the cloud automatically.
+Use `fallbackApiBaseUrls: []` to disable backups, including the cloud backup.
+
+There are no health-check requests. Authentication, token verification, loading states and loading
+course information can switch addresses after a network failure or HTTP 502, 503 or 504.
+Each address is tried at most once per operation. When multiple addresses are configured,
+each retryable read attempt has a 10-second timeout, including reading the response body.
+Other HTTP errors do not trigger switching.
+
+Authentication and saving states retain their existing timeout behavior. Saving states is never
+repeated automatically: a connection failure is returned to the caller and selects the next address
+for subsequent operations. Cancellation does not switch addresses.
+The selected address is kept in memory, including across `init()` calls with the same API key and
+normalized, ordered API addresses. Changing the key or addresses, or reloading the page, starts
+with the primary again. There are no background requests.
+
+Authentication retries use the same identity on another address of the same API. The existing user
+and token are reused; if the original response was lost, another authentication event may be logged.
+SCORM startup waits for these attempts within the original session and fails only if none succeeds.
+
 ## Stable content URL
 
 For SCORM players that launch different SCOs from the same browser URL, provide a stable canonical
@@ -223,8 +261,12 @@ remote UI/API available offline.
 
 Requirements:
 
-- Node.js >=22.12
-- Bun
+- Bun >=1.4.4 <2
+- Git for release commands
+
+`bunfig.toml` runs JavaScript CLIs and their subprocesses with Bun, including tools with Node
+shebangs. Separate Node.js and npm installations are not required. Node-compatible APIs used by
+tooling are supplied by Bun and `@types/bun`.
 
 To install dependencies:
 
@@ -302,7 +344,7 @@ Edit `RELEASE_NOTES.md` to update the site's release notes. Use `# v2` (or the r
 for a version group and `## 2.4.0 — Title` for each release. Write descriptions with ordinary
 Markdown paragraphs, lists, links and inline code; no HTML is needed. Put new releases first
 in their group. The site renders the file during development and production builds, displaying
-the current major and collapsing older groups automatically. `bun dev` reloads the page when
+the five latest entries of the current major and collapsing earlier entries and older majors. `bun dev` reloads the page when
 the file changes. Release notes are maintained manually; `release-it` does not overwrite this file.
 
 Prepare and inspect a release without changing the repository:
@@ -317,11 +359,14 @@ Create the release commit and tag:
 bun run release
 ```
 
-`release-it` selects the next version from conventional commits, updates `package.json`, creates
-and pushes the release commit and `v*` tag. The tag workflow tests and builds the exact revision,
+`release-it` selects the next version from conventional commits, updates `package.json` through
+`@release-it/bumper`, creates and pushes the release commit and `v*` tag. The tag workflow tests
+and builds the exact revision,
 publishes the npm package and GHCR image, deploys the SDK site through Coolify, and creates the
 GitHub Release. Configure the repository secrets `COOLIFY_WEBHOOK` and `COOLIFY_TOKEN` before the
-first deployment.
+first deployment. The built-in npm plugin is disabled. CI packs with `bun pm pack`; publishing
+runs a pinned npm CLI through `bunx --bun` to retain trusted publishing and provenance, which
+`bun publish` does not yet generate. No separate Node.js runtime is installed.
 
 ### Learning results
 

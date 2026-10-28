@@ -34,10 +34,13 @@ describe("message listener registration", () => {
     const user = { uid: "1", token: "t", is_admin: false };
 
     // Mock the API response
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(user),
-    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(user),
+      }),
+    );
 
     // Spy on addEventListener
     const addEventListenerSpy = vi.spyOn(window, "addEventListener");

@@ -34,7 +34,7 @@ function request(origin: string, source: Window | null): MessageEvent {
 beforeEach(() => {
   setupSdk();
   init({ apiKey: "key", realm: "test" });
-  global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => user });
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => user }));
 });
 afterEach(() => {
   document.body.replaceChildren();

@@ -348,6 +348,11 @@ export interface PumpRoomConfig {
   trustedOrigins?: string[];
   /** PumpRoom API base URL. May include a path prefix for an on-premises deployment. */
   apiBaseUrl?: string;
+  /** Ordered alternative API URLs for the same installation. No health-check requests are sent.
+   * When both URL options are omitted, cloud defaults apply. An explicit apiBaseUrl has no implicit fallbacks.
+   * An empty array disables fallbacks. All addresses must share data, keys and user tokens.
+   */
+  fallbackApiBaseUrls?: string[];
   /** Stable URL identifying the current LMS content. Overrides the browser URL when provided. */
   pageUrl?: string;
   /** API key for authenticating with the PumpRoom API */
@@ -392,6 +397,8 @@ export interface InternalConfig {
   trustedOrigins?: string[];
   /** Normalized PumpRoom API base URL without a trailing slash. */
   apiBaseUrl: string;
+  /** Normalized, deduplicated alternative API addresses in priority order. */
+  fallbackApiBaseUrls: string[];
   /** Normalized explicit LMS content URL, when configured. */
   pageUrl?: string;
   /** API key for authenticating with the PumpRoom API */

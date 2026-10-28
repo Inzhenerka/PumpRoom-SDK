@@ -9,7 +9,17 @@ export default defineConfig({
     __VERSION__: JSON.stringify(pkg.version),
   },
   test: {
-    environment: "jsdom",
+    environment: "happy-dom",
+    setupFiles: ["./tests/setup.ts"],
+    environmentOptions: {
+      happyDOM: {
+        settings: {
+          // Create iframe windows for messaging tests without loading remote pages.
+          enableIframePageLoading: true,
+          navigation: { disableChildFrameNavigation: true },
+        },
+      },
+    },
     coverage: {
       provider: "istanbul",
       reporter: ["text", "html", "json-summary", "json"],

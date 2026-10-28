@@ -1,11 +1,10 @@
 import {
-  API_BASE_URL,
   AUTH_URL,
   GET_STATES_URL,
   LOAD_COURSE_URL,
   SET_STATES_URL,
   VERIFY_URL,
-  normalizeApiBaseUrl,
+  resolveApiBaseUrls,
 } from "./constants.ts";
 import { getApiClientInstance, getConfig, setApiClientInstance } from "./globals.ts";
 import type { FetchStatesInput, StoreStatesInput } from "./types/index.ts";
@@ -47,15 +46,92 @@ type RequestContext = LMSContextAPI & {
  */
 export class ApiClient {
   private readonly apiKey: string;
-  private readonly apiBaseUrl: string;
+  private readonly apiBaseUrls: string[];
+  private activeAddress = 0;
 
-  constructor(apiKey: string, apiBaseUrl = API_BASE_URL) {
+  constructor(apiKey: string, apiBaseUrl?: string, fallbackApiBaseUrls?: readonly string[]) {
     this.apiKey = apiKey;
-    this.apiBaseUrl = normalizeApiBaseUrl(apiBaseUrl);
+    this.apiBaseUrls = resolveApiBaseUrls(apiBaseUrl, fallbackApiBaseUrls);
   }
 
-  private endpoint(defaultUrl: string): string {
-    return `${this.apiBaseUrl}${new URL(defaultUrl).pathname}`;
+  /** Routing can be reused only for the same key and ordered, normalized addresses. */
+  hasSameConfiguration(other: ApiClient): boolean {
+    return (
+      this.apiKey === other.apiKey &&
+      this.apiBaseUrls.length === other.apiBaseUrls.length &&
+      this.apiBaseUrls.every((url, index) => url === other.apiBaseUrls[index])
+    );
+  }
+
+  /** Retry only operations known to be safe to repeat, even though this API uses POST for reads. */
+  private async request<T>(
+    url: string,
+    payload: unknown,
+    errorPrefix: string,
+    retryable: boolean,
+    signal?: AbortSignal,
+  ): Promise<T> {
+    const assertNotAborted = () => {
+      if (signal?.aborted) throw signal.reason ?? new DOMException("Request aborted", "AbortError");
+    };
+    const body = JSON.stringify(payload);
+    let address = this.activeAddress;
+    for (let attempt = 0; attempt < this.apiBaseUrls.length; attempt++) {
+      assertNotAborted();
+      const controller =
+        retryable && url !== AUTH_URL && this.apiBaseUrls.length > 1
+          ? new AbortController()
+          : undefined;
+      let timedOut = false;
+      const onAbort = () => controller?.abort(signal?.reason);
+      signal?.addEventListener("abort", onAbort, { once: true });
+      // Bound retryable attempts; authentication and writes retain their existing timeout behavior.
+      const timeout = controller
+        ? setTimeout(() => {
+            timedOut = true;
+            controller.abort(new DOMException("API request timed out", "TimeoutError"));
+          }, 10000)
+        : undefined;
+      let response: Response | undefined;
+      let failure: unknown;
+      try {
+        response = await fetch(`${this.apiBaseUrls[address]}${new URL(url).pathname}`, {
+          ...((controller?.signal ?? signal) ? { signal: controller?.signal ?? signal } : {}),
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-API-KEY": this.apiKey },
+          body,
+        });
+        assertNotAborted();
+        if (controller?.signal.aborted) throw controller.signal.reason;
+        if (response.ok) {
+          const result = (await response.json()) as T;
+          assertNotAborted();
+          if (controller?.signal.aborted) throw controller.signal.reason;
+          return result;
+        }
+      } catch (error) {
+        // Cancellation and invalid responses are not evidence that another address should be tried.
+        assertNotAborted();
+        if (!timedOut && !(error instanceof TypeError)) throw error;
+        failure = timedOut ? controller!.signal.reason : error;
+      } finally {
+        if (timeout !== undefined) clearTimeout(timeout);
+        signal?.removeEventListener("abort", onAbort);
+      }
+      if (response && !response.ok) {
+        failure = new Error(`${errorPrefix}: ${response.status} ${response.statusText}`);
+        if (response.status !== 502 && response.status !== 503 && response.status !== 504) {
+          throw failure;
+        }
+        void response.body?.cancel().catch(() => {});
+      }
+      // A late failure from an older concurrent request must not skip the currently selected address.
+      const next = (address + 1) % this.apiBaseUrls.length;
+      if (this.activeAddress === address) this.activeAddress = next;
+      if (!retryable || attempt === this.apiBaseUrls.length - 1) throw failure;
+      address = next;
+    }
+    throw new Error("No API address available");
   }
 
   /**
@@ -105,21 +181,13 @@ export class ApiClient {
       context: this.buildContext(),
     };
 
-    const resp = await fetch(this.endpoint(VERIFY_URL), {
-      ...(signal ? { signal } : {}),
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": this.apiKey,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!resp.ok) {
-      throw new Error(`User verification error: ${resp.status} ${resp.statusText}`);
-    }
-
-    return (await resp.json()) as VerifyTokenResult;
+    return this.request<VerifyTokenResult>(
+      VERIFY_URL,
+      payload,
+      "User verification error",
+      true,
+      signal,
+    );
   }
 
   /**
@@ -148,21 +216,7 @@ export class ApiClient {
       context: this.buildContext(),
     };
 
-    const response = await fetch(this.endpoint(AUTH_URL), {
-      ...(options.signal ? { signal: options.signal } : {}),
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": this.apiKey,
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (response.ok) {
-      return (await response.json()) as PumpRoomUser;
-    } else {
-      throw new Error(`Authentication error: ${response.status} ${response.statusText}`);
-    }
+    return this.request<PumpRoomUser>(AUTH_URL, body, "Authentication error", true, options.signal);
   }
 
   /**
@@ -195,20 +249,7 @@ export class ApiClient {
       sdk_version: getVersion(),
     };
 
-    const response = await fetch(this.endpoint(LOAD_COURSE_URL), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": this.apiKey,
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Request error: ${response.status} ${response.statusText}`);
-    }
-
-    return (await response.json()) as LoadCourseDataOutput;
+    return this.request<LoadCourseDataOutput>(LOAD_COURSE_URL, body, "Request error", true);
   }
 
   /**
@@ -245,20 +286,7 @@ export class ApiClient {
       sdk_version: getVersion(),
       context,
     };
-    const response = await fetch(this.endpoint(GET_STATES_URL), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": this.apiKey,
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Request error: ${response.status} ${response.statusText}`);
-    }
-
-    return (await response.json()) as StatesResponse;
+    return this.request<StatesResponse>(GET_STATES_URL, body, "Request error", true);
   }
 
   /**
@@ -298,20 +326,7 @@ export class ApiClient {
       sdk_version: getVersion(),
       context,
     };
-    const response = await fetch(this.endpoint(SET_STATES_URL), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": this.apiKey,
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Request error: ${response.status} ${response.statusText}`);
-    }
-
-    return (await response.json()) as StatesResponse;
+    return this.request<StatesResponse>(SET_STATES_URL, body, "Request error", false);
   }
 }
 
@@ -329,8 +344,14 @@ export class ApiClient {
  * const client = getApiClient();
  * ```
  */
-export function initApiClient(apiKey: string, apiBaseUrl = API_BASE_URL): void {
-  setApiClientInstance(new ApiClient(apiKey, apiBaseUrl));
+export function initApiClient(
+  apiKey: string,
+  apiBaseUrl?: string,
+  fallbackApiBaseUrls?: readonly string[],
+): void {
+  const client = new ApiClient(apiKey, apiBaseUrl, fallbackApiBaseUrls);
+  const current = getApiClientInstance();
+  if (!current?.hasSameConfiguration(client)) setApiClientInstance(client);
 }
 
 /**
@@ -346,5 +367,7 @@ export function initApiClient(apiKey: string, apiBaseUrl = API_BASE_URL): void {
  * ```
  */
 export function getApiClient(): ApiClient {
-  return getApiClientInstance();
+  const client = getApiClientInstance();
+  if (!client) throw new Error("API client is not initialized. Call initApiClient first.");
+  return client;
 }

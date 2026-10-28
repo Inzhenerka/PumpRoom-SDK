@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1.7
 
-FROM oven/bun:1.4.2-alpine@sha256:d888c0ae6c86d7866ff10c5aafdd9077b36aee6455b33dd270fb93c0dd5cef6f AS builder
+FROM oven/bun:1.4.4-alpine@sha256:4cf82f5686b196504fe119db3fcd9185b191f82ece82c40680e597228ec6070a AS builder
 
 WORKDIR /app
 
-COPY package.json bun.lock ./
+COPY package.json bun.lock bunfig.toml ./
 RUN bun install --frozen-lockfile
 
 COPY README.md RELEASE_NOTES.md index.html site.ts releaseNotes.ts tsconfig.json tsconfig.build.json typedoc.json ./

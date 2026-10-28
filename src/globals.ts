@@ -7,7 +7,7 @@
  * @module Globals
  */
 import type { ApiClient } from "./api-client.ts";
-import { API_BASE_URL, normalizeApiBaseUrl, normalizePageUrl } from "./constants.ts";
+import { resolveApiBaseUrls, normalizePageUrl } from "./constants.ts";
 import type { OnTaskResultChangedCallback } from "./types/index.ts";
 import type {
   InstanceContext,
@@ -63,14 +63,23 @@ export function setConfig(cfg: PumpRoomConfig): void {
       throw new Error(`${field} must be a non-empty string`);
     }
   }
-  const apiBaseUrl = normalizeApiBaseUrl(cfg.apiBaseUrl ?? API_BASE_URL);
+  const [apiBaseUrl, ...fallbackApiBaseUrls] = resolveApiBaseUrls(
+    cfg.apiBaseUrl,
+    cfg.fallbackApiBaseUrls,
+  );
   const pageUrl = cfg.pageUrl === undefined ? undefined : normalizePageUrl(cfg.pageUrl);
   const authenticationScopeChanged =
     config !== null &&
     (config.apiKey !== cfg.apiKey ||
       config.realm !== cfg.realm ||
       config.apiBaseUrl !== apiBaseUrl);
-  const { cacheUser = true, apiBaseUrl: _apiBaseUrl, pageUrl: _pageUrl, ...rest } = cfg;
+  const {
+    cacheUser = true,
+    apiBaseUrl: _apiBaseUrl,
+    fallbackApiBaseUrls: _fallbackApiBaseUrls,
+    pageUrl: _pageUrl,
+    ...rest
+  } = cfg;
   let trustedOrigins: string[] | undefined;
   if (cfg.trustedOrigins !== undefined) {
     if (!Array.isArray(cfg.trustedOrigins)) throw new Error("trustedOrigins must be an array");
@@ -102,7 +111,8 @@ export function setConfig(cfg: PumpRoomConfig): void {
   }
   config = {
     ...rest,
-    apiBaseUrl,
+    apiBaseUrl: apiBaseUrl!,
+    fallbackApiBaseUrls,
     cacheUser,
     ...(pageUrl ? { pageUrl } : {}),
     ...(trustedOrigins ? { trustedOrigins } : {}),
@@ -322,7 +332,7 @@ export function getOnResultReadyCallback(): OnResultReadyCallback | null {
  *
  * @param client - The API client instance
  */
-export function setApiClientInstance(client: ApiClient): void {
+export function setApiClientInstance(client: ApiClient | null): void {
   apiClientInstance = client;
 }
 
@@ -330,12 +340,8 @@ export function setApiClientInstance(client: ApiClient): void {
  * Gets the API client instance
  *
  * @returns The API client instance or null if not set
- * @throws Error if the API client is not initialized
  */
-export function getApiClientInstance(): ApiClient {
-  if (!apiClientInstance) {
-    throw new Error("API client is not initialized. Call initApiClient first.");
-  }
+export function getApiClientInstance(): ApiClient | null {
   return apiClientInstance;
 }
 

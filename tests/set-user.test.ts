@@ -14,7 +14,10 @@ describe("setUser", () => {
     // enable caching
     setConfig({ apiKey: "key", realm: "test", cacheUser: true });
     const verifyResp = { is_valid: true, is_admin: true };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) }),
+    );
 
     const result = await setUser({ uid: mockUser.uid, token: mockUser.token });
 
@@ -26,7 +29,10 @@ describe("setUser", () => {
 
   it("returns null and logs error on invalid user", async () => {
     const verifyResp = { is_valid: false, is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) }),
+    );
     const err = vi.spyOn(console, "error").mockImplementation(() => {});
     const removeSpy = vi.spyOn(localStorage, "removeItem");
 

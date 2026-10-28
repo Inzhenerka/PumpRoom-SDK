@@ -34,6 +34,12 @@ describe("globals", () => {
     ["realm", undefined],
     ["realm", 123],
     ["apiBaseUrl", "not-a-url"],
+    ["fallbackApiBaseUrls", "https://backup.example"],
+    ["fallbackApiBaseUrls", ["not-a-url"]],
+    ["fallbackApiBaseUrls", ["https://user:password@backup.example"]],
+    ["fallbackApiBaseUrls", ["https://backup.example?key=secret"]],
+    ["fallbackApiBaseUrls", ["https://backup.example#fragment"]],
+    ["fallbackApiBaseUrls", Array(1)],
     ["trustedOrigins", ["not-an-origin"]],
     ["trustedOrigins", ["*"]],
     ["trustedOrigins", [123]],
@@ -60,6 +66,7 @@ describe("globals", () => {
       apiKey: "key",
       realm: "test",
       apiBaseUrl: API_BASE_URL,
+      fallbackApiBaseUrls: ["https://pumproom-api.inzhenerka-cloud.com"],
       cacheUser: true,
     });
   });

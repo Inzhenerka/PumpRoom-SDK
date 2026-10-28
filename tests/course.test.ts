@@ -7,12 +7,12 @@ import * as utils from "../src/utils.ts";
 import { setupSdk } from "./test-utils.ts";
 
 // Mock fetch
-global.fetch = vi.fn();
+vi.stubGlobal("fetch", vi.fn());
 
 describe("course", () => {
   beforeEach(() => {
     setupSdk();
-    global.fetch = vi.fn();
+    vi.stubGlobal("fetch", vi.fn());
     (global.fetch as any).mockReset();
   });
 
@@ -102,10 +102,13 @@ describe("course", () => {
       },
     };
     let resolveFetch!: (value: unknown) => void;
-    global.fetch = vi.fn().mockReturnValue(
-      new Promise((resolve) => {
-        resolveFetch = resolve;
-      }),
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockReturnValue(
+        new Promise((resolve) => {
+          resolveFetch = resolve;
+        }),
+      ),
     );
 
     const pending = loadCourseData();

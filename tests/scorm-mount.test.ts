@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 import { authenticate } from "../src/auth.ts";
+import { getApiClientInstance, setApiClientInstance } from "../src/globals.ts";
 import { mountScormTask, type MountedScormTask } from "../src/scorm/mount.ts";
 
 vi.mock("../src/auth.ts", () => ({ authenticate: vi.fn() }));
@@ -19,6 +20,7 @@ let values: Record<string, string>;
 let api: Record<string, ReturnType<typeof vi.fn>>;
 let mounted: MountedScormTask | undefined;
 beforeEach(() => {
+  setApiClientInstance(null);
   vi.useFakeTimers();
   values = {
     "cmi.learner_id": "student:42",
@@ -206,4 +208,79 @@ it("requires a real LMS and matching realm", async () => {
   delete (window as unknown as Record<string, unknown>).API_1484_11;
   await expect(mountScormTask(container, options)).rejects.toThrow("not accessible");
   expect(authenticate).not.toHaveBeenCalled();
+});
+
+it("forwards on-premises backup addresses to the SDK client", async () => {
+  const fetchMock = vi
+    .fn<typeof fetch>()
+    .mockRejectedValueOnce(new TypeError("offline"))
+    .mockResolvedValueOnce(new Response(JSON.stringify({ is_valid: true, is_admin: false })));
+  vi.stubGlobal("fetch", fetchMock);
+  try {
+    const pending = mountScormTask(container, {
+      ...options,
+      apiBaseUrl: "https://primary.example/api",
+      fallbackApiBaseUrls: ["https://backup.example/api"],
+    });
+    await Promise.resolve();
+    send("onTaskLoaded");
+    mounted = await pending;
+    await getApiClientInstance()!.verifyToken(user, "school");
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "https://primary.example/api/integration/verify_token",
+      "https://backup.example/api/integration/verify_token",
+    ]);
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});
+
+it("closes SCORM only after authentication fails on every address", async () => {
+  const actual = await vi.importActual<typeof import("../src/auth.ts")>("../src/auth.ts");
+  vi.mocked(authenticate).mockImplementation(actual.authenticate);
+  const fetchMock = vi.fn<typeof fetch>().mockRejectedValue(new TypeError("Primary unavailable"));
+  vi.stubGlobal("fetch", fetchMock);
+  try {
+    await expect(
+      mountScormTask(container, {
+        ...options,
+        apiBaseUrl: "https://primary.example/api",
+        fallbackApiBaseUrls: ["https://backup.example/api"],
+      }),
+    ).rejects.toThrow("Primary unavailable");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(container.querySelector("iframe")).toBeNull();
+    expect(api.Terminate).toHaveBeenCalledTimes(1);
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});
+
+it("starts SCORM through a backup within the original session", async () => {
+  const actual = await vi.importActual<typeof import("../src/auth.ts")>("../src/auth.ts");
+  vi.mocked(authenticate).mockImplementation(actual.authenticate);
+  const fetchMock = vi
+    .fn<typeof fetch>()
+    .mockRejectedValueOnce(new TypeError("Primary unavailable"))
+    .mockResolvedValueOnce(new Response(JSON.stringify(user)));
+  vi.stubGlobal("fetch", fetchMock);
+  try {
+    const pending = mountScormTask(container, {
+      ...options,
+      apiBaseUrl: "https://primary.example/api",
+      fallbackApiBaseUrls: ["https://backup.example/api"],
+    });
+    await vi.waitFor(() => expect(container.querySelector("iframe")).not.toBeNull());
+    expect(api.Initialize).toHaveBeenCalledTimes(1);
+    expect(api.Terminate).not.toHaveBeenCalled();
+    send("onTaskLoaded");
+    mounted = await pending;
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "https://primary.example/api/integration/authenticate",
+      "https://backup.example/api/integration/authenticate",
+    ]);
+    expect(authenticate).toHaveBeenCalledTimes(1);
+  } finally {
+    vi.unstubAllGlobals();
+  }
 });

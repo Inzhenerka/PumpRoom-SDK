@@ -16,7 +16,7 @@ describe("GetCourse UID validation", () => {
   it("alerts and throws when id contains curly braces", async () => {
     const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
     // Ensure no network call happens
-    global.fetch = vi.fn();
+    vi.stubGlobal("fetch", vi.fn());
 
     await expect(authenticate({ identity: { provider: "lms", id: "{user_id}" } })).rejects.toThrow(
       "GetCourse UID validation failed",
@@ -28,7 +28,7 @@ describe("GetCourse UID validation", () => {
 
   it("alerts and throws when id is missing", async () => {
     const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
-    global.fetch = vi.fn();
+    vi.stubGlobal("fetch", vi.fn());
 
     await expect(
       // id omitted entirely
@@ -42,7 +42,10 @@ describe("GetCourse UID validation", () => {
   it("proceeds to authenticate when id is valid", async () => {
     const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
     const response = { uid: "ok", token: "tok", is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) }),
+    );
 
     const user = await authenticate({ identity: { provider: "lms", id: "12345" } });
 

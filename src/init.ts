@@ -15,7 +15,7 @@ export function init(cfg: PumpRoomConfig): void {
   setConfig(cfg);
   const config = getConfig();
   if (!config) throw new Error("SDK configuration failed");
-  initApiClient(config.apiKey, config.apiBaseUrl);
+  initApiClient(config.apiKey, config.apiBaseUrl, config.fallbackApiBaseUrls);
   setFullscreenListener();
   setEnvironmentListener();
   setTaskListener();

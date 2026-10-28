@@ -6,7 +6,7 @@ import * as utils from "../src/utils.ts";
 import * as version from "../src/version.ts";
 
 // Mock fetch
-global.fetch = vi.fn();
+vi.stubGlobal("fetch", vi.fn());
 
 // No need to mock version - use actual version from package.json
 
@@ -73,7 +73,7 @@ describe("ApiClient", () => {
       // Validate fetch was called with correct URL and options
       expect(global.fetch).toHaveBeenCalled();
       const call = (global.fetch as any).mock.calls[0];
-      expect(call[0]).toBe("https://pumproom-api.inzhenerka-cloud.com/tracker/get_states");
+      expect(call[0]).toBe("https://api.pumproom.tech/tracker/get_states");
       const opts = call[1];
       expect(opts).toEqual(
         expect.objectContaining({
@@ -128,7 +128,7 @@ describe("ApiClient", () => {
       // Validate fetch was called with correct URL and options
       expect(global.fetch).toHaveBeenCalled();
       const call = (global.fetch as any).mock.calls[0];
-      expect(call[0]).toBe("https://pumproom-api.inzhenerka-cloud.com/tracker/set_states");
+      expect(call[0]).toBe("https://api.pumproom.tech/tracker/set_states");
       const opts = call[1];
       expect(opts).toEqual(
         expect.objectContaining({
@@ -190,7 +190,7 @@ describe("ApiClient", () => {
       expect(result).toEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalled();
       const call = (global.fetch as any).mock.calls[0];
-      expect(call[0]).toBe("https://pumproom-api.inzhenerka-cloud.com/course/load");
+      expect(call[0]).toBe("https://api.pumproom.tech/course/load");
       const opts = call[1];
       expect(opts).toEqual(
         expect.objectContaining({

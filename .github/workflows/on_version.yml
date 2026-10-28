@@ -22,12 +22,7 @@ jobs:
       - name: ⚙️ Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.4.2
-
-      - name: ⚙️ Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
+          bun-version: 1.4.4
 
       - name: 💪 Install deps
         run: bun install --frozen-lockfile
@@ -35,7 +30,7 @@ jobs:
       - name: 🏷️ Verify package version
         shell: bash
         run: |
-          package_version=$(node -p "require('./package.json').version")
+          package_version=$(bun -p "require('./package.json').version")
           if [ "${GITHUB_REF_NAME}" != "v${package_version}" ]; then
             echo "Tag ${GITHUB_REF_NAME} does not match package version ${package_version}" >&2
             exit 1
@@ -65,7 +60,7 @@ jobs:
       - name: 📦 Pack npm package
         run: |
           mkdir -p npm-package
-          npm pack --ignore-scripts --pack-destination npm-package
+          bun pm pack --ignore-scripts --destination npm-package
 
       - name: 📤 Upload release archive
         uses: actions/upload-artifact@v4
@@ -95,15 +90,14 @@ jobs:
           name: npm-package
           path: npm-package
 
-      - name: ⚙️ Setup Node.js
-        uses: actions/setup-node@v6
+      - name: ⚙️ Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "24"
-          registry-url: "https://registry.npmjs.org"
-          package-manager-cache: false
+          bun-version: 1.4.4
 
       - name: 📦 Publish package
-        run: npm publish ./npm-package/*.tgz --ignore-scripts --provenance
+        # Bun publish does not yet generate provenance. Run the pinned npm CLI on Bun.
+        run: bunx --bun npm@12.2.1 publish ./npm-package/*.tgz --registry=https://registry.npmjs.org --ignore-scripts --provenance
 
   deploy:
     name: 🚀 Deploy to production

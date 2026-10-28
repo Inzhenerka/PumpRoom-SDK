@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "typeRoots": ["types", "node_modules/@types"],
-    "types": ["node", "vite/client", "highlightjs-copy"],
+    "types": ["bun", "vite/client", "highlightjs-copy"],
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,

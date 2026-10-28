@@ -2,6 +2,7 @@
 
 !package.json
 !bun.lock
+!bunfig.toml
 !README.md
 !RELEASE_NOTES.md
 !releaseNotes.ts

@@ -1,5 +1,5 @@
 [install]
-# Use the exact versions specified in package.json
+# Save compatible version ranges when adding dependencies
 exact = false
 
 # Enable peer dependency auto-installation
@@ -9,3 +9,8 @@ peer = true
 cache = true
 
 minimumReleaseAge = 432000
+
+[run]
+# Run JavaScript CLIs and their subprocesses with Bun, including Node shebangs.
+bun = true
+shell = "bun"

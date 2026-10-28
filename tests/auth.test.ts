@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { initApiClient } from "../src/api-client.ts";
 import { authenticate, setUser } from "../src/auth.ts";
 import { AUTH_URL, VERIFY_URL } from "../src/constants.ts";
-import { getCurrentUser, setConfig, setCurrentUser } from "../src/globals.ts";
+import { getCurrentUser, getConfig, setConfig, setCurrentUser } from "../src/globals.ts";
+import { init } from "../src/init.ts";
 import { getTestFrame, setupSdk, trustedMessage } from "./test-utils.ts";
 
 function boundCache(user: { uid: string; token: string; is_admin: boolean }, id: string) {
@@ -18,7 +19,7 @@ describe("authenticate", () => {
   it("rejects pre-aborted authentication without starting a request", async () => {
     const abort = new AbortController();
     abort.abort();
-    global.fetch = vi.fn();
+    vi.stubGlobal("fetch", vi.fn());
     await expect(
       authenticate({ identity: { provider: "lms", id: "student" }, signal: abort.signal }),
     ).rejects.toMatchObject({ name: "AbortError" });
@@ -28,18 +29,25 @@ describe("authenticate", () => {
   it("passes cancellation to fetch and never installs a late response", async () => {
     const abort = new AbortController();
     let finish!: (value: unknown) => void;
-    global.fetch = vi.fn().mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          finish = resolve;
-        }),
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            finish = resolve;
+          }),
+      ),
     );
     const pending = authenticate({
       identity: { provider: "lms", id: "student" },
       signal: abort.signal,
     });
-    expect(fetch).toHaveBeenCalledWith(AUTH_URL, expect.objectContaining({ signal: abort.signal }));
+    expect(fetch).toHaveBeenCalledWith(
+      AUTH_URL,
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    );
     abort.abort();
+    expect(vi.mocked(fetch).mock.calls[0]![1]!.signal!.aborted).toBe(true);
     finish({ ok: true, json: async () => ({ uid: "late", token: "late", is_admin: false }) });
     await expect(pending).rejects.toMatchObject({ name: "AbortError" });
     expect(getCurrentUser()).toBeNull();
@@ -49,19 +57,25 @@ describe("authenticate", () => {
     setConfig({ apiKey: "key", realm: "test", cacheUser: true });
     const cached = { uid: "student", token: "cached", is_admin: false };
     localStorage.setItem("pumproomUser", JSON.stringify(boundCache(cached, "student")));
-    global.fetch = vi
-      .fn()
-      .mockResolvedValue({ ok: true, json: async () => ({ is_valid: true, is_admin: false }) });
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue({ ok: true, json: async () => ({ is_valid: true, is_admin: false }) }),
+    );
     const abort = new AbortController();
     await authenticate({ identity: { provider: "lms", id: "student" }, signal: abort.signal });
     expect(fetch).toHaveBeenCalledWith(
       VERIFY_URL,
-      expect.objectContaining({ signal: abort.signal }),
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
   it("requests auth endpoint", async () => {
     const response = { uid: "1", token: "tok", is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) }),
+    );
 
     const user = await authenticate({
       identity: { provider: "lms", id: "lms-user-1" },
@@ -75,7 +89,10 @@ describe("authenticate", () => {
   it("authenticates without caching when localStorage access is denied", async () => {
     setConfig({ apiKey: "key", realm: "test", cacheUser: true });
     const response = { uid: "1", token: "tok", is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) }),
+    );
     const storageSpy = vi.spyOn(globalThis, "localStorage", "get").mockImplementation(() => {
       throw new DOMException("Access denied", "SecurityError");
     });
@@ -110,7 +127,10 @@ describe("authenticate", () => {
     );
 
     const verifyResp = { is_valid: true, is_admin: true };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) }),
+    );
 
     const user = await authenticate({
       identity: { provider: "lms", id: "lms-user-2" },
@@ -130,10 +150,13 @@ describe("authenticate", () => {
 
     const verifyResp = { is_valid: false, is_admin: false };
     const authResp = { uid: "3", token: "new", is_admin: false };
-    global.fetch = vi
-      .fn()
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(verifyResp) })
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(authResp) });
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(verifyResp) })
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(authResp) }),
+    );
 
     const user = await authenticate({
       identity: { provider: "lms", id: "lms-user-3" },
@@ -147,7 +170,10 @@ describe("authenticate", () => {
 
   it("throws on auth error", async () => {
     setConfig({ apiKey: "key", realm: "test", cacheUser: false });
-    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500, statusText: "fail" });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: false, status: 500, statusText: "fail" }),
+    );
 
     await expect(
       authenticate({
@@ -159,7 +185,10 @@ describe("authenticate", () => {
 
   it("sends LMS identity fields to auth endpoint", async () => {
     const response = { uid: "4", token: "tok", is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) }),
+    );
 
     await authenticate({
       identity: {
@@ -182,7 +211,10 @@ describe("setUser", () => {
   it("verifies and sets a user with valid token", async () => {
     const userInput = { uid: "123", token: "valid-token" };
     const verifyResp = { is_valid: true, is_admin: true };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) }),
+    );
 
     const user = await setUser(userInput);
 
@@ -194,7 +226,10 @@ describe("setUser", () => {
   it("returns null when token verification fails", async () => {
     const userInput = { uid: "123", token: "invalid-token" };
     const verifyResp = { is_valid: false, is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) }),
+    );
 
     const user = await setUser(userInput);
 
@@ -204,7 +239,7 @@ describe("setUser", () => {
 
   it("returns null when verification request fails", async () => {
     const userInput = { uid: "123", token: "token" };
-    global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("Network error")));
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const user = await setUser(userInput);
@@ -217,7 +252,10 @@ describe("setUser", () => {
     setConfig({ apiKey: "key", realm: "test", cacheUser: true });
     const userInput = { uid: "123", token: "valid-token" };
     const verifyResp = { is_valid: true, is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) }),
+    );
 
     await setUser(userInput);
 
@@ -229,7 +267,10 @@ describe("setUser", () => {
 describe("default user listener", () => {
   it("responds to getPumpRoomUser messages", async () => {
     const response = { uid: "9", token: "tok", is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(response) }),
+    );
 
     await authenticate({ identity: { provider: "lms", id: "u" } });
 
@@ -254,7 +295,10 @@ describe("default user listener", () => {
 
   it("does nothing when current user is null", async () => {
     const verifyResp = { is_valid: true, is_admin: false };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(verifyResp) }),
+    );
 
     await setUser({ uid: "1", token: "t" });
     setCurrentUser(null);
@@ -281,7 +325,7 @@ describe("error handling in authentication", () => {
     const user = { uid: "11", token: "token", is_admin: false };
     localStorage.setItem("pumproomUser", JSON.stringify(boundCache(user, "u")));
 
-    global.fetch = vi.fn().mockRejectedValue(new Error("API error"));
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("API error")));
 
     await expect(authenticate({ identity: { provider: "lms", id: "u" } })).rejects.toThrow(
       "API error",
@@ -295,10 +339,13 @@ describe("error handling in authentication", () => {
     setConfig({ apiKey: "key", realm: "test", cacheUser: true });
     const response = { uid: "12", token: "new-token", is_admin: false };
     localStorage.setItem("pumproomUser", JSON.stringify({ uid: "12" }));
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(response),
-    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(response),
+      }),
+    );
 
     const result = await authenticate({ identity: { provider: "lms", id: "u" } });
 
@@ -322,7 +369,7 @@ describe("identity-bound cache migration", () => {
     "resolves legacy credentials by current identity: $uid",
     async (resolved) => {
       localStorage.setItem("pumproomUser", JSON.stringify(oldUser));
-      global.fetch = vi.fn().mockResolvedValue(response(resolved));
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response(resolved)));
       expect(await authenticate({ identity })).toEqual(resolved);
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(fetch).toHaveBeenCalledWith(
@@ -346,10 +393,38 @@ describe("identity-bound cache migration", () => {
       "pumproomUser",
       JSON.stringify({ ...boundCache(oldUser, identity.id), authContext }),
     );
-    global.fetch = vi.fn().mockResolvedValue(response(newUser));
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response(newUser)));
     expect(await authenticate({ identity })).toEqual(newUser);
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith(AUTH_URL, expect.any(Object));
+  });
+
+  it("verifies the cached user through a backup without changing the cache namespace", async () => {
+    const primary = "https://pump.example/api";
+    const backup = "https://backup.example/api";
+    init({ apiKey: "key", realm: "test", apiBaseUrl: primary, fallbackApiBaseUrls: [backup] });
+    const cached = {
+      ...boundCache(oldUser, identity.id),
+      authContext: { realm: "test", provider: "lms", id: identity.id, apiBaseUrl: primary },
+    };
+    localStorage.setItem("pumproomUser", JSON.stringify(cached));
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockRejectedValueOnce(new TypeError("offline"))
+        .mockResolvedValue({ ok: true, json: async () => ({ is_valid: true, is_admin: false }) }),
+    );
+    expect(await authenticate({ identity })).toEqual(oldUser);
+    expect(getCurrentUser()).toEqual(oldUser);
+    expect(getConfig()?.apiBaseUrl).toBe(primary);
+    expect(JSON.parse(localStorage.getItem("pumproomUser")!)).toEqual(cached);
+    expect(vi.mocked(fetch).mock.calls.map(([url]) => url)).toEqual([
+      `${primary}/integration/verify_token`,
+      `${backup}/integration/verify_token`,
+    ]);
+    await authenticate({ identity });
+    expect(vi.mocked(fetch).mock.calls[2]![0]).toBe(`${backup}/integration/verify_token`);
   });
 
   it("does not reuse cloud credentials with a custom API", async () => {
@@ -357,7 +432,7 @@ describe("identity-bound cache migration", () => {
     localStorage.setItem("pumproomUser", JSON.stringify(boundCache(oldUser, identity.id)));
     setConfig({ apiKey: "key", realm: "test", cacheUser: true, apiBaseUrl });
     initApiClient("key", apiBaseUrl);
-    global.fetch = vi.fn().mockResolvedValue(response(newUser));
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response(newUser)));
 
     expect(await authenticate({ identity })).toEqual(newUser);
     expect(fetch).toHaveBeenCalledTimes(1);
@@ -378,7 +453,7 @@ describe("identity-bound cache migration", () => {
       const raw = JSON.stringify(cached);
       localStorage.setItem("pumproomUser", raw);
       setCurrentUser(oldUser);
-      global.fetch = vi.fn().mockRejectedValue(new Error("offline"));
+      vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
       await expect(authenticate({ identity })).rejects.toThrow("offline");
       expect(localStorage.getItem("pumproomUser")).toBe(raw);
       expect(getCurrentUser()).toBeNull();
@@ -390,7 +465,7 @@ describe("identity-bound cache migration", () => {
     localStorage.setItem("pumproomUser", JSON.stringify(boundCache(oldUser, "{email}")));
     setCurrentUser(oldUser);
     vi.spyOn(window, "alert").mockImplementation(() => {});
-    global.fetch = vi.fn();
+    vi.stubGlobal("fetch", vi.fn());
     await expect(authenticate({ identity: { ...identity, id: "{email}" } })).rejects.toThrow(
       "GetCourse UID",
     );
@@ -400,15 +475,18 @@ describe("identity-bound cache migration", () => {
 
   it("rejects a stale auth response without overwriting the newer account", async () => {
     let finish!: (value: ReturnType<typeof response>) => void;
-    global.fetch = vi
-      .fn()
-      .mockImplementationOnce(
-        () =>
-          new Promise((resolve) => {
-            finish = resolve;
-          }),
-      )
-      .mockResolvedValueOnce(response(newUser));
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              finish = resolve;
+            }),
+        )
+        .mockResolvedValueOnce(response(newUser)),
+    );
     const stale = authenticate({ identity: { ...identity, id: "old" } });
     expect(getCurrentUser()).toBeNull();
     await authenticate({ identity });
@@ -423,15 +501,18 @@ describe("identity-bound cache migration", () => {
   it("rejects stale verification without restoring the old cache", async () => {
     localStorage.setItem("pumproomUser", JSON.stringify(boundCache(oldUser, "old")));
     let finish!: (value: unknown) => void;
-    global.fetch = vi
-      .fn()
-      .mockImplementationOnce(
-        () =>
-          new Promise((resolve) => {
-            finish = resolve;
-          }),
-      )
-      .mockResolvedValueOnce(response(newUser));
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              finish = resolve;
+            }),
+        )
+        .mockResolvedValueOnce(response(newUser)),
+    );
     const stale = authenticate({ identity: { ...identity, id: "old" } });
     await authenticate({ identity });
     finish({ ok: true, json: async () => ({ is_valid: true, is_admin: true }) });
@@ -443,10 +524,16 @@ describe("identity-bound cache migration", () => {
   });
 
   it("strips inherited context in setUser and migrates it on the next authenticate", async () => {
-    global.fetch = vi
-      .fn()
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ is_valid: true, is_admin: false }) })
-      .mockResolvedValueOnce(response(newUser));
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ is_valid: true, is_admin: false }),
+        })
+        .mockResolvedValueOnce(response(newUser)),
+    );
     await setUser(boundCache(oldUser, "old"));
     expect(JSON.parse(localStorage.getItem("pumproomUser")!)).toEqual(oldUser);
     expect(await authenticate({ identity })).toEqual(newUser);
@@ -454,15 +541,18 @@ describe("identity-bound cache migration", () => {
 
   it("does not let a pending setUser overwrite a newer authenticate", async () => {
     let finish!: (value: unknown) => void;
-    global.fetch = vi
-      .fn()
-      .mockImplementationOnce(
-        () =>
-          new Promise((resolve) => {
-            finish = resolve;
-          }),
-      )
-      .mockResolvedValueOnce(response(newUser));
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockImplementationOnce(
+          () =>
+            new Promise((resolve) => {
+              finish = resolve;
+            }),
+        )
+        .mockResolvedValueOnce(response(newUser)),
+    );
     const stale = setUser(oldUser);
     await authenticate({ identity });
     finish({ ok: true, json: async () => ({ is_valid: true, is_admin: false }) });

@@ -15,7 +15,16 @@ import {
  */
 export interface MountScormTaskOptions
   extends
-    Pick<PumpRoomConfig, "apiKey" | "realm" | "apiBaseUrl" | "pageUrl" | "cacheUser" | "context">,
+    Pick<
+      PumpRoomConfig,
+      | "apiKey"
+      | "realm"
+      | "apiBaseUrl"
+      | "fallbackApiBaseUrls"
+      | "pageUrl"
+      | "cacheUser"
+      | "context"
+    >,
     Omit<MountTaskOptions, "user" | "taskUid"> {
   /** UID of the task whose results should be reported to the LMS. */
   taskUid: string;
@@ -91,6 +100,7 @@ export async function mountScormTask(
       apiKey: options.apiKey,
       realm: options.realm,
       apiBaseUrl: options.apiBaseUrl,
+      fallbackApiBaseUrls: options.fallbackApiBaseUrls,
       pageUrl: options.pageUrl,
       cacheUser: options.cacheUser ?? false,
       context: options.context,

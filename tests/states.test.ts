@@ -39,14 +39,14 @@ import * as version from "../src/version.ts";
 import { mockUser, setupSdk } from "./test-utils.ts";
 
 // Mock fetch
-global.fetch = vi.fn();
+vi.stubGlobal("fetch", vi.fn());
 
 // No need to mock version - use actual version from package.json
 
 describe("states", () => {
   beforeEach(() => {
     setupSdk();
-    global.fetch = vi.fn();
+    vi.stubGlobal("fetch", vi.fn());
     vi.resetAllMocks();
     // Reset the fetch mock
     (global.fetch as any).mockReset();
@@ -99,7 +99,7 @@ describe("states", () => {
       expect(result).toEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalled();
       const call = (global.fetch as any).mock.calls[0];
-      expect(call[0]).toBe("https://pumproom-api.inzhenerka-cloud.com/tracker/get_states");
+      expect(call[0]).toBe("https://api.pumproom.tech/tracker/get_states");
       const opts = call[1];
       expect(opts).toEqual(
         expect.objectContaining({
@@ -167,10 +167,13 @@ describe("states", () => {
       const nextUrl = "https://lms.example/course/two";
       const urlSpy = vi.spyOn(utils, "getCurrentNormalizedUrl").mockReturnValue(initialUrl);
       let resolveFetch!: (value: unknown) => void;
-      global.fetch = vi.fn().mockReturnValue(
-        new Promise((resolve) => {
-          resolveFetch = resolve;
-        }),
+      vi.stubGlobal(
+        "fetch",
+        vi.fn().mockReturnValue(
+          new Promise((resolve) => {
+            resolveFetch = resolve;
+          }),
+        ),
       );
 
       const pending = fetchStates(["test1"]);
@@ -214,7 +217,7 @@ describe("states", () => {
       expect(result).toEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalled();
       const call = (global.fetch as any).mock.calls[0];
-      expect(call[0]).toBe("https://pumproom-api.inzhenerka-cloud.com/tracker/set_states");
+      expect(call[0]).toBe("https://api.pumproom.tech/tracker/set_states");
       const opts = call[1];
       expect(opts).toEqual(
         expect.objectContaining({
@@ -273,7 +276,7 @@ describe("states", () => {
       expect(result).toEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalled();
       const call = (global.fetch as any).mock.calls[0];
-      expect(call[0]).toBe("https://pumproom-api.inzhenerka-cloud.com/tracker/set_states");
+      expect(call[0]).toBe("https://api.pumproom.tech/tracker/set_states");
       const opts = call[1];
       expect(opts).toEqual(
         expect.objectContaining({
