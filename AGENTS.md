@@ -69,3 +69,7 @@
 - When adding build inputs, update both `Dockerfile` and the allowlist in `.dockerignore` as needed.
   The nginx image must build the same guide, docs and local assets as the normal site build.
 - Do not expose `.env.local` values, learner tokens or other credentials in logs or documentation.
+
+## Commit messages
+
+- Mark a commit as breaking only when the user explicitly asks. Otherwise omit the `!` marker in the subject and the `BREAKING CHANGE` or `BREAKING-CHANGE` footer, even if the change breaks compatibility.
