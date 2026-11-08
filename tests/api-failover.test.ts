@@ -159,7 +159,7 @@ describe("API failover", () => {
     const client = new ApiClient("key", primary, [backup]);
     fetchMock.mockRejectedValueOnce(new TypeError("primary offline"));
     fetchMock.mockRejectedValueOnce(new TypeError("backup offline"));
-    await expect(client.loadCourseData("realm")).rejects.toThrow("backup offline");
+    await expect(client.loadExternalCourseData("realm")).rejects.toThrow("backup offline");
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 

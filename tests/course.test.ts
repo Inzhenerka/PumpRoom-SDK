@@ -1,8 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { COURSE_STORAGE_PREFIX } from "../src/constants.ts";
-import { loadCourseData } from "../src/course.ts";
-import { getCourseFromLocalStorage, saveCourseToLocalStorage } from "../src/storage.ts";
+import { EXTERNAL_COURSE_STORAGE_PREFIX } from "../src/constants.ts";
+import { loadExternalCourseData } from "../src/external-course.ts";
+import {
+  getExternalCourseFromLocalStorage,
+  saveExternalCourseToLocalStorage,
+} from "../src/storage.ts";
 import * as utils from "../src/utils.ts";
 import { setupSdk } from "./test-utils.ts";
 
@@ -18,7 +21,7 @@ describe("course", () => {
 
   it("returns cached data via callback and refreshes from backend", async () => {
     const cached = {
-      course: {
+      external_course: {
         uid: "course-1",
         visible_name: "Course One",
         url: "https://example.com/course",
@@ -28,10 +31,10 @@ describe("course", () => {
         vote_task: null,
       },
     };
-    saveCourseToLocalStorage(cached);
+    saveExternalCourseToLocalStorage(cached);
 
     const fresh = {
-      course: {
+      external_course: {
         uid: "course-1",
         visible_name: "Course One",
         url: "https://example.com/course",
@@ -52,18 +55,18 @@ describe("course", () => {
     });
 
     const callback = vi.fn();
-    const result = await loadCourseData(callback);
+    const result = await loadExternalCourseData(callback);
 
     expect(result).toEqual(fresh);
     expect(callback).toHaveBeenCalledTimes(2);
     expect(callback.mock.calls[0][0]).toEqual(cached);
     expect(callback.mock.calls[1][0]).toEqual(fresh);
-    expect(getCourseFromLocalStorage()).toEqual(fresh);
+    expect(getExternalCourseFromLocalStorage()).toEqual(fresh);
   });
 
   it("calls callback once when cache is missing", async () => {
     const fresh = {
-      course: {
+      external_course: {
         uid: "course-2",
         visible_name: "Course Two",
         url: "https://example.com/course-2",
@@ -79,7 +82,7 @@ describe("course", () => {
     });
 
     const callback = vi.fn();
-    const result = await loadCourseData(callback);
+    const result = await loadExternalCourseData(callback);
 
     expect(result).toEqual(fresh);
     expect(callback).toHaveBeenCalledTimes(1);
@@ -91,7 +94,7 @@ describe("course", () => {
     const nextUrl = "https://lms.example/course/two";
     const urlSpy = vi.spyOn(utils, "getCurrentNormalizedUrl").mockReturnValue(initialUrl);
     const fresh = {
-      course: {
+      external_course: {
         uid: "course-1",
         visible_name: "Course One",
         url: initialUrl,
@@ -111,13 +114,13 @@ describe("course", () => {
       ),
     );
 
-    const pending = loadCourseData();
+    const pending = loadExternalCourseData();
     await vi.waitFor(() => expect(global.fetch).toHaveBeenCalled());
     urlSpy.mockReturnValue(nextUrl);
     resolveFetch({ ok: true, json: async () => fresh });
     await pending;
 
-    expect(localStorage.getItem(`${COURSE_STORAGE_PREFIX}:${initialUrl}`)).not.toBeNull();
-    expect(localStorage.getItem(`${COURSE_STORAGE_PREFIX}:${nextUrl}`)).toBeNull();
+    expect(localStorage.getItem(`${EXTERNAL_COURSE_STORAGE_PREFIX}:${initialUrl}`)).not.toBeNull();
+    expect(localStorage.getItem(`${EXTERNAL_COURSE_STORAGE_PREFIX}:${nextUrl}`)).toBeNull();
   });
 });

@@ -1,18 +1,18 @@
 /**
- * Course data module for PumpRoom SDK
+ * External LMS course data for PumpRoom SDK
  *
- * This module provides functionality for loading course information from the backend.
+ * This module provides functionality for loading external course information from the backend.
  * Course data is cached in localStorage for faster access during page load.
  *
- * @module Courses
+ * @module ExternalCourses
  * @category Courses
  * @experimental
  */
 
 import { getApiClient } from "./api-client.ts";
 import { getConfig } from "./globals.ts";
-import { getCourseFromLocalStorage, saveCourseToLocalStorage } from "./storage.ts";
-import type { CourseDataCallback, LoadCourseDataOutput } from "./types/index.ts";
+import { getExternalCourseFromLocalStorage, saveExternalCourseToLocalStorage } from "./storage.ts";
+import type { ExternalCourseDataCallback, LoadExternalCourseDataOutput } from "./types/index.ts";
 import { getCurrentNormalizedUrl } from "./utils.ts";
 
 /**
@@ -30,28 +30,30 @@ import { getCurrentNormalizedUrl } from "./utils.ts";
  * @experimental
  * @example
  * ```typescript
- * const data = await loadCourseData((cached) => {
- *   console.log('Cached course:', cached.course?.visible_name);
+ * const data = await loadExternalCourseData((cached) => {
+ *   console.log('Cached course:', cached.external_course?.visible_name);
  * });
- * console.log('Fresh course:', data.course?.visible_name);
+ * console.log('Fresh course:', data.external_course?.visible_name);
  * ```
  */
-export async function loadCourseData(callback?: CourseDataCallback): Promise<LoadCourseDataOutput> {
+export async function loadExternalCourseData(
+  callback?: ExternalCourseDataCallback,
+): Promise<LoadExternalCourseDataOutput> {
   const config = getConfig();
   if (!config) {
     throw new Error("SDK is not initialized");
   }
 
   const pageUrl = getCurrentNormalizedUrl();
-  const cached = getCourseFromLocalStorage(pageUrl);
+  const cached = getExternalCourseFromLocalStorage(pageUrl);
   if (cached && callback) {
     callback(cached);
   }
 
   const apiClient = getApiClient();
-  const response = await apiClient.loadCourseData(config.realm);
+  const response = await apiClient.loadExternalCourseData(config.realm);
 
-  saveCourseToLocalStorage(response, pageUrl);
+  saveExternalCourseToLocalStorage(response, pageUrl);
 
   if (callback) {
     callback(response);

@@ -163,10 +163,10 @@ describe("ApiClient", () => {
     });
   });
 
-  describe("loadCourseData", () => {
+  describe("loadExternalCourseData", () => {
     it("loads course data from the backend", async () => {
       const mockResponse = {
-        course: {
+        external_course: {
           uid: "course-1",
           visible_name: "Course One",
           url: "https://example.com/course",
@@ -186,11 +186,11 @@ describe("ApiClient", () => {
         json: async () => mockResponse,
       });
 
-      const result = await apiClient.loadCourseData("academy");
+      const result = await apiClient.loadExternalCourseData("academy");
       expect(result).toEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalled();
       const call = (global.fetch as any).mock.calls[0];
-      expect(call[0]).toBe("https://api.pumproom.tech/course/load");
+      expect(call[0]).toBe("https://api.pumproom.tech/external_course/load");
       const opts = call[1];
       expect(opts).toEqual(
         expect.objectContaining({
@@ -212,7 +212,7 @@ describe("ApiClient", () => {
       const urlSpy = vi.spyOn(utils, "getCurrentNormalizedUrl").mockReturnValue(null);
 
       await expect(async () => {
-        await apiClient.loadCourseData("academy");
+        await apiClient.loadExternalCourseData("academy");
       }).rejects.toThrow("Current URL is not available");
 
       urlSpy.mockRestore();
@@ -226,7 +226,7 @@ describe("ApiClient", () => {
       });
 
       await expect(async () => {
-        await apiClient.loadCourseData("academy");
+        await apiClient.loadExternalCourseData("academy");
       }).rejects.toThrow("Request error: 500 Internal Server Error");
     });
   });

@@ -1,13 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { COURSE_STORAGE_PREFIX, STORAGE_PREFIX, USER_STORAGE_KEY } from "../src/constants.ts";
 import {
-  generateCourseKey,
+  EXTERNAL_COURSE_STORAGE_PREFIX,
+  STORAGE_PREFIX,
+  USER_STORAGE_KEY,
+} from "../src/constants.ts";
+import {
+  generateExternalCourseKey,
   generateStateKey,
-  getCourseFromLocalStorage,
+  getExternalCourseFromLocalStorage,
   getStatesFromLocalStorage,
   retrieveData,
-  saveCourseToLocalStorage,
+  saveExternalCourseToLocalStorage,
   saveStatesToLocalStorage,
   storeData,
 } from "../src/storage.ts";
@@ -157,14 +161,14 @@ describe("storage", () => {
 
   describe("course storage operations", () => {
     it("generates correct course key", () => {
-      const key = generateCourseKey();
-      expect(key).toBe(`${COURSE_STORAGE_PREFIX}:http://localhost/test-page`);
+      const key = generateExternalCourseKey();
+      expect(key).toBe(`${EXTERNAL_COURSE_STORAGE_PREFIX}:http://localhost/test-page`);
       expect(utils.getCurrentNormalizedUrl).toHaveBeenCalled();
     });
 
     it("saves and retrieves course data", () => {
       const data = {
-        course: {
+        external_course: {
           uid: "course-1",
           visible_name: "Course One",
           url: "https://example.com/course",
@@ -175,13 +179,13 @@ describe("storage", () => {
         },
       };
 
-      saveCourseToLocalStorage(data);
-      const cached = getCourseFromLocalStorage();
+      saveExternalCourseToLocalStorage(data);
+      const cached = getExternalCourseFromLocalStorage();
       expect(cached).toEqual(data);
     });
 
     it("returns null when course cache is missing", () => {
-      const cached = getCourseFromLocalStorage();
+      const cached = getExternalCourseFromLocalStorage();
       expect(cached).toBeNull();
     });
   });

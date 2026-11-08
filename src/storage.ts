@@ -8,8 +8,8 @@
  * @module Storage
  */
 
-import { COURSE_STORAGE_PREFIX, STORAGE_PREFIX } from "./constants.ts";
-import type { LoadCourseDataOutput, StateOutput } from "./types/index.ts";
+import { EXTERNAL_COURSE_STORAGE_PREFIX, STORAGE_PREFIX } from "./constants.ts";
+import type { LoadExternalCourseDataOutput, StateOutput } from "./types/index.ts";
 import { getCurrentNormalizedUrl } from "./utils.js";
 
 /**
@@ -88,11 +88,13 @@ export function generateStateKey(
  *
  * @experimental
  */
-export function generateCourseKey(pageUrl: string | null = getCurrentNormalizedUrl()): string {
+export function generateExternalCourseKey(
+  pageUrl: string | null = getCurrentNormalizedUrl(),
+): string {
   if (!pageUrl) {
     throw new Error("Unable to determine current page URL");
   }
-  return `${COURSE_STORAGE_PREFIX}:${pageUrl}`;
+  return `${EXTERNAL_COURSE_STORAGE_PREFIX}:${pageUrl}`;
 }
 
 /**
@@ -161,12 +163,12 @@ export function getStatesFromLocalStorage(
  *
  * @experimental
  */
-export function saveCourseToLocalStorage(
-  data: LoadCourseDataOutput,
+export function saveExternalCourseToLocalStorage(
+  data: LoadExternalCourseDataOutput,
   pageUrl?: string | null,
 ): void {
   try {
-    const key = generateCourseKey(pageUrl);
+    const key = generateExternalCourseKey(pageUrl);
     localStorage.setItem(key, JSON.stringify(data));
   } catch (error) {
     console.warn("Failed to save course data to localStorage:", error);
@@ -181,11 +183,13 @@ export function saveCourseToLocalStorage(
  *
  * @experimental
  */
-export function getCourseFromLocalStorage(pageUrl?: string | null): LoadCourseDataOutput | null {
+export function getExternalCourseFromLocalStorage(
+  pageUrl?: string | null,
+): LoadExternalCourseDataOutput | null {
   try {
-    const key = generateCourseKey(pageUrl);
+    const key = generateExternalCourseKey(pageUrl);
     const cached = localStorage.getItem(key);
-    return cached ? (JSON.parse(cached) as LoadCourseDataOutput) : null;
+    return cached ? (JSON.parse(cached) as LoadExternalCourseDataOutput) : null;
   } catch (error) {
     console.warn("Failed to retrieve course data from localStorage:", error);
     return null;

@@ -35,7 +35,7 @@ export {
   setOnTaskLoadedCallback,
   setOnTaskSubmittedCallback,
 } from "./callbacks.ts";
-export { loadCourseData } from "./course.ts";
+export { loadExternalCourseData } from "./external-course.ts";
 export { getCurrentUser } from "./globals.ts";
 export { getTaskInstances } from "./instance.ts";
 export { connectScorm, ScormError } from "./scorm/index.ts";
@@ -44,16 +44,16 @@ export { clearStates, fetchStates, getRegisteredStates, storeStates } from "./st
 export type {
   AuthenticateOptions,
   CompletionStatus,
-  CourseDataCallback,
-  CourseDataOutput,
+  ExternalCourseDataCallback,
+  ExternalCourseDataOutput,
   EnvironmentData,
   IdentityProviderType,
   InstanceContext,
   LMSContext,
   LMSContextAPI,
   LMSIdentityInput,
-  LoadCourseDataInput,
-  LoadCourseDataOutput,
+  LoadExternalCourseDataInput,
+  LoadExternalCourseDataOutput,
   LoadedTaskData,
   OnInitCallback,
   OnResultReadyCallback,

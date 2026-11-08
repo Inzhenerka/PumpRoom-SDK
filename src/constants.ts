@@ -126,7 +126,7 @@ export const SET_STATES_URL = `${API_BASE_URL}/tracker/set_states`;
  *
  * @experimental
  */
-export const LOAD_COURSE_URL = `${API_BASE_URL}/course/load`;
+export const LOAD_EXTERNAL_COURSE_URL = `${API_BASE_URL}/external_course/load`;
 
 /** Standard origins used for iframe sizing and opt-in message sender checks. */
 export const DEFAULT_TRUSTED_ORIGINS = [
@@ -155,4 +155,4 @@ export const STORAGE_PREFIX = "pumproomState:";
  *
  * @experimental
  */
-export const COURSE_STORAGE_PREFIX = "pumproomCourse:";
+export const EXTERNAL_COURSE_STORAGE_PREFIX = "pumproomExternalCourse:";

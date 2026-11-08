@@ -1,7 +1,7 @@
 import {
   AUTH_URL,
   GET_STATES_URL,
-  LOAD_COURSE_URL,
+  LOAD_EXTERNAL_COURSE_URL,
   SET_STATES_URL,
   VERIFY_URL,
   resolveApiBaseUrls,
@@ -12,8 +12,8 @@ import {
   AuthenticateOptions,
   AuthInput,
   LMSContextAPI,
-  LoadCourseDataInput,
-  LoadCourseDataOutput,
+  LoadExternalCourseDataInput,
+  LoadExternalCourseDataOutput,
   PumpRoomUser,
   State,
   StatesResponse,
@@ -233,23 +233,28 @@ export class ApiClient {
    * @experimental
    * @example
    * ```typescript
-   * const result = await client.loadCourseData('academy');
-   * console.log(result.course?.visible_name);
+   * const result = await client.loadExternalCourseData('academy');
+   * console.log(result.external_course?.visible_name);
    * ```
    */
-  async loadCourseData(realm: string): Promise<LoadCourseDataOutput> {
+  async loadExternalCourseData(realm: string): Promise<LoadExternalCourseDataOutput> {
     const url = getCurrentNormalizedUrl();
     if (!url) {
       throw new Error("Current URL is not available");
     }
-    const body: LoadCourseDataInput = {
+    const body: LoadExternalCourseDataInput = {
       realm,
       url,
       context: this.buildContext(),
       sdk_version: getVersion(),
     };
 
-    return this.request<LoadCourseDataOutput>(LOAD_COURSE_URL, body, "Request error", true);
+    return this.request<LoadExternalCourseDataOutput>(
+      LOAD_EXTERNAL_COURSE_URL,
+      body,
+      "Request error",
+      true,
+    );
   }
 
   /**

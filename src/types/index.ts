@@ -277,7 +277,7 @@ export interface TaskDataOutput {
  * @category Courses
  * @experimental
  */
-export interface CourseDataOutput {
+export interface ExternalCourseDataOutput {
   /** Unique identifier of the course */
   uid: string;
   /** Display name of the course */
@@ -301,7 +301,7 @@ export interface CourseDataOutput {
  * @category Courses
  * @experimental
  */
-export interface LoadCourseDataInput extends RealmPayload {
+export interface LoadExternalCourseDataInput extends RealmPayload {
   /** Current page URL */
   url: string;
   /** LMS context information */
@@ -317,9 +317,9 @@ export interface LoadCourseDataInput extends RealmPayload {
  * @category Courses
  * @experimental
  */
-export interface LoadCourseDataOutput {
+export interface LoadExternalCourseDataOutput {
   /** Loaded course data or null if not found */
-  course: CourseDataOutput | null;
+  external_course: ExternalCourseDataOutput | null;
 }
 
 /**
@@ -329,7 +329,7 @@ export interface LoadCourseDataOutput {
  * @category Courses
  * @experimental
  */
-export type CourseDataCallback = (data: LoadCourseDataOutput) => void;
+export type ExternalCourseDataCallback = (data: LoadExternalCourseDataOutput) => void;
 
 /**
  * Configuration for initializing the SDK
